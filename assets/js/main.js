@@ -1,7 +1,7 @@
 /* ZYVA — main.js */
 
 /* ⚠️ TROQUE AQUI: número do WhatsApp da Zyva no formato 55 + DDD + número (só dígitos) */
-const WHATSAPP_NUMBER = "5585900000000";
+const WHATSAPP_NUMBER = "5598983493806";
 const WHATSAPP_DEFAULT_MSG = "Olá, Zyva! Quero um diagnóstico gratuito para minha empresa.";
 
 /* Aplica o número em todos os links de WhatsApp */
