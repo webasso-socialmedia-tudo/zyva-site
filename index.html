@@ -36,7 +36,7 @@
   }
   </script>
 </head>
-<body>
+<body class="home">
 
   <header class="site-header">
     <div class="container nav">
@@ -58,13 +58,42 @@
   </header>
 
   <section class="hero on-dark">
-    <div class="container">
-      <span class="kicker">Agência de marketing digital</span>
-      <h1>Sua empresa crescendo.<br />E você <em>vendo cada resultado</em>.</h1>
-      <p class="lead">A Zyva cuida do seu marketing de ponta a ponta — SEO, redes sociais, anúncios e conteúdo — com relatórios claros do retorno sobre cada real investido.</p>
-      <div class="hero-ctas">
-        <a href="/contato/" class="btn btn-primary">Pedir diagnóstico gratuito</a>
-        <a href="#" class="btn btn-ghost" data-wa>Chamar no WhatsApp</a>
+    <div class="container hero-grid">
+      <div>
+        <span class="kicker kicker-pill">Agência de marketing digital</span>
+        <h1>Sua empresa crescendo.<br />E você <em>vendo cada resultado</em>.</h1>
+        <p class="lead">A Zyva cuida do seu marketing de ponta a ponta — SEO, redes sociais, anúncios e conteúdo — com relatórios claros do retorno sobre cada real investido.</p>
+        <div class="hero-ctas">
+          <a href="/contato/" class="btn btn-primary">Pedir diagnóstico gratuito</a>
+          <a href="#" class="btn btn-ghost" data-wa>Chamar no WhatsApp</a>
+        </div>
+        <ul class="hero-points">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Resposta em 1 dia útil</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Relatório todo mês</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Todo o Brasil</li>
+        </ul>
+      </div>
+      <div class="hero-visual" aria-hidden="true">
+        <div class="mock mock-report">
+          <div class="mock-top"><span class="m-dot"></span><span class="m-dot"></span><span class="m-dot"></span><em>relatorio-mensal.pdf</em></div>
+          <strong class="m-title">De onde veio cada cliente</strong>
+          <svg class="m-chart" viewBox="0 0 260 112" aria-hidden="true">
+            <defs><linearGradient id="mg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#6C4CF1"/><stop offset="1" stop-color="#22D3EE"/></linearGradient></defs>
+            <rect x="6"   y="76" width="26" height="34" rx="6" fill="url(#mg)" opacity="0.45"/>
+            <rect x="43"  y="58" width="26" height="52" rx="6" fill="url(#mg)" opacity="0.55"/>
+            <rect x="80"  y="66" width="26" height="44" rx="6" fill="url(#mg)" opacity="0.6"/>
+            <rect x="117" y="44" width="26" height="66" rx="6" fill="url(#mg)" opacity="0.7"/>
+            <rect x="154" y="32" width="26" height="78" rx="6" fill="url(#mg)" opacity="0.8"/>
+            <rect x="191" y="38" width="26" height="72" rx="6" fill="url(#mg)" opacity="0.9"/>
+            <rect x="228" y="14" width="26" height="96" rx="6" fill="url(#mg)"/>
+          </svg>
+          <div class="m-row"><span>Google</span><span>Instagram</span><span>WhatsApp</span><span>Site</span></div>
+        </div>
+        <div class="mock mock-chat">
+          <span class="m-wa"></span>
+          <div><b>Novo contato pelo site</b><small>quer um orçamento agora</small></div>
+        </div>
+        <div class="mock mock-roi">Cada real rastreado. <b class="grad-text">ROI visível.</b></div>
       </div>
     </div>
     <svg class="hero-z" viewBox="0 0 64 64" aria-hidden="true"><polygon points="10,10 54,10 54,20 38,31 46,31 30,44 54,44 54,54 10,54 10,44 26,33 18,33 34,20 10,20" fill="#fff"/></svg>
@@ -79,127 +108,261 @@
     </div>
   </div>
 
-  <section class="section">
+  <!-- ====== FOLHA CLARA 1: serviços + comparativo ====== -->
+  <div class="sheet sheet-pull">
+
+    <section class="section">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="kicker kicker-pill">O que fazemos</span>
+          <h2>Tudo o que sua empresa precisa para <span class="grad-text">vender mais</span> no digital</h2>
+          <p>Oito frentes de trabalho, um objetivo: transformar presença digital em cliente no caixa.</p>
+        </div>
+        <div class="grid grid-4">
+          <div class="card reveal">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
+            <h3>SEO</h3>
+            <p>Apareça no Google quando o cliente procura o que você vende.</p>
+            <a class="more" href="/servicos/#seo">Saiba mais →</a>
+          </div>
+          <div class="card reveal">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></div>
+            <h3>Redes Sociais</h3>
+            <p>Perfil ativo, público engajado e marca viva todos os dias.</p>
+            <a class="more" href="/servicos/#redes-sociais">Saiba mais →</a>
+          </div>
+          <div class="card reveal">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
+            <h3>Tráfego Pago</h3>
+            <p>Anúncios no Google e no Instagram que trazem cliente, não só clique.</p>
+            <a class="more" href="/servicos/#trafego-pago">Saiba mais →</a>
+          </div>
+          <div class="card reveal">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+            <h3>Conteúdo</h3>
+            <p>Conteúdo que educa, gera confiança e vende pelo caminho.</p>
+            <a class="more" href="/servicos/#conteudo">Saiba mais →</a>
+          </div>
+          <div class="card reveal">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-4-1L3 21l2-5.5a8.5 8.5 0 1 1 16-4Z"/></svg></div>
+            <h3>WhatsApp Business</h3>
+            <p>Transforme o canal que o brasileiro mais usa no seu melhor vendedor.</p>
+            <a class="more" href="/servicos/#whatsapp">Saiba mais →</a>
+          </div>
+          <div class="card reveal">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg></div>
+            <h3>Criação de Sites</h3>
+            <p>Sites rápidos, bonitos e feitos para transformar visita em contato.</p>
+            <a class="more" href="/servicos/#sites">Saiba mais →</a>
+          </div>
+          <div class="card reveal">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 3 7h7l-5.5 4.5L18 21l-6-4.5L6 21l1.5-7.5L2 9h7Z"/></svg></div>
+            <h3>Branding</h3>
+            <p>Uma marca coerente, profissional e com cara de quem cresceu.</p>
+            <a class="more" href="/servicos/#branding">Saiba mais →</a>
+          </div>
+          <div class="card reveal">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M8 17V9m4 8V5m4 12v-6"/></svg></div>
+            <h3>Relatórios e ROI</h3>
+            <p>Você sabe exatamente o que está funcionando — e o que voltou.</p>
+            <a class="more" href="/servicos/#relatorios">Saiba mais →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 6px;">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="kicker kicker-pill">A diferença</span>
+          <h2>Marketing no improviso × marketing com <span class="grad-text">método</span></h2>
+          <p>O problema quase nunca é falta de esforço — é falta de sistema. Veja de que lado sua empresa está hoje.</p>
+        </div>
+        <div class="compare">
+          <div class="compare-col compare-bad reveal">
+            <h3>Como costuma ser <span class="compare-tag">improviso</span></h3>
+            <ul>
+              <li>Posta quando dá tempo, sem estratégia por trás</li>
+              <li>Anúncio ligado sem saber quanto voltou de venda</li>
+              <li>Site bonito que o Google não encontra</li>
+              <li>Relatório cheio de termo técnico — ou nenhum relatório</li>
+              <li>Cliente chama no WhatsApp e espera horas por resposta</li>
+            </ul>
+          </div>
+          <div class="compare-col compare-good reveal">
+            <h3>Como é com a Zyva <span class="compare-tag">método</span></h3>
+            <ul>
+              <li>Calendário de conteúdo com objetivo de venda definido</li>
+              <li>Cada real de anúncio rastreado até o pedido</li>
+              <li>SEO pensado desde a estrutura do site</li>
+              <li>Relatório mensal em português claro, sem jargão</li>
+              <li>WhatsApp configurado para responder e vender rápido</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ====== FAIXA ESCURA: dores + método + compromissos ====== -->
+  <section class="band">
     <div class="container">
       <div class="section-head reveal">
-        <span class="kicker">O que fazemos</span>
-        <h2>Tudo o que sua empresa precisa para vender mais no digital</h2>
-        <p>Oito frentes de trabalho, um objetivo: transformar presença digital em cliente no caixa.</p>
+        <span class="kicker kicker-pill">Se identifica?</span>
+        <h2>Sinais de que o digital está te <em>custando cliente</em></h2>
+        <p>São os quatro problemas que mais encontramos quando fazemos o primeiro diagnóstico de uma empresa.</p>
       </div>
       <div class="grid grid-4">
-        <div class="card reveal">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
-          <h3>SEO</h3>
-          <p>Apareça no Google quando o cliente procura o que você vende.</p>
-          <a class="more" href="/servicos/#seo">Saiba mais →</a>
+        <div class="pain-card reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></div>
+          <h3>Movimento sem venda</h3>
+          <p>Curtida até tem. Mas o caixa não sente diferença nenhuma.</p>
         </div>
-        <div class="card reveal">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></div>
-          <h3>Redes Sociais</h3>
-          <p>Perfil ativo, público engajado e marca viva todos os dias.</p>
-          <a class="more" href="/servicos/#redes-sociais">Saiba mais →</a>
+        <div class="pain-card reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></div>
+          <h3>Anúncio no escuro</h3>
+          <p>Você paga todo mês, mas ninguém sabe dizer o que voltou.</p>
         </div>
-        <div class="card reveal">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
-          <h3>Tráfego Pago</h3>
-          <p>Anúncios no Google e no Instagram que trazem cliente, não só clique.</p>
-          <a class="more" href="/servicos/#trafego-pago">Saiba mais →</a>
+        <div class="pain-card reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M8 11h6"/></svg></div>
+          <h3>Invisível no Google</h3>
+          <p>Quem procura o seu serviço encontra o seu concorrente.</p>
         </div>
-        <div class="card reveal">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
-          <h3>Conteúdo</h3>
-          <p>Conteúdo que educa, gera confiança e vende pelo caminho.</p>
-          <a class="more" href="/servicos/#conteudo">Saiba mais →</a>
-        </div>
-        <div class="card reveal">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-4-1L3 21l2-5.5a8.5 8.5 0 1 1 16-4Z"/></svg></div>
-          <h3>WhatsApp Business</h3>
-          <p>Transforme o canal que o brasileiro mais usa no seu melhor vendedor.</p>
-          <a class="more" href="/servicos/#whatsapp">Saiba mais →</a>
-        </div>
-        <div class="card reveal">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg></div>
-          <h3>Criação de Sites</h3>
-          <p>Sites rápidos, bonitos e feitos para transformar visita em contato.</p>
-          <a class="more" href="/servicos/#sites">Saiba mais →</a>
-        </div>
-        <div class="card reveal">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 3 7h7l-5.5 4.5L18 21l-6-4.5L6 21l1.5-7.5L2 9h7Z"/></svg></div>
-          <h3>Branding</h3>
-          <p>Uma marca coerente, profissional e com cara de quem cresceu.</p>
-          <a class="more" href="/servicos/#branding">Saiba mais →</a>
-        </div>
-        <div class="card reveal">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M8 17V9m4 8V5m4 12v-6"/></svg></div>
-          <h3>Relatórios e ROI</h3>
-          <p>Você sabe exatamente o que está funcionando — e o que voltou.</p>
-          <a class="more" href="/servicos/#relatorios">Saiba mais →</a>
+        <div class="pain-card reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-4-1L3 21l2-5.5a8.5 8.5 0 1 1 16-4Z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/></svg></div>
+          <h3>WhatsApp no vácuo</h3>
+          <p>O cliente chama, a resposta demora e a venda esfria.</p>
         </div>
       </div>
-    </div>
-  </section>
 
-  <section class="section" style="padding-top: 0;">
-    <div class="container">
+      <div class="band-gap"></div>
+
       <div class="section-head reveal">
-        <span class="kicker">Como trabalhamos</span>
-        <h2>Método simples, resultado visível</h2>
+        <span class="kicker kicker-pill">Como trabalhamos</span>
+        <h2>Método simples, resultado <em>visível</em></h2>
         <p>Sem caixa-preta: você sabe o que está sendo feito, por que está sendo feito e o que está voltando.</p>
       </div>
-      <div class="grid grid-4 steps">
-        <div class="step reveal">
+      <div class="grid grid-4 timeline">
+        <div class="tl-step reveal">
           <div class="num">1</div>
           <h3>Diagnóstico</h3>
           <p>Analisamos seu negócio, sua concorrência e sua presença digital. De graça.</p>
         </div>
-        <div class="step reveal">
+        <div class="tl-step reveal">
           <div class="num">2</div>
           <h3>Plano</h3>
-          <p>Montamos a estratégia e o pacote certo para o seu momento e seu orçamento.</p>
+          <p>Montamos a estratégia e o pacote certo para o seu momento e orçamento.</p>
         </div>
-        <div class="step reveal">
+        <div class="tl-step reveal">
           <div class="num">3</div>
           <h3>Execução</h3>
           <p>Nosso time coloca tudo para rodar: conteúdo, anúncios, site, WhatsApp.</p>
         </div>
-        <div class="step reveal">
+        <div class="tl-step reveal">
           <div class="num">4</div>
           <h3>Resultado</h3>
           <p>Relatório mensal em linguagem simples + reunião de ajuste de rota.</p>
         </div>
       </div>
+
+      <div class="stats reveal">
+        <div class="stat"><b data-count="8">0</b><span>frentes de trabalho integradas</span></div>
+        <div class="stat"><b data-count="1">0</b><span>dia útil para responder você</span></div>
+        <div class="stat"><b data-count="12">0</b><span>relatórios de resultado por ano</span></div>
+        <div class="stat"><b>0</b><span>caixa-preta no seu investimento</span></div>
+      </div>
+      <p class="stats-note">Compromissos de trabalho, não promessa de vitrine — é assim que operamos com todo cliente.</p>
     </div>
   </section>
 
-  <section class="section" style="padding-top: 0;">
-    <div class="container">
-      <div class="section-head reveal">
-        <span class="kicker">Blog da Zyva</span>
-        <h2>Aprenda marketing com a gente</h2>
-        <p>Conteúdo prático, em português claro, para quem toca o próprio negócio.</p>
-      </div>
-      <div class="grid grid-3">
-        <div class="card post-card reveal">
-          <span class="post-cat">Estratégia</span>
-          <h3>Marketing digital para pequenas empresas: por onde começar</h3>
-          <p>O guia direto ao ponto para dar os primeiros passos sem desperdiçar dinheiro.</p>
-          <a class="more" href="/blog/marketing-digital-pequenas-empresas-por-onde-comecar/">Ler artigo →</a>
-        </div>
-        <div class="card post-card reveal">
-          <span class="post-cat">Anúncios</span>
-          <h3>Quanto custa anunciar no Google e no Instagram?</h3>
-          <p>Guia de orçamento realista para PMEs planejarem tráfego pago.</p>
-          <a class="more" href="/blog/quanto-custa-anunciar-google-instagram/">Ler artigo →</a>
-        </div>
-        <div class="card post-card reveal">
-          <span class="post-cat">WhatsApp</span>
-          <h3>7 configurações do WhatsApp Business que fazem vender mais</h3>
-          <p>Ajustes simples que profissionalizam seu atendimento ainda hoje.</p>
-          <span class="soon">Em breve</span>
+  <!-- ====== FOLHA CLARA 2: diagnóstico + blog + FAQ ====== -->
+  <div class="sheet">
+
+    <section class="section">
+      <div class="container">
+        <div class="diag reveal">
+          <span class="kicker kicker-pill">Primeiro passo</span>
+          <h2>Comece pelo diagnóstico <span class="grad-text">gratuito</span></h2>
+          <p>Antes de falar de contrato, a gente te mostra preto no branco onde sua empresa está deixando cliente na mesa.</p>
+          <ul class="diag-list">
+            <li>Análise do seu site e da sua presença no Google</li>
+            <li>Raio-X das redes sociais e dos anúncios atuais</li>
+            <li>Comparação direta com dois concorrentes seus</li>
+            <li>Lista de prioridades para os próximos 90 dias</li>
+          </ul>
+          <div class="hero-ctas">
+            <a href="/contato/" class="btn btn-primary">Pedir meu diagnóstico</a>
+            <a href="#" class="btn btn-ghost" data-wa>Chamar no WhatsApp</a>
+          </div>
+          <p class="diag-note">Sem compromisso: se não fizer sentido seguir, o diagnóstico fica com você do mesmo jeito.</p>
+          <svg class="hero-z" viewBox="0 0 64 64" aria-hidden="true"><polygon points="10,10 54,10 54,20 38,31 46,31 30,44 54,44 54,54 10,54 10,44 26,33 18,33 34,20 10,20" fill="#fff"/></svg>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+
+    <section class="section" style="padding-top: 6px;">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="kicker kicker-pill">Blog da Zyva</span>
+          <h2>Aprenda marketing com a gente</h2>
+          <p>Conteúdo prático, em português claro, para quem toca o próprio negócio — atualizado todo dia útil.</p>
+        </div>
+        <div class="grid grid-3">
+          <div class="card post-card reveal">
+            <span class="post-cat">Estratégia</span>
+            <h3>Marketing digital para pequenas empresas: por onde começar</h3>
+            <p>O guia direto ao ponto para dar os primeiros passos sem desperdiçar dinheiro.</p>
+            <a class="more" href="/blog/marketing-digital-pequenas-empresas-por-onde-comecar/">Ler artigo →</a>
+          </div>
+          <div class="card post-card reveal">
+            <span class="post-cat">Anúncios</span>
+            <h3>Quanto custa anunciar no Google e no Instagram?</h3>
+            <p>Guia de orçamento realista para PMEs planejarem tráfego pago.</p>
+            <a class="more" href="/blog/quanto-custa-anunciar-google-instagram/">Ler artigo →</a>
+          </div>
+          <div class="card post-card reveal" data-latest-slot>
+            <span class="post-cat">Notícias</span>
+            <h3>O post do dia sai toda manhã no blog</h3>
+            <p>Análise diária de uma notícia de marketing — e o que ela muda para a sua empresa.</p>
+            <a class="more" href="/blog/">Ver o blog →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 6px;">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="kicker kicker-pill">Perguntas frequentes</span>
+          <h2>O que todo mundo pergunta antes de fechar</h2>
+        </div>
+        <div class="faq reveal">
+          <details>
+            <summary>Quanto custa contratar a Zyva?</summary>
+            <p>Depende do pacote — trabalhamos com planos pensados para o orçamento de pequenas e médias empresas, e você só decide depois do diagnóstico gratuito, quando já sabe exatamente o que precisa. Sem surpresa no boleto: o valor é fechado e o que está incluso fica por escrito.</p>
+          </details>
+          <details>
+            <summary>Em quanto tempo vejo resultado?</summary>
+            <p>Honestamente: anúncios bem configurados começam a trazer contato nas primeiras semanas; SEO e conteúdo são construção de médio prazo (3 a 6 meses para ganhar força). Por isso você recebe relatório desde o primeiro mês — para acompanhar a evolução em vez de esperar no escuro.</p>
+          </details>
+          <details>
+            <summary>Preciso já ter site e redes sociais?</summary>
+            <p>Não. Se você ainda não tem, a gente cria do zero; se já tem, aproveitamos o que funciona e arrumamos o que trava resultado. O diagnóstico indica o caminho mais econômico.</p>
+          </details>
+          <details>
+            <summary>Como eu acompanho o trabalho?</summary>
+            <p>Todo mês você recebe um relatório em português claro — o que foi feito, o que aconteceu e o que vem agora — e uma reunião de ajuste de rota. No dia a dia, o canal é o WhatsApp direto com o time.</p>
+          </details>
+          <details>
+            <summary>Vocês atendem a minha cidade?</summary>
+            <p>Sim — o atendimento é 100% digital e funciona para empresas de todo o Brasil, com reuniões por vídeo e comunicação pelo WhatsApp.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+  </div>
 
   <section class="cta-final on-dark">
     <div class="container reveal">
