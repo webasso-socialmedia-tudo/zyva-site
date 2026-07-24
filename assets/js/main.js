@@ -82,6 +82,33 @@ document.querySelectorAll("[data-year]").forEach((el) => {
 });
 
 /* ================================================================
+   Cores por categoria nos chips do blog (.post-cat)
+   "Notícias" ganha violeta para destacar o conteúdo do dia;
+   "Especial ..." (datas comemorativas) ganha âmbar;
+   demais categorias têm cores próprias para orientar a leitura.
+   Categorias não mapeadas mantêm o estilo padrão (ciano do CSS).
+   ================================================================ */
+(() => {
+  const CAT_COLORS = {
+    "notícias": ["rgba(108,76,241,.16)", "#5B3DE0"],
+    "anúncios": ["rgba(236,72,153,.14)", "#DB2777"],
+    "seo local": ["rgba(16,185,129,.15)", "#059669"],
+    "whatsapp": ["rgba(37,211,102,.16)", "#1FA855"],
+    "sites": ["rgba(59,130,246,.14)", "#2563EB"],
+    "gestão": ["rgba(245,158,11,.16)", "#B45309"]
+  };
+  document.querySelectorAll(".post-cat").forEach((chip) => {
+    const t = (chip.textContent || "").trim().toLowerCase();
+    let c = CAT_COLORS[t];
+    if (!c && t.indexOf("especial") === 0) c = ["rgba(255,170,40,.18)", "#B36A00"];
+    if (c) {
+      chip.style.background = c[0];
+      chip.style.color = c[1];
+    }
+  });
+})();
+
+/* ================================================================
    Destaque do blog diário (post do dia + data comemorativa)
    Lê /assets/data/latest.json e:
    1) mostra uma faixa "novo no blog" no topo até o visitante ler o post;
