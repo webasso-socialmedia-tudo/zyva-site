@@ -82,6 +82,106 @@ document.querySelectorAll("[data-year]").forEach((el) => {
 });
 
 /* ================================================================
+   Rodapé revelado (estilo "cortina"): o conteúdo desliza por cima
+   do rodapé fixo, que aparece no fim da rolagem. Ativado só quando
+   o rodapé cabe na tela; no celular fica estático como sempre.
+   ================================================================ */
+(() => {
+  const footer = document.querySelector(".site-footer");
+  if (!footer) return;
+
+  let wrap = null;
+  const build = () => {
+    if (wrap) return;
+    wrap = document.createElement("main");
+    wrap.className = "page-curtain";
+    const move = [...document.body.children].filter(
+      (el) =>
+        el !== footer &&
+        el.tagName !== "SCRIPT" &&
+        !el.classList.contains("wa-float") &&
+        el.id !== "alert-box"
+    );
+    document.body.insertBefore(wrap, footer);
+    move.forEach((el) => wrap.appendChild(el));
+  };
+
+  const apply = () => {
+    const h = footer.offsetHeight;
+    const on = window.matchMedia("(min-width: 820px)").matches && h > 0 && h < window.innerHeight * 0.92;
+    if (on) build();
+    document.body.classList.toggle("curtain-on", on && !!wrap);
+    if (wrap) wrap.style.marginBottom = on ? h + "px" : "";
+  };
+
+  apply();
+  window.addEventListener("resize", apply);
+  window.addEventListener("load", () => {
+    apply();
+    setTimeout(apply, 600);
+  });
+})();
+
+/* ================================================================
+   Números dos compromissos: contagem animada ao entrar na tela
+   ================================================================ */
+(() => {
+  const nums = document.querySelectorAll("[data-count]");
+  if (!nums.length || !("IntersectionObserver" in window)) return;
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        io.unobserve(e.target);
+        const el = e.target;
+        const end = parseInt(el.getAttribute("data-count"), 10) || 0;
+        if (reduced) { el.textContent = end; return; }
+        const t0 = performance.now();
+        const dur = 900;
+        const tick = (t) => {
+          const k = Math.min(1, (t - t0) / dur);
+          const ease = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+          el.textContent = Math.round(end * ease);
+          if (k < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      });
+    },
+    { threshold: 0.5 }
+  );
+  nums.forEach((n) => io.observe(n));
+})();
+
+/* ================================================================
+   Card "post do dia" na home: preenche com o último post do blog
+   a partir de /assets/data/latest.json (com fallback estático).
+   ================================================================ */
+(async () => {
+  const slot = document.querySelector("[data-latest-slot]");
+  if (!slot) return;
+  try {
+    const res = await fetch("/assets/data/latest.json", { cache: "no-store" });
+    if (!res.ok) return;
+    const data = await res.json();
+    const p = (data.special && data.special.slug ? data.special : null) || data.latest;
+    if (!p || !p.slug || !p.title) return;
+    const chip = slot.querySelector(".post-cat");
+    const title = slot.querySelector("h3");
+    const link = slot.querySelector("a.more");
+    if (chip) {
+      chip.textContent = data.special && p === data.special ? "Especial" : "Notícias";
+      chip.style.background = "rgba(108,76,241,.16)";
+      chip.style.color = "#5B3DE0";
+    }
+    if (title) title.textContent = p.title;
+    const desc = slot.querySelector("p");
+    if (desc) desc.textContent = "O post de hoje no blog — análise em português claro e o que muda para a sua empresa.";
+    if (link) { link.textContent = "Ler artigo →"; link.href = p.slug; }
+  } catch (e) {}
+})();
+
+/* ================================================================
    Cores por categoria nos chips do blog (.post-cat)
    "Notícias" ganha violeta para destacar o conteúdo do dia;
    "Especial ..." (datas comemorativas) ganha âmbar;
@@ -140,26 +240,35 @@ document.querySelectorAll("[data-year]").forEach((el) => {
       catch (e) { return here !== i.slug; }
     });
 
-    /* Faixa de destaque no topo (todas as páginas) */
+    /* Aviso de post novo: notificação flutuante (sem emoji, sem sublinhado) */
     if (unseen.length) {
-      const bar = document.createElement("div");
-      bar.className = "zyva-newsbar";
-      bar.style.cssText =
-        "background:linear-gradient(90deg,#6C4CF1,#22D3EE);color:#fff;font-size:.92rem;padding:9px 16px;text-align:center;line-height:1.4;";
-      bar.innerHTML = unseen
-        .map((i) => {
-          const icon = i.kind === "special" ? "🎉" : "📰";
-          const label = i.kind === "special" ? "Especial de hoje" : "Novo no blog";
-          const a = document.createElement("a");
-          a.href = i.slug;
-          a.textContent = icon + " " + label + ": " + i.title + " →";
-          a.style.cssText = "color:#fff;font-weight:600;text-decoration:underline;";
-          return a.outerHTML;
-        })
-        .join('<span style="opacity:.7;margin:0 10px;">·</span>');
-      const header = document.querySelector(".site-header");
-      if (header && header.parentNode) header.parentNode.insertBefore(bar, header.nextSibling);
-      else document.body.prepend(bar);
+      const wrapEl = document.createElement("div");
+      wrapEl.className = "zyva-toasts";
+      let shown = 0;
+      unseen.slice(0, 2).forEach((i) => {
+        try { if (sessionStorage.getItem("zyva_hide_" + i.slug)) return; } catch (e) {}
+        const t = document.createElement("aside");
+        t.className = "zyva-toast " + (i.kind === "special" ? "zt-special" : "zt-news");
+        t.setAttribute("role", "status");
+        t.innerHTML =
+          '<button class="zt-close" type="button" aria-label="Fechar aviso">&times;</button>' +
+          '<span class="zt-label"><span class="zt-dot"></span><span class="zt-label-text"></span></span>' +
+          '<strong class="zt-title"></strong>' +
+          '<a class="zt-link">Ler agora <span aria-hidden="true">&rarr;</span></a>';
+        t.querySelector(".zt-label-text").textContent =
+          i.kind === "special" ? "Especial de hoje" : "Novo no blog";
+        t.querySelector(".zt-title").textContent = i.title;
+        t.querySelector(".zt-link").href = i.slug;
+        t.querySelector(".zt-close").addEventListener("click", () => {
+          try { sessionStorage.setItem("zyva_hide_" + i.slug, "1"); } catch (e) {}
+          t.classList.remove("zt-in");
+          setTimeout(() => t.remove(), 400);
+        });
+        wrapEl.appendChild(t);
+        shown++;
+        setTimeout(() => t.classList.add("zt-in"), 900 + shown * 260);
+      });
+      if (wrapEl.children.length) document.body.appendChild(wrapEl);
     }
 
     /* Selo NOVO/ESPECIAL nos cards do /blog/ */
