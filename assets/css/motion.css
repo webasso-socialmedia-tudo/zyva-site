@@ -351,17 +351,34 @@ body.zcursor-active .cursor-target { cursor: none; }
   inset: 0;
   border-radius: 44px;
   background: linear-gradient(150deg, #1a1d2b, #0a0c14);
-  transform: translateZ(-15px);
+  transform: translateZ(-16px);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
-/* Laterais — 4 tiras que fecham a caixa */
-.phone-edge { position: absolute; background: linear-gradient(#3a3f57, #141621); }
-.phone-edge-l, .phone-edge-r { top: 44px; bottom: 44px; width: 15px; }
-.phone-edge-l { left: 0; transform: rotateY(-90deg); transform-origin: left center; }
-.phone-edge-r { right: 0; transform: rotateY(90deg); transform-origin: right center; }
-.phone-edge-t, .phone-edge-b { left: 44px; right: 44px; height: 15px; }
-.phone-edge-t { top: 0; transform: rotateX(90deg); transform-origin: center top; }
-.phone-edge-b { bottom: 0; transform: rotateX(-90deg); transform-origin: center bottom; }
+/* Espessura por extrusão em camadas.
+   Tiras planas nas laterais saltavam para fora nos cantos arredondados;
+   empilhar cópias do mesmo retângulo arredondado mantém a silhueta lisa
+   em toda a volta, inclusive nos cantos. */
+.phone-depth {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+.phone-depth i {
+  position: absolute;
+  inset: 0;
+  display: block;
+  border-radius: 44px;
+  background: linear-gradient(150deg, #454a63 0%, #23273a 45%, #10121c 100%);
+}
+.phone-depth i:nth-child(1) { transform: translateZ(-1.8px); }
+.phone-depth i:nth-child(2) { transform: translateZ(-3.6px); }
+.phone-depth i:nth-child(3) { transform: translateZ(-5.4px); }
+.phone-depth i:nth-child(4) { transform: translateZ(-7.2px); }
+.phone-depth i:nth-child(5) { transform: translateZ(-9px); }
+.phone-depth i:nth-child(6) { transform: translateZ(-10.8px); }
+.phone-depth i:nth-child(7) { transform: translateZ(-12.6px); }
+.phone-depth i:nth-child(8) { transform: translateZ(-14.4px); }
 /* Botões físicos */
 .phone-btn { position: absolute; right: -2.5px; width: 3px; border-radius: 3px; background: #3d4258; }
 .phone-btn-power { top: 168px; height: 62px; }
@@ -724,3 +741,287 @@ body.zcursor-active .cursor-target { cursor: none; }
   .phone-track { height: auto; }
   .phone-sticky { position: static; height: auto; padding: 60px 0; }
 }
+
+/* ============================================================
+   10. Campo de partículas do Z (Home)
+   ============================================================ */
+.hero { position: relative; }
+.particle-z {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+.hero > .container { position: relative; z-index: 1; }
+
+/* ============================================================
+   11. Máquina de marketing (Serviços)
+   ============================================================ */
+.pipeline {
+  position: relative;
+  background:
+    radial-gradient(700px 340px at 20% 0%, rgba(108, 76, 241, 0.26), transparent 62%),
+    radial-gradient(620px 340px at 92% 100%, rgba(34, 211, 238, 0.13), transparent 60%),
+    var(--night);
+  color: #fff;
+  border-radius: var(--radius-sheet);
+  padding: clamp(38px, 5vw, 62px) clamp(22px, 4vw, 52px);
+  overflow: hidden;
+}
+.pipeline h2 { color: #fff; max-width: 18ch; }
+.pipeline h2 em {
+  font-style: normal;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.pipeline > p { color: rgba(255, 255, 255, 0.66); max-width: 54ch; margin: 12px 0 34px; }
+.pipe-stage { position: relative; }
+.pipe-svg { width: 100%; height: auto; display: block; overflow: visible; }
+.pipe-line {
+  fill: none;
+  stroke: url(#pipeGrad);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+.pipe-rail {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.1);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+.pipe-dot { fill: var(--cyan); opacity: 0; filter: drop-shadow(0 0 6px var(--cyan)); }
+.pipe-nodes {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  margin-top: -8px;
+}
+.pipe-node { text-align: center; opacity: 0.32; transition: opacity 0.45s ease; }
+.pipe-node.on { opacity: 1; }
+.pipe-ico {
+  width: 48px; height: 48px;
+  margin: 0 auto 12px;
+  border-radius: 14px;
+  display: grid; place-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: transform 0.5s var(--ease-out-expo), background 0.45s ease, border-color 0.45s ease, box-shadow 0.45s ease;
+}
+.pipe-node.on .pipe-ico {
+  transform: translateY(-5px) scale(1.06);
+  background: rgba(108, 76, 241, 0.2);
+  border-color: rgba(108, 76, 241, 0.6);
+  box-shadow: 0 0 26px rgba(108, 76, 241, 0.35);
+}
+.pipe-node:nth-child(even).on .pipe-ico {
+  background: rgba(34, 211, 238, 0.16);
+  border-color: rgba(34, 211, 238, 0.55);
+  box-shadow: 0 0 26px rgba(34, 211, 238, 0.28);
+}
+.pipe-ico svg { width: 22px; height: 22px; stroke: #fff; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.pipe-node b { display: block; font-family: var(--font-head); font-size: 0.95rem; margin-bottom: 3px; }
+.pipe-node span { display: block; font-size: 0.8rem; color: rgba(255, 255, 255, 0.55); }
+.pipe-step {
+  display: inline-block;
+  font-family: var(--font-head);
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  color: var(--cyan);
+  margin-bottom: 6px;
+}
+
+/* ============================================================
+   12. ZYVA — quatro letras, quatro valores (Sobre)
+   ============================================================ */
+.brand-letters {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 44px;
+  align-items: center;
+}
+.bl-word { display: flex; gap: 8px; }
+.bl-letter {
+  flex: 1;
+  aspect-ratio: 3 / 4;
+  border: 0;
+  cursor: pointer;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line);
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: clamp(2.4rem, 6vw, 4.4rem);
+  line-height: 1;
+  color: var(--muted);
+  display: grid;
+  place-items: center;
+  transition:
+    transform 0.5s var(--ease-out-expo),
+    background 0.35s ease,
+    border-color 0.35s ease,
+    color 0.35s ease,
+    box-shadow 0.35s ease;
+}
+.bl-letter.on {
+  transform: translateY(-10px);
+  background: linear-gradient(var(--white), var(--white)) padding-box, var(--grad) border-box;
+  border: 2px solid transparent;
+  color: transparent;
+  background-clip: padding-box, border-box;
+  box-shadow: var(--shadow-lg);
+}
+.bl-letter.on span {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.bl-panels { position: relative; min-height: 210px; }
+.bl-value {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: translateY(16px);
+  pointer-events: none;
+  transition: opacity 0.4s ease, transform 0.55s var(--ease-out-expo);
+}
+.bl-value.on { opacity: 1; transform: none; pointer-events: auto; }
+.bl-value .kicker { margin-bottom: 10px; }
+.bl-value h3 { font-size: 1.5rem; margin-bottom: 10px; }
+.bl-value p { font-size: 1rem; }
+
+/* ============================================================
+   13. Vitrine 3D dos projetos (Cases)
+   ============================================================ */
+.marquee3d {
+  height: 560px;
+  overflow: hidden;
+  border-radius: 26px;
+  background: var(--night);
+  position: relative;
+  -webkit-mask-image: radial-gradient(ellipse 78% 72% at 50% 50%, #000 55%, transparent 100%);
+  mask-image: radial-gradient(ellipse 78% 72% at 50% 50%, #000 55%, transparent 100%);
+}
+.m3-stage {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 1500px; height: 1500px;
+  margin: -750px 0 0 -750px;
+  transform: rotateX(52deg) rotateZ(-44deg) scale(0.62);
+  transform-style: preserve-3d;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 26px;
+}
+.m3-col { display: flex; flex-direction: column; gap: 26px; }
+.m3-col:nth-child(odd) { animation: m3-up 22s ease-in-out infinite alternate; }
+.m3-col:nth-child(even) { animation: m3-down 28s ease-in-out infinite alternate; }
+@keyframes m3-up { from { transform: translateY(-90px); } to { transform: translateY(90px); } }
+@keyframes m3-down { from { transform: translateY(90px); } to { transform: translateY(-90px); } }
+.m3-card {
+  aspect-ratio: 97 / 70;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 14px;
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 18px 40px rgba(0, 0, 0, 0.45);
+  transition: transform 0.35s var(--ease-out-expo), box-shadow 0.35s ease;
+}
+.m3-card:hover { transform: translateZ(40px); box-shadow: 0 0 0 1px rgba(34,211,238,.5), 0 26px 60px rgba(0,0,0,.6); }
+.m3-a { background: var(--grad); }
+.m3-b { background: linear-gradient(140deg, #0B0E1A, #35307a); }
+.m3-c { background: linear-gradient(140deg, #0e7490, #22D3EE); }
+.m3-d { background: linear-gradient(140deg, #241b52, #6C4CF1); }
+.marquee-cap {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 3;
+  padding: 26px;
+  text-align: center;
+  background: linear-gradient(transparent, rgba(11, 14, 26, 0.9) 55%);
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.92rem;
+}
+
+/* ============================================================
+   14. Barra de progresso de leitura (artigos)
+   ============================================================ */
+.read-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  z-index: 80;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.06);
+}
+.read-bar i {
+  display: block;
+  height: 100%;
+  background: var(--grad);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  will-change: transform;
+}
+
+/* ============================================================
+   15. Responsivo dos módulos novos
+   ============================================================ */
+@media (max-width: 1000px) {
+  .brand-letters { grid-template-columns: 1fr; gap: 26px; }
+  .bl-panels { min-height: 178px; }
+  .marquee3d { height: 420px; }
+  .m3-stage { transform: rotateX(52deg) rotateZ(-44deg) scale(0.42); }
+  .pipe-nodes { grid-template-columns: repeat(2, 1fr); gap: 22px; margin-top: 20px; }
+  .pipe-stage .pipe-svg { display: none; }
+  .pipe-node { opacity: 1; text-align: left; }
+  .pipe-ico { margin: 0 0 10px; }
+}
+@media (max-width: 640px) {
+  .marquee3d { height: 330px; }
+  .m3-stage { transform: rotateX(52deg) rotateZ(-44deg) scale(0.3); }
+  .bl-letter { border-radius: 13px; font-size: 2rem; }
+  .pipe-nodes { grid-template-columns: 1fr; gap: 16px; }
+  .pipeline { border-radius: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .m3-col { animation: none; }
+  .particle-z { display: none; }
+  .bl-letter, .bl-value { transition: none; }
+  .read-bar { display: none; }
+}
+
+/* Filtro de categorias do blog */
+.blog-filter { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 26px; }
+.chip-filter {
+  border: 1px solid var(--line);
+  background: var(--white);
+  color: var(--muted);
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 0.83rem;
+  padding: 8px 16px;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: background .2s ease, color .2s ease, border-color .2s ease, transform .2s var(--ease-out-expo);
+}
+.chip-filter:hover { transform: translateY(-2px); border-color: var(--violet); color: var(--violet); }
+.chip-filter[aria-pressed="true"] {
+  background: var(--grad);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(108,76,241,.32);
+}
+
+/* O atributo [hidden] só esconde se nada declarar display depois dele —
+   e .post-card declara display:flex. Sem isto, o filtro "esconde" no DOM
+   mas os cards continuam à vista. */
+[data-blog-grid] > [hidden] { display: none !important; }
