@@ -259,14 +259,27 @@ document.querySelectorAll("[data-year]").forEach((el) => {
           i.kind === "special" ? "Especial de hoje" : "Novo no blog";
         t.querySelector(".zt-title").textContent = i.title;
         t.querySelector(".zt-link").href = i.slug;
-        t.querySelector(".zt-close").addEventListener("click", () => {
-          try { sessionStorage.setItem("zyva_hide_" + i.slug, "1"); } catch (e) {}
+        const hide = (remember) => {
+          if (remember) {
+            try { sessionStorage.setItem("zyva_hide_" + i.slug, "1"); } catch (e) {}
+          }
           t.classList.remove("zt-in");
           setTimeout(() => t.remove(), 400);
-        });
+        };
+        t.querySelector(".zt-close").addEventListener("click", () => hide(true));
         wrapEl.appendChild(t);
         shown++;
         setTimeout(() => t.classList.add("zt-in"), 900 + shown * 260);
+        /* Some sozinho — o aviso não pode competir com o conteúdo da página:
+           sai no tempo, ou assim que o visitante começa a ler de verdade. */
+        setTimeout(() => hide(false), 9000 + shown * 260);
+        const onScroll = () => {
+          if (window.scrollY > 600) {
+            window.removeEventListener("scroll", onScroll);
+            hide(false);
+          }
+        };
+        window.addEventListener("scroll", onScroll, { passive: true });
       });
       if (wrapEl.children.length) document.body.appendChild(wrapEl);
     }
