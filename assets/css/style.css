@@ -104,7 +104,12 @@ ul { list-style: none; }
 }
 .btn:hover { transform: translateY(-2px); }
 .btn-primary {
-  background: var(--grad);
+  /* O gradiente "sobra" para fora (size 150% centralizado): as pontas
+     arredondadas mostram tons do meio da transição, sem o violeta/ciano
+     puros destoando nas bordas. */
+  background-image: linear-gradient(to right, #6C4CF1, #22D3EE);
+  background-size: 150% 100%;
+  background-position: center;
   color: #fff;
   box-shadow: 0 8px 24px rgba(108, 76, 241, 0.35);
 }
