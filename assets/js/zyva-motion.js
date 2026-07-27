@@ -618,6 +618,312 @@
     setInterval(tick, 20000);
   });
 
+  /* ==========================================================
+     10. Campo de partículas que se organiza no "Z" da marca (Home)
+         Metáfora do trabalho: atenção dispersa vira marca.
+     ========================================================== */
+  safe("particle-logo", () => {
+    const cv = document.querySelector("[data-particle-z]");
+    if (!cv) return;
+    const host = cv.parentElement;
+    if (REDUCED) { cv.style.display = "none"; return; }
+    const ctx = cv.getContext("2d", { alpha: true });
+    if (!ctx) return;
+
+    const Z_POLY = "10,10 54,10 54,20 38,31 46,31 30,44 54,44 54,54 10,54 10,44 26,33 18,33 34,20 10,20";
+
+    /* Rasteriza o polígono do Z e amostra pontos internos: é a forma exata
+       do logo, sem precisar embutir coordenadas à mão. */
+    const sampleLogo = () => {
+      const S = 200;
+      const off = document.createElement("canvas");
+      off.width = off.height = S;
+      const c = off.getContext("2d");
+      c.fillStyle = "#fff";
+      c.beginPath();
+      Z_POLY.split(" ").forEach((pair, i) => {
+        const xy = pair.split(",");
+        const px = (+xy[0] / 64) * S;
+        const py = (+xy[1] / 64) * S;
+        if (i) c.lineTo(px, py); else c.moveTo(px, py);
+      });
+      c.closePath();
+      c.fill();
+      const d = c.getImageData(0, 0, S, S).data;
+      const out = [];
+      for (let y = 0; y < S; y += 3) {
+        for (let x = 0; x < S; x += 3) {
+          if (d[(y * S + x) * 4 + 3] > 140) out.push([x / S - 0.5, y / S - 0.5]);
+        }
+      }
+      return out;
+    };
+
+    const targets = sampleLogo();
+    if (!targets.length) return;
+
+    let W = 0, H = 0, dpr = 1, box = 0, cxp = 0, cyp = 0;
+    let mouse = { x: -9999, y: -9999 };
+    let gather = 0;          /* 0 = disperso, 1 = formado */
+    let started = 0;
+    const parts = [];
+
+    const layout = () => {
+      const r = host.getBoundingClientRect();
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = r.width; H = r.height;
+      cv.width = Math.round(W * dpr);
+      cv.height = Math.round(H * dpr);
+      cv.style.width = W + "px";
+      cv.style.height = H + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      /* Grande e sangrando pela direita, como a marca d'água original —
+         assim o traço do Z continua legível em volta do painel. */
+      box = Math.min(H * 1.22, W * 0.58);
+      cxp = W * 0.86;
+      cyp = H * 0.5;
+    };
+
+    layout();
+    targets.forEach((t) => {
+      parts.push({
+        tx: t[0], ty: t[1],
+        x: Math.random() * W, y: Math.random() * H,
+        vx: 0, vy: 0,
+        ph: Math.random() * Math.PI * 2,
+        sz: 1.1 + Math.random() * 1.7
+      });
+    });
+
+    host.addEventListener("mousemove", (e) => {
+      const r = host.getBoundingClientRect();
+      mouse.x = e.clientX - r.left;
+      mouse.y = e.clientY - r.top;
+    });
+    host.addEventListener("mouseleave", () => { mouse.x = mouse.y = -9999; });
+    window.addEventListener("resize", layout);
+
+    const draw = (t) => {
+      if (!started) started = t;
+      /* forma sozinho na entrada (sem exigir scroll) */
+      gather = Math.min(1, (t - started) / 2200);
+      const g = 1 - Math.pow(1 - gather, 3);
+
+      /* some conforme sai da tela — não gasta bateria fora de vista */
+      const r = host.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > window.innerHeight) {
+        requestAnimationFrame(draw);
+        return;
+      }
+
+      ctx.clearRect(0, 0, W, H);
+      const time = t * 0.001;
+
+      for (let i = 0; i < parts.length; i++) {
+        const p = parts[i];
+        const hx = cxp + p.tx * box + Math.sin(time * 0.6 + p.ph) * 3;
+        const hy = cyp + p.ty * box + Math.cos(time * 0.5 + p.ph) * 3;
+        const gx = p.x + (hx - p.x) * 0.055 * (0.25 + g);
+        const gy = p.y + (hy - p.y) * 0.055 * (0.25 + g);
+
+        /* o cursor empurra as partículas */
+        let dx = p.x - mouse.x, dy = p.y - mouse.y;
+        const d2 = dx * dx + dy * dy;
+        let push = 0;
+        if (d2 < 13000) {
+          const d = Math.sqrt(d2) || 1;
+          push = (1 - d / 114) * 5.5;
+          dx /= d; dy /= d;
+        }
+        p.x = gx + (push ? dx * push : 0);
+        p.y = gy + (push ? dy * push : 0);
+
+        const mix = (p.tx + 0.5);
+        ctx.fillStyle =
+          "rgba(" + Math.round(108 + mix * (34 - 108)) + "," +
+          Math.round(76 + mix * (211 - 76)) + "," +
+          Math.round(241 + mix * (238 - 241)) + "," +
+          (0.14 + g * 0.52) + ")";
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.sz, 0, 6.283);
+        ctx.fill();
+      }
+      requestAnimationFrame(draw);
+    };
+    requestAnimationFrame(draw);
+  });
+
+  /* ==========================================================
+     11. Máquina de marketing: o fluxo se desenha no scroll (Serviços)
+     ========================================================== */
+  safe("pipeline", () => {
+    const wrap = document.querySelector("[data-pipeline]");
+    if (!wrap) return;
+    const path = wrap.querySelector(".pipe-line");
+    const dot = wrap.querySelector(".pipe-dot");
+    const nodes = Array.from(wrap.querySelectorAll(".pipe-node"));
+    if (!path) return;
+
+    const len = path.getTotalLength();
+    path.style.strokeDasharray = len;
+    path.style.strokeDashoffset = REDUCED ? 0 : len;
+
+    const paint = (p) => {
+      path.style.strokeDashoffset = len * (1 - p);
+      if (dot && p > 0.02) {
+        const pt = path.getPointAtLength(len * p);
+        dot.setAttribute("cx", pt.x);
+        dot.setAttribute("cy", pt.y);
+        dot.style.opacity = p < 0.99 ? 1 : 0;
+      }
+      nodes.forEach((n, i) => {
+        n.classList.toggle("on", p >= (i + 0.5) / nodes.length - 0.12);
+      });
+    };
+
+    if (REDUCED) { paint(1); return; }
+    if (!("IntersectionObserver" in window)) { paint(1); return; }
+
+    /* Sem trava de "está visível": o observer dispara de forma assíncrona e,
+       se o visitante parasse a rolagem no exato momento da entrada, o traço
+       nunca era pintado. São cinco toggles de classe — pode rodar sempre. */
+    const onScroll = () => {
+      const r = wrap.getBoundingClientRect();
+      if (r.bottom < -200 || r.top > window.innerHeight + 200) return;
+      const p = clamp((window.innerHeight * 0.85 - r.top) / (r.height * 0.85), 0, 1);
+      paint(p);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    onScroll();
+  });
+
+  /* ==========================================================
+     12. ZYVA: quatro letras, quatro valores (Sobre)
+     ========================================================== */
+  safe("brand-letters", () => {
+    const wrap = document.querySelector("[data-brand-letters]");
+    if (!wrap) return;
+    const letters = Array.from(wrap.querySelectorAll(".bl-letter"));
+    const panels = Array.from(wrap.querySelectorAll(".bl-value"));
+    if (!letters.length) return;
+
+    let active = 0;
+    const show = (i) => {
+      active = i;
+      letters.forEach((l, k) => l.classList.toggle("on", k === i));
+      panels.forEach((v, k) => v.classList.toggle("on", k === i));
+    };
+    show(0);
+
+    letters.forEach((l, i) => {
+      l.addEventListener("mouseenter", () => show(i));
+      l.addEventListener("focus", () => show(i));
+      l.addEventListener("click", () => show(i));
+    });
+
+    /* sem mouse (celular), o scroll conduz a troca */
+    if (!FINE && !REDUCED) {
+      let t = 0;
+      setInterval(() => { t = (t + 1) % letters.length; show(t); }, 2600);
+    }
+  });
+
+  /* ==========================================================
+     13. Filtro do blog com animação FLIP (posições animam de verdade)
+     ========================================================== */
+  safe("blog-filter", () => {
+    const bar = document.querySelector("[data-blog-filter]");
+    const grid = document.querySelector("[data-blog-grid]");
+    if (!bar || !grid) return;
+    const cards = Array.from(grid.children);
+
+    /* A categoria vem do próprio chip do card. Assim os posts que a
+       automação diária publica entram no filtro sozinhos, sem precisar
+       de nenhum atributo extra no HTML gerado. */
+    const catOf = (c) => {
+      const chip = c.querySelector(".post-cat");
+      return (chip ? chip.textContent : "").trim();
+    };
+
+    const cats = [];
+    cards.forEach((c) => {
+      const k = catOf(c);
+      if (k && cats.indexOf(k) === -1) cats.push(k);
+    });
+    if (cats.length < 2) return;
+
+    const mk = (label, value, pressed) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip-filter cursor-target";
+      b.textContent = label;
+      b.setAttribute("data-cat", value);
+      b.setAttribute("aria-pressed", String(pressed));
+      bar.appendChild(b);
+      return b;
+    };
+
+    bar.textContent = "";
+    const btns = [mk("Todos", "*", true)];
+    cats.forEach((k) => btns.push(mk(k, k, false)));
+
+    const apply = (cat) => {
+      const first = new Map();
+      cards.forEach((c) => first.set(c, c.getBoundingClientRect()));
+
+      cards.forEach((c) => {
+        c.hidden = !(cat === "*" || catOf(c) === cat);
+      });
+
+      if (REDUCED) return;
+      cards.forEach((c) => {
+        if (c.hidden) return;
+        const a = first.get(c);
+        const b = c.getBoundingClientRect();
+        const dx = a.left - b.left;
+        const dy = a.top - b.top;
+        if (!a.width) {
+          c.animate([{ opacity: 0, transform: "scale(.94)" }, { opacity: 1, transform: "none" }],
+            { duration: 340, easing: "cubic-bezier(.16,1,.3,1)" });
+        } else if (dx || dy) {
+          c.animate([{ transform: "translate(" + dx + "px," + dy + "px)" }, { transform: "none" }],
+            { duration: 480, easing: "cubic-bezier(.16,1,.3,1)" });
+        }
+      });
+    };
+
+    btns.forEach((b) => {
+      b.addEventListener("click", () => {
+        btns.forEach((o) => o.setAttribute("aria-pressed", String(o === b)));
+        apply(b.getAttribute("data-cat"));
+      });
+    });
+  });
+
+  /* ==========================================================
+     14. Barra de progresso de leitura (artigos do blog)
+     ========================================================== */
+  safe("read-progress", () => {
+    const art = document.querySelector(".article");
+    if (!art) return;
+    const bar = document.createElement("div");
+    bar.className = "read-bar";
+    bar.innerHTML = "<i></i>";
+    document.body.appendChild(bar);
+    const fill = bar.firstElementChild;
+
+    const onScroll = () => {
+      const r = art.getBoundingClientRect();
+      const total = r.height - window.innerHeight;
+      const p = total > 0 ? clamp((-r.top) / total, 0, 1) : (r.top <= 0 ? 1 : 0);
+      fill.style.transform = "scaleX(" + p.toFixed(4) + ")";
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    onScroll();
+  });
+
   /* Recalcula depois que fontes/imagens assentam */
   window.addEventListener("load", () => setTimeout(scheduleScenes, 120));
   scheduleScenes();
