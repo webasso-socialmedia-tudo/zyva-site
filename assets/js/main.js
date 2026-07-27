@@ -247,18 +247,25 @@ document.querySelectorAll("[data-year]").forEach((el) => {
       let shown = 0;
       unseen.slice(0, 2).forEach((i) => {
         try { if (sessionStorage.getItem("zyva_hide_" + i.slug)) return; } catch (e) {}
+        const special = i.kind === "special";
         const t = document.createElement("aside");
-        t.className = "zyva-toast " + (i.kind === "special" ? "zt-special" : "zt-news");
+        t.className = "zyva-toast " + (special ? "zt-special" : "zt-news");
         t.setAttribute("role", "status");
         t.innerHTML =
           '<button class="zt-close" type="button" aria-label="Fechar aviso">&times;</button>' +
           '<span class="zt-label"><span class="zt-dot"></span><span class="zt-label-text"></span></span>' +
           '<strong class="zt-title"></strong>' +
-          '<a class="zt-link">Ler agora <span aria-hidden="true">&rarr;</span></a>';
-        t.querySelector(".zt-label-text").textContent =
-          i.kind === "special" ? "Especial de hoje" : "Novo no blog";
+          '<a class="zt-link">Ler agora <span aria-hidden="true">&rarr;</span></a>' +
+          '<span class="zt-hint-arrow zt-hint-up" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg></span>' +
+          '<span class="zt-hint-arrow zt-hint-right" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>' +
+          '<span class="zt-flash" aria-hidden="true"></span>';
+        t.querySelector(".zt-label-text").textContent = special ? "Especial de hoje" : "Novo no blog";
         t.querySelector(".zt-title").textContent = i.title;
         t.querySelector(".zt-link").href = i.slug;
+
+        let interacted = false;
+        let island = null;
+
         const hide = (remember) => {
           if (remember) {
             try { sessionStorage.setItem("zyva_hide_" + i.slug, "1"); } catch (e) {}
@@ -267,16 +274,124 @@ document.querySelectorAll("[data-year]").forEach((el) => {
           setTimeout(() => t.remove(), 400);
         };
         t.querySelector(".zt-close").addEventListener("click", () => hide(true));
+
+        /* --- confirmação curta sobre o toast --- */
+        const flashEl = t.querySelector(".zt-flash");
+        const showFlash = (msg, withCheck) => {
+          flashEl.innerHTML = (withCheck
+            ? '<svg class="zt-flash-ic" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>' : "") + msg;
+          flashEl.classList.add("on");
+        };
+
+        /* --- deslizar para CIMA: ativa avisos do navegador --- */
+        const subscribeNotify = () => {
+          interacted = true;
+          t.style.transition = "transform .3s ease, opacity .3s ease";
+          t.style.transform = "translateY(-12px)";
+          t.style.opacity = "1";
+          const fire = () => {
+            try {
+              const n = new Notification("Novo no blog — Zyva", {
+                body: i.title,
+                icon: "/assets/img/favicon.svg",
+                badge: "/assets/img/favicon.svg",
+                tag: "zyva-blog"
+              });
+              n.onclick = () => { window.focus(); location.href = i.slug; try { n.close(); } catch (e) {} };
+            } catch (e) {}
+          };
+          if (!("Notification" in window)) {
+            showFlash("Seu navegador não suporta avisos", false);
+            setTimeout(() => hide(true), 1900); return;
+          }
+          if (Notification.permission === "granted") {
+            fire(); showFlash("Avisos ativados", true); setTimeout(() => hide(true), 1700);
+          } else if (Notification.permission !== "denied") {
+            Notification.requestPermission().then((perm) => {
+              if (perm === "granted") { fire(); showFlash("Avisos ativados", true); }
+              else { showFlash("Avisos não permitidos", false); }
+              setTimeout(() => hide(true), 1700);
+            }).catch(() => { showFlash("Não foi possível ativar", false); setTimeout(() => hide(true), 1900); });
+          } else {
+            showFlash("Avisos bloqueados no navegador", false);
+            setTimeout(() => hide(true), 2100);
+          }
+        };
+
+        /* --- deslizar para o LADO: minimiza em Ilha Dinâmica --- */
+        const expandFromIsland = () => {
+          if (island) { island.classList.remove("zi-in"); const isl = island; island = null; setTimeout(() => isl.remove(), 380); }
+          t.style.display = "";
+          t.style.transition = "transform .45s cubic-bezier(.16,1,.3,1), opacity .35s ease";
+          requestAnimationFrame(() => { t.style.transform = ""; t.style.opacity = "1"; t.classList.add("zt-in"); });
+        };
+        const minimize = () => {
+          interacted = true;
+          t.style.transition = "transform .42s cubic-bezier(.4,0,.2,1), opacity .42s ease";
+          t.style.transform = "translate(0,-46px) scale(.55)";
+          t.style.opacity = "0";
+          setTimeout(() => { t.style.display = "none"; }, 440);
+          if (island) { island.classList.add("zi-in"); return; }
+          island = document.createElement("button");
+          island.type = "button";
+          island.className = "zyva-island" + (special ? " zt-special-i" : "");
+          island.setAttribute("aria-label", "Abrir aviso do blog: " + i.title);
+          island.innerHTML =
+            '<span class="zi-dot"></span>' +
+            '<svg class="zi-bell" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>' +
+            '<svg class="zi-chevron" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>';
+          island.addEventListener("click", expandFromIsland);
+          document.body.appendChild(island);
+          requestAnimationFrame(() => island.classList.add("zi-in"));
+        };
+
+        /* --- gestos (mouse + toque via Pointer Events) --- */
+        let sx = 0, sy = 0, dragging = false;
+        const TH = 46;
+        const onDown = (e) => {
+          if (e.target.closest(".zt-close") || e.target.closest(".zt-link")) return;
+          dragging = true; interacted = true;
+          sx = e.clientX; sy = e.clientY;
+          t.classList.remove("zt-hint");
+          t.style.animation = "none";
+          t.classList.add("zt-dragging");
+          try { t.setPointerCapture(e.pointerId); } catch (er) {}
+        };
+        const onMove = (e) => {
+          if (!dragging) return;
+          const dx = e.clientX - sx;
+          const ty = Math.min(e.clientY - sy, 0); /* só reage para cima */
+          t.style.transform = "translate(" + dx + "px," + ty + "px)";
+          const far = Math.max(-ty, Math.abs(dx));
+          t.style.opacity = String(Math.max(0.4, 1 - far / 240));
+        };
+        const onUp = (e) => {
+          if (!dragging) return;
+          dragging = false;
+          t.classList.remove("zt-dragging");
+          const dx = e.clientX - sx, dy = e.clientY - sy;
+          if (-dy > TH && -dy >= Math.abs(dx)) { subscribeNotify(); }
+          else if (Math.abs(dx) > TH) { minimize(); }
+          else { t.style.transform = ""; t.style.opacity = ""; } /* volta */
+        };
+        t.addEventListener("pointerdown", onDown);
+        t.addEventListener("pointermove", onMove);
+        t.addEventListener("pointerup", onUp);
+        t.addEventListener("pointercancel", onUp);
+
         wrapEl.appendChild(t);
         shown++;
-        setTimeout(() => t.classList.add("zt-in"), 900 + shown * 260);
-        /* Some sozinho — o aviso não pode competir com o conteúdo da página:
-           sai no tempo, ou assim que o visitante começa a ler de verdade. */
-        setTimeout(() => hide(false), 9000 + shown * 260);
+        const delay = 900 + shown * 260;
+        setTimeout(() => t.classList.add("zt-in"), delay);
+        /* dica: leves movimentos + setas mostrando as direções */
+        setTimeout(() => { if (!interacted && document.body.contains(t)) t.classList.add("zt-hint"); }, delay + 700);
+
+        /* Some sozinho se o visitante não interagir; interação cancela. */
+        setTimeout(() => { if (!interacted) hide(false); }, 13000 + shown * 260);
         const onScroll = () => {
           if (window.scrollY > 600) {
             window.removeEventListener("scroll", onScroll);
-            hide(false);
+            if (!interacted) hide(false);
           }
         };
         window.addEventListener("scroll", onScroll, { passive: true });

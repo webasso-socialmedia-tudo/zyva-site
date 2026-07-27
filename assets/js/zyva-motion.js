@@ -937,6 +937,29 @@
   });
 
   /* ==========================================================
+     14a. Ícones vivos da faixa de confiança (home)
+          Dispara ao entrar na tela; refaz a cada nova entrada.
+     ========================================================== */
+  safe("trust-icons", () => {
+    const trust = document.querySelector(".trust");
+    if (!trust) return;
+    if (REDUCED) return;
+    if (!("IntersectionObserver" in window)) { trust.classList.add("play"); return; }
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          trust.classList.remove("play");
+          void trust.offsetWidth; /* reinicia as animações */
+          trust.classList.add("play");
+        } else {
+          trust.classList.remove("play");
+        }
+      });
+    }, { threshold: 0.45 });
+    io.observe(trust);
+  });
+
+  /* ==========================================================
      14b. Marquee 3D (Cases): clique/toque traz a peça à frente
           — no celular não há hover, então isto é essencial
      ========================================================== */
