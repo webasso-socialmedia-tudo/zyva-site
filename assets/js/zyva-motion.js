@@ -799,10 +799,15 @@
     /* Sem trava de "está visível": o observer dispara de forma assíncrona e,
        se o visitante parasse a rolagem no exato momento da entrada, o traço
        nunca era pintado. São cinco toggles de classe — pode rodar sempre. */
+    /* Ancora no próprio gráfico e espalha o desenho por ~1 tela inteira de
+       scroll: assim a linha não termina cedo demais — ela vai se desenhando
+       enquanto cruza a tela e completa perto do topo. */
+    const stage = wrap.querySelector(".pipe-stage") || wrap;
     const onScroll = () => {
-      const r = wrap.getBoundingClientRect();
-      if (r.bottom < -200 || r.top > window.innerHeight + 200) return;
-      const p = clamp((window.innerHeight * 0.85 - r.top) / (r.height * 0.85), 0, 1);
+      const vh = window.innerHeight || 1;
+      const r = stage.getBoundingClientRect();
+      if (r.bottom < -200 || r.top > vh + 200) return;
+      const p = clamp((vh - r.top) / (vh * 0.9), 0, 1);
       paint(p);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -943,20 +948,29 @@
   safe("trust-icons", () => {
     const trust = document.querySelector(".trust");
     if (!trust) return;
-    if (REDUCED) return;
-    if (!("IntersectionObserver" in window)) { trust.classList.add("play"); return; }
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (e.isIntersecting) {
-          trust.classList.remove("play");
-          void trust.offsetWidth; /* reinicia as animações */
-          trust.classList.add("play");
-        } else {
-          trust.classList.remove("play");
-        }
-      });
-    }, { threshold: 0.45 });
-    io.observe(trust);
+    /* Sem movimento: deixa no estado final (--p = 1). */
+    if (REDUCED) { trust.style.setProperty("--p", "1"); return; }
+
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      const vh = window.innerHeight || 1;
+      const r = trust.getBoundingClientRect();
+      /* p = 0 quando a faixa está entrando por baixo (topo em vh);
+         p = 1 quando ela já subiu (topo em ~38% da tela).
+         Descer aumenta p (avança), subir diminui (volta). */
+      const p = clamp((vh - r.top) / (vh * 0.62), 0, 1);
+      trust.style.setProperty("--p", p.toFixed(4));
+    };
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    window.addEventListener("load", update);
+    update();
   });
 
   /* ==========================================================
