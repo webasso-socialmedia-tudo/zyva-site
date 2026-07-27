@@ -1261,54 +1261,56 @@ body.zcursor-active .cursor-target { cursor: none; }
 }
 
 /* ============================================================
-   16. Ícones vivos da faixa de confiança (home)
-       Estado de repouso = ícone normal; ao entrar na tela,
-       cada um faz uma entrada e para. Reduced-motion não anima.
+   16. Ícones da faixa de confiança (home) — CONTROLADOS PELO SCROLL
+       Truque: cada animação fica pausada e o "frame" é escolhido por
+       um animation-delay negativo proporcional a --p (0→1). O JS
+       atualiza --p conforme o scroll, então a animação avança ao
+       descer e volta ao subir. Sem JS, --p = 1 (ícone normal).
    ============================================================ */
+.trust { --p: 1; }
 .trust .ti-bar { fill: var(--cyan); stroke: none; }
 .trust .ti-plane { fill: var(--cyan); stroke: none; }
 
-/* origens de transformação */
-.trust .ti-checkg { transform-box: fill-box; transform-origin: center; }
-.trust .ti-hands  { transform-box: view-box; transform-origin: center; }
-.trust .ti-bar    { transform-box: fill-box; transform-origin: bottom; }
-.trust .ti-orbit  { transform-box: view-box; transform-origin: center; }
-
-/* 1. Verificado: começa grande e assenta no tamanho normal + traço se desenha */
-.trust .ti-checkg { transform: scale(1); }
-.trust .ti-check path { stroke-dasharray: 26; stroke-dashoffset: 0; }
-.trust.play .ti-checkg { animation: ti-pop .72s cubic-bezier(.22,1,.36,1) both; }
-.trust.play .ti-check path { animation: ti-draw .5s ease-out .06s both; }
-@keyframes ti-pop { 0% { transform: scale(1.9); } 62% { transform: scale(.9); } 100% { transform: scale(1); } }
-@keyframes ti-draw { from { stroke-dashoffset: 26; } to { stroke-dashoffset: 0; } }
-
-/* 2. Relógio: gira rápido e desacelera até parar, com um brilho no fim */
-.trust .ti-hands { transform: rotate(0deg); }
-.trust.play .ti-hands { animation: ti-spin 1.15s cubic-bezier(.16,.86,.26,1) both; }
-.trust.play .ti-clock { animation: ti-flash 1.25s ease-out both; }
-@keyframes ti-spin { from { transform: rotate(-1080deg); } to { transform: rotate(0deg); } }
-@keyframes ti-flash { 0%,68% { filter: none; } 82% { filter: drop-shadow(0 0 5px var(--cyan)); } 100% { filter: none; } }
-
-/* 3. Gráfico: as barras sobem escalonadas e param */
-.trust .ti-bar { transform: scaleY(1); }
-.trust.play .ti-chart .ti-bar { animation: ti-grow .6s cubic-bezier(.22,1,.36,1) both; }
-.trust.play .ti-chart .ti-bar:nth-child(2) { animation-delay: .05s; }
-.trust.play .ti-chart .ti-bar:nth-child(3) { animation-delay: .17s; }
-.trust.play .ti-chart .ti-bar:nth-child(4) { animation-delay: .29s; }
-@keyframes ti-grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
-
-/* 4. Globo: o aviãozinho dá uma volta e para no topo */
-.trust .ti-orbit { transform: rotate(0deg); }
-.trust.play .ti-orbit { animation: ti-fly 1.7s cubic-bezier(.42,0,.2,1) both; }
-@keyframes ti-fly { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-@media (prefers-reduced-motion: reduce) {
-  .trust .ti-checkg, .trust .ti-hands, .trust .ti-bar, .trust .ti-orbit,
-  .trust.play .ti-checkg, .trust.play .ti-check path, .trust.play .ti-hands,
-  .trust.play .ti-clock, .trust.play .ti-chart .ti-bar, .trust.play .ti-orbit {
-    animation: none !important;
-  }
+/* Todos os elementos animados: mesma "régua" dirigida por --p */
+.trust .ti-checkg,
+.trust .ti-check path,
+.trust .ti-hands,
+.trust .ti-clock,
+.trust .ti-chart .ti-bar,
+.trust .ti-orbit {
+  animation-duration: 1s;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+  animation-play-state: paused;
+  animation-delay: calc(var(--p) * -1s);
 }
+
+/* origens de transformação */
+.trust .ti-checkg { transform-box: fill-box; transform-origin: center; animation-name: ti-pop; }
+.trust .ti-check path { stroke-dasharray: 26; animation-name: ti-draw; }
+.trust .ti-hands { transform-box: view-box; transform-origin: center; animation-name: ti-spin; }
+.trust .ti-clock { animation-name: ti-flash; }
+.trust .ti-bar { transform-box: fill-box; transform-origin: bottom; }
+.trust .ti-chart .ti-bar:nth-child(2) { animation-name: ti-grow1; }
+.trust .ti-chart .ti-bar:nth-child(3) { animation-name: ti-grow2; }
+.trust .ti-chart .ti-bar:nth-child(4) { animation-name: ti-grow3; }
+.trust .ti-orbit { transform-box: view-box; transform-origin: center; animation-name: ti-fly; }
+
+/* 1. Verificado: grande -> normal, com o traço se desenhando */
+@keyframes ti-pop { 0% { transform: scale(1.85); } 72% { transform: scale(.95); } 100% { transform: scale(1); } }
+@keyframes ti-draw { 0% { stroke-dashoffset: 26; } 60%,100% { stroke-dashoffset: 0; } }
+
+/* 2. Relógio: gira (3 voltas) e assenta, com um brilho perto do fim */
+@keyframes ti-spin { 0% { transform: rotate(-1080deg); } 100% { transform: rotate(0deg); } }
+@keyframes ti-flash { 0%,72% { filter: none; } 86% { filter: drop-shadow(0 0 5px var(--cyan)); } 100% { filter: none; } }
+
+/* 3. Gráfico: barras sobem escalonadas (stagger embutido no tempo) */
+@keyframes ti-grow1 { 0% { transform: scaleY(0); } 55%,100% { transform: scaleY(1); } }
+@keyframes ti-grow2 { 0%,16% { transform: scaleY(0); } 72%,100% { transform: scaleY(1); } }
+@keyframes ti-grow3 { 0%,32% { transform: scaleY(0); } 88%,100% { transform: scaleY(1); } }
+
+/* 4. Globo: o aviãozinho dá a volta */
+@keyframes ti-fly { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
 /* ============================================================
    17. Notificação do blog: gestos, dicas e Ilha Dinâmica
