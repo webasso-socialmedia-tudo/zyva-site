@@ -936,6 +936,109 @@
     onScroll();
   });
 
+  /* ==========================================================
+     14b. Marquee 3D (Cases): clique/toque traz a peça à frente
+          — no celular não há hover, então isto é essencial
+     ========================================================== */
+  safe("marquee-front", () => {
+    const stage = document.querySelector(".m3-stage");
+    if (!stage) return;
+    const cards = Array.from(stage.querySelectorAll(".m3-card"));
+    if (!cards.length) return;
+
+    const clearAll = (except) => {
+      cards.forEach((c) => { if (c !== except) c.classList.remove("m3-front"); });
+    };
+
+    cards.forEach((card) => {
+      card.addEventListener("click", () => {
+        const wasFront = card.classList.contains("m3-front");
+        clearAll(card);
+        card.classList.toggle("m3-front", !wasFront);
+      });
+    });
+
+    /* toca fora dos cards → volta tudo */
+    const wrap = document.querySelector(".marquee3d");
+    if (wrap) {
+      wrap.addEventListener("click", (e) => {
+        if (!e.target.closest(".m3-card")) clearAll(null);
+      });
+    }
+  });
+
+  /* ==========================================================
+     15. Rodapé cinematográfico: cortina + parallax + revelação
+     ========================================================== */
+  safe("cine-footer", () => {
+    const wrap = document.querySelector("[data-cine-reveal]");
+    if (!wrap) return;
+    const giant = wrap.querySelector("[data-cine-giant]");
+    const title = wrap.querySelector("[data-cine-title]");
+    const links = wrap.querySelector("[data-cine-links]");
+    const topBtn = wrap.querySelector("[data-cine-top]");
+    const waFloat = document.querySelector(".wa-float");
+
+    if (topBtn) {
+      topBtn.addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    }
+
+    /* Sem movimento: deixa tudo visível e para por aqui */
+    if (REDUCED) {
+      [giant, title, links].forEach((el) => {
+        if (!el) return;
+        el.style.opacity = "1";
+        if (el === giant) el.style.transform = "translateX(-50%)";
+        else el.style.transform = "none";
+      });
+      return;
+    }
+
+    const outCubic = (t) => 1 - Math.pow(1 - t, 3);
+    let ticking = false;
+
+    const paint = () => {
+      ticking = false;
+      const vh = window.innerHeight || 1;
+      const r = wrap.getBoundingClientRect();
+      /* p = 0 quando a cortina começa a entrar (topo em vh);
+         p = 1 quando a cortina preenche a tela (topo em 0). */
+      const p = clamp((vh - r.top) / (r.height || vh), 0, 1);
+
+      if (giant) {
+        const gp = outCubic(clamp(p * 1.12, 0, 1));
+        giant.style.opacity = gp.toFixed(3);
+        giant.style.transform =
+          "translateX(-50%) translateY(" + ((1 - gp) * 10).toFixed(2) + "vh) scale(" +
+          (0.8 + gp * 0.2).toFixed(3) + ")";
+      }
+
+      const reveal = (el, delay) => {
+        if (!el) return;
+        const cp = outCubic(clamp((p - delay) / 0.5, 0, 1));
+        el.style.opacity = cp.toFixed(3);
+        el.style.transform = "translateY(" + ((1 - cp) * 50).toFixed(2) + "px)";
+      };
+      reveal(title, 0.14);
+      reveal(links, 0.26);
+
+      /* esconde o WhatsApp flutuante quando a cortina já entrou */
+      if (waFloat) waFloat.classList.toggle("wa-hidden", p > 0.35);
+    };
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(paint);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    window.addEventListener("load", () => setTimeout(paint, 120));
+    paint();
+  });
+
   /* Recalcula depois que fontes/imagens assentam */
   window.addEventListener("load", () => setTimeout(scheduleScenes, 120));
   scheduleScenes();
