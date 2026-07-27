@@ -11,12 +11,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/assets/css/style.css" />
+  <link rel="stylesheet" href="/assets/css/motion.css" />
 </head>
 <body class="dark-shell">
 
   <header class="site-header">
     <div class="container nav">
-      <a class="logo" href="/" aria-label="Zyva — início">
+      <a class="logo cursor-target" href="/" aria-label="Zyva — início">
         <svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6C4CF1"/><stop offset="1" stop-color="#22D3EE"/></linearGradient></defs><polygon points="10,10 54,10 54,20 38,31 46,31 30,44 54,44 54,54 10,54 10,44 26,33 18,33 34,20 10,20" fill="url(#lg)"/></svg>
         <span class="logo-word">zyva<span class="dot">.</span></span>
       </a>
@@ -28,7 +29,7 @@
         <a href="/sobre/">Sobre</a>
         <a href="/blog/" class="active">Blog</a>
         <a href="/contato/">Contato</a>
-        <a href="/contato/" class="btn btn-primary nav-cta">Diagnóstico gratuito</a>
+        <a href="/contato/" class="btn btn-primary nav-cta cursor-target">Diagnóstico gratuito</a>
       </nav>
     </div>
   </header>
@@ -36,7 +37,7 @@
   <section class="page-hero on-dark">
     <div class="container">
       <span class="kicker kicker-pill">Blog da Zyva</span>
-      <h1>Marketing digital em português claro</h1>
+      <h1 data-reveal>Marketing digital em português claro</h1>
       <p>Sem jargão, sem enrolação: conteúdo prático para quem toca o próprio negócio e quer vender mais.</p>
     </div>
   </section>
@@ -45,24 +46,25 @@
 
   <section class="section">
     <div class="container">
-      <div class="grid grid-3">
+      <div class="blog-filter rise" data-blog-filter role="group" aria-label="Filtrar por categoria"></div>
+      <div class="grid grid-3" data-blog-grid>
         <div class="card post-card reveal">
           <span class="post-cat">Notícias</span>
           <h3>Google fatura US$ 81,6 bi com busca — e o clique está sumindo</h3>
           <p>Notícia do dia (24/07): resultados recordes, buscas respondidas por IA e o novo relatório do Search Console — com 6 ações práticas para PMEs.</p>
-          <a class="more" href="/blog/noticia-2026-07-24-google-ia-buscas/">Ler artigo →</a>
+          <a class="more cursor-target" href="/blog/noticia-2026-07-24-google-ia-buscas/">Ler artigo →</a>
         </div>
         <div class="card post-card reveal">
           <span class="post-cat">Estratégia</span>
           <h3>Marketing digital para pequenas empresas: por onde começar</h3>
           <p>O guia direto ao ponto para dar os primeiros passos sem desperdiçar dinheiro: presença, canal e medição.</p>
-          <a class="more" href="/blog/marketing-digital-pequenas-empresas-por-onde-comecar/">Ler artigo →</a>
+          <a class="more cursor-target" href="/blog/marketing-digital-pequenas-empresas-por-onde-comecar/">Ler artigo →</a>
         </div>
         <div class="card post-card reveal">
           <span class="post-cat">Anúncios</span>
           <h3>Quanto custa anunciar no Google e no Instagram?</h3>
           <p>Guia de orçamento realista para PMEs: quanto investir, o que esperar e como não queimar verba.</p>
-          <a class="more" href="/blog/quanto-custa-anunciar-google-instagram/">Ler artigo →</a>
+          <a class="more cursor-target" href="/blog/quanto-custa-anunciar-google-instagram/">Ler artigo →</a>
         </div>
         <div class="card post-card reveal">
           <span class="post-cat">SEO local</span>
@@ -99,8 +101,8 @@
       <h2>Prefere que a gente faça por você?</h2>
       <p>Conteúdo é um dos nossos serviços. Peça seu diagnóstico gratuito.</p>
       <div class="hero-ctas" style="justify-content: center;">
-        <a href="/contato/" class="btn btn-primary">Pedir diagnóstico gratuito</a>
-        <a href="#" class="btn btn-ghost" data-wa>Chamar no WhatsApp</a>
+        <a href="/contato/" class="btn btn-primary cursor-target">Pedir diagnóstico gratuito</a>
+        <a href="#" class="btn btn-ghost cursor-target" data-wa>Chamar no WhatsApp</a>
       </div>
     </div>
   </section>
@@ -153,10 +155,11 @@
     </div>
   </footer>
 
-  <a href="#" class="wa-float" data-wa aria-label="Falar no WhatsApp">
+  <a href="#" class="wa-float cursor-target" data-wa aria-label="Falar no WhatsApp">
     <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
   </a>
 
   <script src="/assets/js/main.js"></script>
+  <script src="/assets/js/zyva-motion.js"></script>
 </body>
 </html>
