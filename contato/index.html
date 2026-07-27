@@ -11,12 +11,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/assets/css/style.css" />
+  <link rel="stylesheet" href="/assets/css/motion.css" />
 </head>
 <body class="dark-shell">
 
   <header class="site-header">
     <div class="container nav">
-      <a class="logo" href="/" aria-label="Zyva — início">
+      <a class="logo cursor-target" href="/" aria-label="Zyva — início">
         <svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6C4CF1"/><stop offset="1" stop-color="#22D3EE"/></linearGradient></defs><polygon points="10,10 54,10 54,20 38,31 46,31 30,44 54,44 54,54 10,54 10,44 26,33 18,33 34,20 10,20" fill="url(#lg)"/></svg>
         <span class="logo-word">zyva<span class="dot">.</span></span>
       </a>
@@ -28,7 +29,7 @@
         <a href="/sobre/">Sobre</a>
         <a href="/blog/">Blog</a>
         <a href="/contato/" class="active">Contato</a>
-        <a href="/contato/" class="btn btn-primary nav-cta">Diagnóstico gratuito</a>
+        <a href="/contato/" class="btn btn-primary nav-cta cursor-target">Diagnóstico gratuito</a>
       </nav>
     </div>
   </header>
@@ -36,81 +37,219 @@
   <section class="page-hero on-dark">
     <div class="container">
       <span class="kicker kicker-pill">Contato</span>
-      <h1>Vamos conversar sobre o seu crescimento?</h1>
-      <p>Preencha o formulário ou chame direto no WhatsApp. Resposta garantida em até 1 dia útil.</p>
+      <h1 data-reveal>Vamos conversar sobre o seu crescimento?</h1>
+      <p class="rise" style="color: rgba(255,255,255,0.72); max-width: 660px; margin-top: 16px; font-size: 1.08rem;">
+        Me chama para falar sobre <strong class="rot-accent" data-rotate='["aparecer no Google","anunciar no Instagram","um site que vende","conteúdo todo dia","vender no WhatsApp"]' data-rotate-interval="2400" style="font-weight:700;">aparecer no Google</strong>. Resposta garantida em até 1 dia útil.
+      </p>
     </div>
   </section>
 
-  <div class="sheet sheet-pull">
+  <!-- ====== CENA: o celular que abre no scroll ====== -->
+  <section class="phone-scene" data-phone-track aria-label="Escolha um assunto e fale no WhatsApp">
+    <div class="phone-track">
+      <div class="phone-sticky">
+        <div class="container">
 
-  <section class="section">
-    <div class="container contact-grid">
+          <div class="phone-copy">
+            <div class="live-status rise" data-live-status>
+              <span class="live-dot"></span>
+              <span data-live-label>Atendendo agora — resposta em minutos</span>
+            </div>
+            <h2 data-reveal>Escolha o assunto. A mensagem <em>se escreve sozinha.</em></h2>
+            <p class="rise">Toque em um dos assuntos: ele aparece digitado na tela do celular, exatamente como vai chegar para a gente. Aí é só enviar.</p>
 
-      <div class="form-card reveal">
-        <h3 style="margin-bottom: 20px;">Peça seu diagnóstico gratuito</h3>
-        <form id="form-contato">
-          <div class="field">
-            <label for="nome">Seu nome*</label>
-            <input type="text" id="nome" name="nome" required placeholder="Como quer ser chamado?" />
+            <div class="topic-list" role="group" aria-label="Assuntos para conversar">
+              <button type="button" class="topic cursor-target" aria-pressed="false"
+                data-msg="Olá, Zyva! Quero o diagnóstico gratuito da minha empresa.">
+                <span class="topic-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.9-3.9"/></svg></span>
+                <span class="topic-txt"><b>Diagnóstico gratuito</b><span>O raio-X da sua presença digital</span></span>
+                <span class="topic-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+              </button>
+
+              <button type="button" class="topic cursor-target" aria-pressed="false"
+                data-msg="Olá, Zyva! Quero anunciar no Google e no Instagram e saber quanto volta de venda.">
+                <span class="topic-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4"/></svg></span>
+                <span class="topic-txt"><b>Tráfego pago</b><span>Anúncios que trazem cliente</span></span>
+                <span class="topic-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+              </button>
+
+              <button type="button" class="topic cursor-target" aria-pressed="false"
+                data-msg="Olá, Zyva! Preciso de gestão de redes sociais e conteúdo para a minha empresa.">
+                <span class="topic-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17.2" cy="6.8" r="1"/></svg></span>
+                <span class="topic-txt"><b>Redes sociais</b><span>Perfil ativo e marca viva</span></span>
+                <span class="topic-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+              </button>
+
+              <button type="button" class="topic cursor-target" aria-pressed="false"
+                data-msg="Olá, Zyva! Quero um site novo, feito para transformar visita em contato.">
+                <span class="topic-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="13.5" rx="2.5"/><path d="M8.5 21h7M12 17.5V21"/></svg></span>
+                <span class="topic-txt"><b>Criação de site</b><span>Rápido, bonito e que converte</span></span>
+                <span class="topic-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+              </button>
+
+              <button type="button" class="topic cursor-target" aria-pressed="false"
+                data-msg="Olá, Zyva! Ainda não sei por onde começar no digital. Podem me orientar?">
+                <span class="topic-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.2 9.2a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></span>
+                <span class="topic-txt"><b>Não sei por onde começar</b><span>A gente te orienta primeiro</span></span>
+                <span class="topic-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+              </button>
+            </div>
           </div>
-          <div class="field">
-            <label for="empresa">Empresa*</label>
-            <input type="text" id="empresa" name="empresa" required placeholder="Nome do seu negócio" />
+
+          <!-- Celular em 3D real (CSS 3D — o que está na tela são elementos de verdade) -->
+          <div class="phone-holder">
+            <div class="phone">
+              <div class="phone-back" aria-hidden="true"></div>
+              <span class="phone-edge phone-edge-l" aria-hidden="true"></span>
+              <span class="phone-edge phone-edge-r" aria-hidden="true"></span>
+              <span class="phone-edge phone-edge-t" aria-hidden="true"></span>
+              <span class="phone-edge phone-edge-b" aria-hidden="true"></span>
+              <span class="phone-btn phone-btn-power" aria-hidden="true"></span>
+              <span class="phone-btn phone-btn-vol" aria-hidden="true"></span>
+              <span class="phone-btn phone-btn-vol2" aria-hidden="true"></span>
+
+              <div class="phone-body">
+                <div class="phone-screen">
+                  <span class="phone-notch" aria-hidden="true"></span>
+                  <span class="phone-glare" aria-hidden="true"></span>
+
+                  <div class="wa-status">
+                    <span data-clock>--:--</span>
+                    <span class="wa-status-icons" aria-hidden="true">
+                      <svg viewBox="0 0 24 24"><path d="M2 20h3v-6H2zm5.5 0h3V9h-3zm5.5 0h3V5h-3zm5.5 0h3V2h-3z"/></svg>
+                      <svg viewBox="0 0 24 24"><path d="M12 20.5 0.6 8.3A16.8 16.8 0 0 1 23.4 8.3z"/></svg>
+                      <svg viewBox="0 0 26 24"><rect x="1" y="7" width="19" height="10" rx="2.6" fill="none" stroke="#fff" stroke-width="1.6"/><rect x="3" y="9" width="14" height="6" rx="1.2"/><rect x="21.4" y="10" width="2" height="4" rx="1"/></svg>
+                    </span>
+                  </div>
+
+                  <div class="wa-head">
+                    <span class="wa-avatar" aria-hidden="true">
+                      <svg viewBox="0 0 64 64"><polygon points="10,10 54,10 54,20 38,31 46,31 30,44 54,44 54,54 10,54 10,44 26,33 18,33 34,20 10,20" fill="#fff"/></svg>
+                    </span>
+                    <span class="wa-head-t">
+                      <b>Zyva · Marketing Digital</b>
+                      <span><i>online</i></span>
+                    </span>
+                    <span class="wa-head-act" aria-hidden="true">
+                      <svg viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+                      <svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>
+                    </span>
+                  </div>
+
+                  <div class="wa-chat">
+                    <span class="wa-day">HOJE</span>
+                    <div class="wa-b wa-in" data-greet>
+                      Oi! Sobre o que você quer falar?<br />É só escolher um assunto aqui do lado.
+                      <span class="wa-meta" data-clock>--:--</span>
+                    </div>
+                    <div class="wa-typing" aria-hidden="true"><i></i><i></i><i></i></div>
+                  </div>
+
+                  <div class="wa-send">
+                    <span class="wa-input">Escolha um assunto ao lado…</span>
+                    <a class="wa-go cursor-target" href="#" data-wa target="_blank" rel="noopener" aria-label="Enviar no WhatsApp">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="field">
-            <label for="whatsapp">Seu WhatsApp*</label>
-            <input type="tel" id="whatsapp" name="whatsapp" required placeholder="(00) 90000-0000" />
-          </div>
-          <div class="field">
-            <label for="servico">Qual serviço interessa mais?*</label>
-            <select id="servico" name="servico" required>
-              <option value="Diagnóstico geral">Não sei ainda — quero o diagnóstico geral</option>
-              <option value="SEO">SEO — aparecer no Google</option>
-              <option value="Redes Sociais">Gestão de Redes Sociais</option>
-              <option value="Tráfego Pago">Tráfego Pago (Google/Meta Ads)</option>
-              <option value="Marketing de Conteúdo">Marketing de Conteúdo</option>
-              <option value="WhatsApp Business">WhatsApp Business</option>
-              <option value="Criação de Site">Criação de Site</option>
-              <option value="Branding">Branding / Identidade Visual</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="mensagem">Conte um pouco sobre o seu momento</label>
-            <textarea id="mensagem" name="mensagem" rows="4" placeholder="Ex.: tenho uma loja de roupas e quero vender mais pelo Instagram..."></textarea>
-          </div>
-          <label class="consent">
-            <input type="checkbox" name="consent" required />
-            <span>Li e aceito a <a href="/politica-de-privacidade/">Política de Privacidade</a> e autorizo o contato da Zyva pelos dados informados (LGPD).</span>
-          </label>
-          <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Enviar pelo WhatsApp →</button>
-          <p class="hint" style="margin-top: 10px; text-align: center;">O formulário abre seu WhatsApp com a mensagem pronta — é só apertar enviar.</p>
-          <p id="form-ok" hidden style="margin-top: 14px; color: var(--green); font-weight: 600; text-align: center;">Mensagem preparada! Confira a aba do WhatsApp que acabou de abrir.</p>
-        </form>
+
+        </div>
+
+        <div class="phone-hint" aria-hidden="true"><i></i>Role para abrir</div>
+        <div class="scene-rail" aria-hidden="true"><i></i></div>
       </div>
-
-      <div class="contact-aside">
-        <div class="card reveal">
-          <h3>WhatsApp</h3>
-          <p>O jeito mais rápido de falar com a gente.</p>
-          <a href="#" class="btn btn-wa" data-wa style="margin-top: 16px;">Chamar no WhatsApp</a>
-        </div>
-        <div class="card reveal">
-          <h3>E-mail</h3>
-          <p><a href="mailto:contato@agenciazyva.com.br">contato@agenciazyva.com.br</a></p>
-        </div>
-        <div class="card reveal">
-          <h3>Horário de atendimento</h3>
-          <p>Segunda a sexta, das 9h às 18h (horário de Brasília).<br />Mensagens fora do horário são respondidas no próximo dia útil.</p>
-        </div>
-        <div class="card reveal">
-          <h3>Atendimento em todo o Brasil</h3>
-          <p>Somos 100% digitais: reuniões por vídeo e acompanhamento online, onde quer que sua empresa esteja.</p>
-        </div>
-      </div>
-
     </div>
   </section>
 
+  <!-- ====== Formulário e canais ====== -->
+  <div class="sheet">
+    <section class="section">
+      <div class="container contact-grid">
+
+        <div class="form-card rise">
+          <h3 style="margin-bottom: 20px;">Prefere escrever? Peça por aqui</h3>
+          <form id="form-contato">
+            <div class="field">
+              <label for="nome">Seu nome*</label>
+              <input type="text" id="nome" name="nome" required placeholder="Como quer ser chamado?" />
+            </div>
+            <div class="field">
+              <label for="empresa">Empresa*</label>
+              <input type="text" id="empresa" name="empresa" required placeholder="Nome do seu negócio" />
+            </div>
+            <div class="field">
+              <label for="whatsapp">Seu WhatsApp*</label>
+              <input type="tel" id="whatsapp" name="whatsapp" required placeholder="(00) 90000-0000" />
+            </div>
+            <div class="field">
+              <label for="servico">Qual serviço interessa mais?*</label>
+              <select id="servico" name="servico" required>
+                <option value="Diagnóstico geral">Não sei ainda — quero o diagnóstico geral</option>
+                <option value="SEO">SEO — aparecer no Google</option>
+                <option value="Redes Sociais">Gestão de Redes Sociais</option>
+                <option value="Tráfego Pago">Tráfego Pago (Google/Meta Ads)</option>
+                <option value="Marketing de Conteúdo">Marketing de Conteúdo</option>
+                <option value="WhatsApp Business">WhatsApp Business</option>
+                <option value="Criação de Site">Criação de Site</option>
+                <option value="Branding">Branding / Identidade Visual</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="mensagem">Conte um pouco sobre o seu momento</label>
+              <textarea id="mensagem" name="mensagem" rows="4" placeholder="Ex.: tenho uma loja de roupas e quero vender mais pelo Instagram..."></textarea>
+            </div>
+            <label class="consent">
+              <input type="checkbox" name="consent" required />
+              <span>Li e aceito a <a href="/politica-de-privacidade/">Política de Privacidade</a> e autorizo o contato da Zyva pelos dados informados (LGPD).</span>
+            </label>
+            <button type="submit" class="btn btn-primary cursor-target" style="width: 100%; justify-content: center;">Enviar pelo WhatsApp →</button>
+            <p class="hint" style="margin-top: 10px; text-align: center;">O formulário abre seu WhatsApp com a mensagem pronta — é só apertar enviar.</p>
+            <p id="form-ok" hidden style="margin-top: 14px; color: var(--green); font-weight: 600; text-align: center;">Mensagem preparada! Confira a aba do WhatsApp que acabou de abrir.</p>
+          </form>
+        </div>
+
+        <div class="contact-aside">
+          <div class="card rise tilt" data-tilt="9">
+            <div class="tilt-inner">
+              <h3>WhatsApp</h3>
+              <p>O jeito mais rápido de falar com a gente.</p>
+              <a href="#" class="btn btn-wa cursor-target" data-wa style="margin-top: 16px;">Chamar no WhatsApp</a>
+            </div>
+          </div>
+          <div class="card rise tilt" data-tilt="9">
+            <div class="tilt-inner">
+              <h3>E-mail</h3>
+              <p><a href="mailto:contato@agenciazyva.com.br" class="cursor-target">contato@agenciazyva.com.br</a></p>
+            </div>
+          </div>
+          <div class="card rise tilt" data-tilt="9">
+            <div class="tilt-inner">
+              <h3>Horário de atendimento</h3>
+              <p>Segunda a sexta, das 9h às 18h (horário de Brasília).<br />Mensagens fora do horário são respondidas no próximo dia útil.</p>
+            </div>
+          </div>
+          <div class="card rise" style="display:flex; align-items:center; gap:22px;">
+            <a class="spin-badge cursor-target" href="#" data-wa aria-label="Falar agora no WhatsApp">
+              <svg viewBox="0 0 132 132" aria-hidden="true">
+                <defs><path id="badgePath" d="M66,66 m-48,0 a48,48 0 1,1 96,0 a48,48 0 1,1 -96,0" /></defs>
+                <text><textPath href="#badgePath" startOffset="0">Fale agora · Fale agora · Fale agora · </textPath></text>
+              </svg>
+              <span class="spin-badge-core" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg>
+              </span>
+            </a>
+            <div>
+              <h3 style="margin-bottom:6px;">Atendemos todo o Brasil</h3>
+              <p style="font-size:0.95rem;">100% digital: reuniões por vídeo e acompanhamento online, onde quer que sua empresa esteja.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
   </div>
 
   <footer class="site-footer">
@@ -161,10 +300,11 @@
     </div>
   </footer>
 
-  <a href="#" class="wa-float" data-wa aria-label="Falar no WhatsApp">
+  <a href="#" class="wa-float cursor-target" data-wa aria-label="Falar no WhatsApp">
     <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
   </a>
 
   <script src="/assets/js/main.js"></script>
+  <script src="/assets/js/zyva-motion.js"></script>
 </body>
 </html>
