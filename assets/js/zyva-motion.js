@@ -677,12 +677,24 @@
       cv.style.width = W + "px";
       cv.style.height = H + "px";
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      /* Grande e sangrando pela direita, como a marca d'água original —
-         assim o traço do Z continua legível em volta do painel. */
-      box = Math.min(H * 1.22, W * 0.58);
-      cxp = W * 0.86;
-      cyp = H * 0.5;
+      /* Posição medida, não chutada: o Z ocupa o corredor livre entre o
+         texto e o painel branco — assim nenhum trecho do traço fica
+         escondido atrás do cartão e a letra se lê inteira. */
+      const mock = host.querySelector(".mock");
+      if (mock && W > 860) {
+        const m = mock.getBoundingClientRect();
+        const cardLeft = Math.max(360, m.left - r.left);
+        box = Math.max(300, Math.min(H * 1.02, (cardLeft + 60) * 0.55));
+        cxp = (cardLeft + 60) - box * 0.36;
+        cyp = H * 0.54;
+      } else {
+        /* layout empilhado: vira um selo no alto, perto do título */
+        box = Math.min(W * 0.55, H * 0.6);
+        cxp = W * 0.80;
+        cyp = H * 0.30;
+      }
     };
+    window.addEventListener("load", layout);
 
     layout();
     targets.forEach((t) => {
@@ -721,8 +733,8 @@
 
       for (let i = 0; i < parts.length; i++) {
         const p = parts[i];
-        const hx = cxp + p.tx * box + Math.sin(time * 0.6 + p.ph) * 3;
-        const hy = cyp + p.ty * box + Math.cos(time * 0.5 + p.ph) * 3;
+        const hx = cxp + p.tx * box + Math.sin(time * 0.6 + p.ph) * 2.2;
+        const hy = cyp + p.ty * box + Math.cos(time * 0.5 + p.ph) * 2.2;
         const gx = p.x + (hx - p.x) * 0.055 * (0.25 + g);
         const gy = p.y + (hy - p.y) * 0.055 * (0.25 + g);
 
@@ -743,7 +755,7 @@
           "rgba(" + Math.round(108 + mix * (34 - 108)) + "," +
           Math.round(76 + mix * (211 - 76)) + "," +
           Math.round(241 + mix * (238 - 241)) + "," +
-          (0.14 + g * 0.52) + ")";
+          (0.16 + g * 0.6) + ")";
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.sz, 0, 6.283);
         ctx.fill();
