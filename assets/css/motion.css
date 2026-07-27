@@ -806,7 +806,7 @@ body.zcursor-active .cursor-target { cursor: none; }
   width: 48px; height: 48px;
   margin: 0 auto 12px;
   border-radius: 14px;
-  display: grid; place-items: center;
+  display: flex; align-items: center; justify-content: center;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.12);
   transition: transform 0.5s var(--ease-out-expo), background 0.45s ease, border-color 0.45s ease, box-shadow 0.45s ease;
@@ -822,9 +822,12 @@ body.zcursor-active .cursor-target { cursor: none; }
   border-color: rgba(34, 211, 238, 0.55);
   box-shadow: 0 0 26px rgba(34, 211, 238, 0.28);
 }
-.pipe-ico svg { width: 22px; height: 22px; stroke: #fff; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.pipe-ico svg { display: block; width: 22px; height: 22px; stroke: #fff; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
 .pipe-node b { display: block; font-family: var(--font-head); font-size: 0.95rem; margin-bottom: 3px; }
-.pipe-node span { display: block; font-size: 0.8rem; color: rgba(255, 255, 255, 0.55); }
+/* Só o subtítulo (o span depois do <b>). Antes era ".pipe-node span", que
+   também pegava o .pipe-ico e o .pipe-step (ambos são <span>) e quebrava a
+   centralização do ícone ao forçar display:block. */
+.pipe-node b ~ span { display: block; font-size: 0.8rem; color: rgba(255, 255, 255, 0.55); }
 .pipe-step {
   display: inline-block;
   font-family: var(--font-head);
@@ -935,8 +938,17 @@ body.zcursor-active .cursor-target { cursor: none; }
   color: rgba(255, 255, 255, 0.92);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 18px 40px rgba(0, 0, 0, 0.45);
   transition: transform 0.35s var(--ease-out-expo), box-shadow 0.35s ease;
+  cursor: pointer;
 }
 .m3-card:hover { transform: translateZ(40px); box-shadow: 0 0 0 1px rgba(34,211,238,.5), 0 26px 60px rgba(0,0,0,.6); }
+/* Trazido à frente por clique/toque (funciona no celular, onde não há hover) */
+.m3-card.m3-front {
+  transform: translateZ(70px) scale(1.05);
+  box-shadow: 0 0 0 1.5px rgba(34,211,238,.7), 0 34px 74px rgba(0,0,0,.7);
+  z-index: 20;
+}
+/* congela a coluna enquanto uma peça está à frente, para dar tempo de ler */
+.m3-col:has(.m3-front) { animation-play-state: paused; }
 .m3-a { background: var(--grad); }
 .m3-b { background: linear-gradient(140deg, #0B0E1A, #35307a); }
 .m3-c { background: linear-gradient(140deg, #0e7490, #22D3EE); }
@@ -980,16 +992,35 @@ body.zcursor-active .cursor-target { cursor: none; }
   .bl-panels { min-height: 178px; }
   .marquee3d { height: 420px; }
   .m3-stage { transform: rotateX(52deg) rotateZ(-44deg) scale(0.42); }
-  .pipe-nodes { grid-template-columns: repeat(2, 1fr); gap: 22px; margin-top: 20px; }
+  /* No celular o pipeline vira uma linha do tempo vertical: o "gráfico"
+     passa a ser a linha em gradiente que conecta os ícones. */
   .pipe-stage .pipe-svg { display: none; }
-  .pipe-node { opacity: 1; text-align: left; }
-  .pipe-ico { margin: 0 0 10px; }
+  .pipe-nodes { grid-template-columns: 1fr; gap: 0; margin-top: 24px; }
+  .pipe-node {
+    opacity: 1; text-align: left;
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    column-gap: 18px;
+    align-items: center;
+    padding-bottom: 30px;
+    position: relative;
+  }
+  .pipe-node:last-child { padding-bottom: 0; }
+  .pipe-ico { grid-column: 1; grid-row: 1 / span 3; align-self: start; margin: 0; }
+  .pipe-step { grid-column: 2; grid-row: 1; }
+  .pipe-node b { grid-column: 2; grid-row: 2; }
+  .pipe-node b ~ span { grid-column: 2; grid-row: 3; }
+  .pipe-node:not(:last-child)::before {
+    content: ""; position: absolute;
+    left: 23px; top: 54px; bottom: -2px; width: 2px;
+    border-radius: 2px;
+    background: linear-gradient(to bottom, rgba(108,76,241,.75), rgba(34,211,238,.55));
+  }
 }
 @media (max-width: 640px) {
   .marquee3d { height: 330px; }
   .m3-stage { transform: rotateX(52deg) rotateZ(-44deg) scale(0.3); }
   .bl-letter { border-radius: 13px; font-size: 2rem; }
-  .pipe-nodes { grid-template-columns: 1fr; gap: 16px; }
   .pipeline { border-radius: 22px; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -1015,13 +1046,216 @@ body.zcursor-active .cursor-target { cursor: none; }
 }
 .chip-filter:hover { transform: translateY(-2px); border-color: var(--violet); color: var(--violet); }
 .chip-filter[aria-pressed="true"] {
-  background: var(--grad);
+  /* O gradiente "sobra" para fora da pílula (background-size 150% centralizado):
+     assim as pontas arredondadas mostram tons do MEIO da transição, e não o
+     violeta/ciano puros das extremidades — nada de cor sólida destoando na borda. */
+  background-image: linear-gradient(to right, #6C4CF1, #22D3EE);
+  background-size: 150% 100%;
+  background-position: center;
   border-color: transparent;
   color: #fff;
-  box-shadow: 0 6px 18px rgba(108,76,241,.32);
+  /* Luz suave e uniforme (azul entre o violeta e o ciano), sem blocos de cor. */
+  box-shadow: 0 8px 22px rgba(76, 132, 232, .34);
 }
 
 /* O atributo [hidden] só esconde se nada declarar display depois dele —
    e .post-card declara display:flex. Sem isto, o filtro "esconde" no DOM
    mas os cards continuam à vista. */
 [data-blog-grid] > [hidden] { display: none !important; }
+
+/* ============================================================
+   15. Rodapé cinematográfico — revelação em cortina
+       (port em JS puro do CinematicFooter React/GSAP)
+   ============================================================ */
+
+/* A "cortina": fica no fluxo normal e recorta seu conteúdo. Como tem
+   clip-path, ela vira o bloco de contenção do rodapé fixo lá dentro —
+   é isso que cria a revelação de baixo para cima ao rolar. */
+.cine-reveal {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  background: var(--night);
+}
+.cine-foot {
+  position: fixed;
+  bottom: 0; left: 0;
+  height: 100vh; width: 100%;
+  display: flex; flex-direction: column; justify-content: space-between;
+  overflow: hidden;
+  background: var(--night);
+  color: #fff;
+  font-family: var(--font-body);
+}
+
+/* Aurora ambiente que "respira" */
+.cine-aurora {
+  position: absolute; left: 50%; top: 50%;
+  height: 60vh; width: 80vw;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle at 50% 50%,
+    rgba(108,76,241,0.22) 0%,
+    rgba(34,211,238,0.15) 40%,
+    transparent 70%);
+  filter: blur(80px);
+  border-radius: 50%;
+  pointer-events: none; z-index: 0;
+  animation: cine-breathe 8s ease-in-out infinite alternate;
+}
+@keyframes cine-breathe {
+  0%   { transform: translate(-50%,-50%) scale(1);   opacity: .6; }
+  100% { transform: translate(-50%,-50%) scale(1.1); opacity: 1;  }
+}
+
+/* Grade sutil ao fundo */
+.cine-grid-bg {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-size: 60px 60px;
+  background-image:
+    linear-gradient(to right,  rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 30%, #000 70%, transparent);
+          mask-image: linear-gradient(to bottom, transparent, #000 30%, #000 70%, transparent);
+}
+
+/* Palavra gigante ao fundo (parallax por scroll via JS) */
+.cine-giant {
+  position: absolute; bottom: -6vh; left: 50%;
+  transform: translateX(-50%);
+  font-size: 27vw; line-height: .72; font-weight: 900; letter-spacing: -.05em;
+  white-space: nowrap; z-index: 0; pointer-events: none; user-select: none;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255,255,255,0.06);
+  background: linear-gradient(180deg, rgba(255,255,255,0.10) 0%, transparent 62%);
+  -webkit-background-clip: text; background-clip: text;
+  font-family: var(--font-head);
+}
+
+/* Faixa diagonal (marquee) */
+.cine-marquee {
+  position: absolute; top: 96px; left: 0; width: 100%;
+  overflow: hidden; z-index: 10;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: rgba(11,14,26,0.6);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  padding: 14px 0;
+  transform: rotate(-2deg) scale(1.1);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+}
+.cine-marquee-track {
+  display: flex; width: max-content;
+  animation: cine-marquee 42s linear infinite;
+  font-family: var(--font-head); font-weight: 700;
+  font-size: .78rem; letter-spacing: .3em; text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+}
+.cine-marquee-track span { padding: 0 22px; white-space: nowrap; }
+.cine-marquee-track i { color: rgba(108,76,241,0.65); font-style: normal; }
+.cine-marquee-track i.c { color: rgba(34,211,238,0.65); }
+@keyframes cine-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* Conteúdo central */
+.cine-center {
+  position: relative; z-index: 10;
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 0 24px; margin: 40px auto 0;
+  width: 100%; max-width: 1024px;
+}
+.cine-title {
+  font-family: var(--font-head);
+  font-size: clamp(2.6rem, 8vw, 5.4rem);
+  font-weight: 800; letter-spacing: -.03em; text-align: center;
+  margin-bottom: 44px; line-height: 1.02;
+  background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.42) 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 22px rgba(255,255,255,0.12));
+}
+.cine-actions { display: flex; flex-direction: column; align-items: center; gap: 22px; width: 100%; }
+.cine-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
+.cine-row-sec { margin-top: 2px; }
+
+/* Pílula de vidro */
+.cine-pill {
+  display: inline-flex; align-items: center; gap: 12px;
+  padding: 18px 38px; border-radius: 999px;
+  font-family: var(--font-head); font-weight: 700;
+  font-size: .98rem; color: #fff; text-decoration: none;
+  background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.09);
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.10);
+  -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+  transition: background .4s cubic-bezier(.16,1,.3,1), border-color .4s, box-shadow .4s, color .3s;
+  will-change: transform;
+}
+.cine-pill:hover {
+  background: linear-gradient(145deg, rgba(255,255,255,0.11), rgba(255,255,255,0.03));
+  border-color: rgba(255,255,255,0.20);
+  box-shadow: 0 20px 40px -10px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.20);
+}
+.cine-pill svg { width: 22px; height: 22px; fill: currentColor; flex: none; }
+.cine-pill-primary {
+  background: var(--grad); border-color: transparent;
+  box-shadow: 0 14px 36px rgba(108,76,241,0.42);
+}
+.cine-pill-primary:hover { background: var(--grad); box-shadow: 0 18px 48px rgba(108,76,241,0.58); }
+.cine-pill-sm { padding: 11px 22px; font-size: .82rem; font-weight: 600; color: rgba(255,255,255,0.7); }
+.cine-pill-sm:hover { color: #fff; }
+
+/* Barra inferior */
+.cine-bottom {
+  position: relative; z-index: 20; width: 100%;
+  padding: 0 clamp(24px,5vw,48px) 30px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 20px; flex-wrap: wrap;
+}
+.cine-copy { color: rgba(255,255,255,0.5); font-size: .68rem; letter-spacing: .16em; text-transform: uppercase; font-weight: 600; }
+.cine-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 10px 20px; border-radius: 999px;
+  background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.6); font-size: .68rem; text-transform: uppercase; letter-spacing: .14em; font-weight: 700;
+}
+.cine-badge strong { color: #fff; font-family: var(--font-head); letter-spacing: normal; font-size: .82rem; }
+.cine-heart { color: #ff5a76; display: inline-block; animation: cine-heartbeat 2s cubic-bezier(.25,1,.5,1) infinite; }
+@keyframes cine-heartbeat {
+  0%,100% { transform: scale(1); }
+  15%,45% { transform: scale(1.25); }
+  30%     { transform: scale(1); }
+}
+.cine-top {
+  width: 48px; height: 48px; border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.09);
+  color: rgba(255,255,255,0.7); cursor: pointer; will-change: transform;
+  transition: color .3s, border-color .3s;
+}
+.cine-top:hover { color: #fff; border-color: rgba(255,255,255,0.2); }
+.cine-top svg { width: 20px; height: 20px; transition: transform .3s; }
+.cine-top:hover svg { transform: translateY(-4px); }
+
+/* Some o botão flutuante do WhatsApp quando o rodapé aparece — o rodapé já
+   tem seu próprio CTA de WhatsApp, e assim ele não cobre o "voltar ao topo". */
+.wa-float { transition: opacity .4s ease, transform .4s ease; }
+.wa-float.wa-hidden { opacity: 0; transform: scale(.6); pointer-events: none; }
+
+/* Responsivo */
+@media (max-width: 720px) {
+  .cine-giant { font-size: 42vw; bottom: -2vh; }
+  .cine-marquee { top: 78px; }
+  .cine-title { margin-bottom: 30px; }
+  .cine-pill { padding: 15px 26px; font-size: .9rem; }
+  .cine-bottom { flex-direction: column; text-align: center; gap: 16px; padding-bottom: 24px; }
+}
+
+/* Sem movimento: vira um rodapé estático, sem cortina nem parallax */
+@media (prefers-reduced-motion: reduce) {
+  .cine-reveal { height: auto; clip-path: none; }
+  .cine-foot { position: relative; height: auto; min-height: 82vh; }
+  .cine-aurora, .cine-marquee-track, .cine-heart { animation: none; }
+}
