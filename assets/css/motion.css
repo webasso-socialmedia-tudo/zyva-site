@@ -1,0 +1,726 @@
+/* ============================================================
+   ZYVA — Motion Layer v1
+   Camada de movimento e cenas 3D. Carrega DEPOIS de style.css.
+   Zero dependências: sem GSAP, sem Three.js, sem React.
+   Paleta preservada: violeta #6C4CF1 · ciano #22D3EE · noite #0B0E1A
+   ============================================================ */
+
+:root {
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --wa-green: #25D366;
+  --wa-panel: #0d1418;
+  --wa-bubble-in: #1f2c33;
+  --wa-bubble-out: #005c4b;
+}
+
+/* ============================================================
+   1. Revelação de texto (palavra a palavra, com máscara)
+   ============================================================ */
+.rv-line { display: block; overflow: hidden; }
+.rv-word {
+  display: inline-block;
+  transform: translateY(110%) rotate(2.5deg);
+  opacity: 0;
+  will-change: transform, opacity;
+  transition:
+    transform 0.95s var(--ease-out-expo) var(--rv-d, 0s),
+    opacity 0.7s ease var(--rv-d, 0s);
+}
+.rv-in .rv-word { transform: none; opacity: 1; }
+
+/* Fade simples com subida — para blocos não-título */
+.rise {
+  opacity: 0;
+  transform: translateY(26px);
+  transition:
+    opacity 0.8s ease var(--rv-d, 0s),
+    transform 0.9s var(--ease-out-expo) var(--rv-d, 0s);
+  will-change: transform, opacity;
+}
+.rise.rv-in { opacity: 1; transform: none; }
+
+/* ============================================================
+   2. Cursor-alvo (port do TargetCursor — JS puro)
+   ============================================================ */
+.zcursor {
+  position: fixed;
+  top: 0; left: 0;
+  width: 0; height: 0;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: difference;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.zcursor.on { opacity: 1; }
+.zcursor-dot {
+  position: absolute;
+  left: 0; top: 0;
+  width: 5px; height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  background: #fff;
+  border-radius: 50%;
+  will-change: transform;
+}
+.zcursor-c {
+  position: absolute;
+  left: 0; top: 0;
+  width: 13px; height: 13px;
+  border: 2.5px solid #fff;
+  will-change: transform;
+}
+.zc-tl { border-right: 0; border-bottom: 0; }
+.zc-tr { border-left: 0; border-bottom: 0; }
+.zc-br { border-left: 0; border-top: 0; }
+.zc-bl { border-right: 0; border-top: 0; }
+body.zcursor-active,
+body.zcursor-active a,
+body.zcursor-active button,
+body.zcursor-active .cursor-target { cursor: none; }
+
+/* ============================================================
+   3. Botões magnéticos
+   ============================================================ */
+.magnetic { will-change: transform; }
+.magnetic > * { display: inline-block; will-change: transform; }
+
+/* ============================================================
+   4. Selo circular rotativo
+   ============================================================ */
+.spin-badge {
+  position: relative;
+  width: 132px; height: 132px;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+.spin-badge svg {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  animation: spin-badge 18s linear infinite;
+}
+.spin-badge text {
+  font-family: var(--font-head);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  fill: var(--cyan);
+}
+.spin-badge-core {
+  width: 62px; height: 62px;
+  border-radius: 50%;
+  background: var(--grad);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 10px 30px rgba(108, 76, 241, 0.45);
+  transition: transform 0.4s var(--ease-out-expo);
+}
+.spin-badge:hover .spin-badge-core { transform: scale(1.12); }
+.spin-badge-core svg {
+  position: static;
+  width: 22px; height: 22px;
+  animation: none;
+  stroke: #fff;
+  stroke-width: 2.2;
+  fill: none;
+}
+@keyframes spin-badge { to { transform: rotate(360deg); } }
+
+/* ============================================================
+   5. Texto rotativo (port do RotatingText — JS puro)
+   ============================================================ */
+.rot-text {
+  display: inline-flex;
+  overflow: hidden;
+  vertical-align: bottom;
+  position: relative;
+}
+/* Cor sólida: um gradiente recortado por caractere ficaria ruidoso,
+   porque cada letra reiniciaria o degradê. */
+.rot-accent { color: var(--cyan); }
+.rot-text-inner { display: inline-flex; }
+.rot-char {
+  display: inline-block;
+  white-space: pre;
+  will-change: transform, opacity;
+}
+.rot-char.out {
+  animation: rot-out 0.42s var(--ease-out-quint) forwards;
+  animation-delay: var(--rc-d, 0s);
+}
+.rot-char.in {
+  transform: translateY(105%);
+  opacity: 0;
+  animation: rot-in 0.55s var(--ease-out-expo) forwards;
+  animation-delay: var(--rc-d, 0s);
+}
+@keyframes rot-in { to { transform: none; opacity: 1; } }
+@keyframes rot-out { to { transform: translateY(-115%); opacity: 0; } }
+
+/* ============================================================
+   6. Cena do celular 3D (Contato)
+   ============================================================ */
+.phone-scene {
+  position: relative;
+  background:
+    radial-gradient(900px 500px at 78% 8%, rgba(108, 76, 241, 0.3), transparent 62%),
+    radial-gradient(700px 460px at 6% 92%, rgba(34, 211, 238, 0.14), transparent 60%),
+    var(--night);
+  color: #fff;
+}
+.phone-track { height: 380vh; position: relative; }
+.phone-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  min-height: 620px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 40px;
+  overflow: hidden;
+}
+.phone-sticky > .container {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1.02fr 0.98fr;
+  align-items: center;
+  gap: 48px;
+  width: min(1140px, 92%);
+}
+
+/* Coluna de texto */
+.phone-copy h2 {
+  color: #fff;
+  font-size: clamp(1.5rem, 2.5vw, 2.05rem);
+  margin-bottom: 14px;
+  max-width: 15ch;
+}
+.phone-copy h2 em {
+  font-style: normal;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.phone-copy > p {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 1.04rem;
+  max-width: 440px;
+  margin-bottom: 26px;
+}
+
+/* Status ao vivo */
+.live-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px 8px 13px;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 0.86rem;
+  color: rgba(255, 255, 255, 0.82);
+  margin-bottom: 22px;
+}
+.live-dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--wa-green);
+  position: relative;
+  flex: none;
+}
+.live-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: inherit;
+  animation: live-pulse 2s ease-out infinite;
+}
+.live-status.off .live-dot { background: #F59E0B; }
+@keyframes live-pulse {
+  0% { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(2.8); opacity: 0; }
+}
+
+/* Lista de assuntos */
+.topic-list { display: flex; flex-direction: column; gap: 9px; max-width: 460px; }
+.topic {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  text-align: left;
+  padding: 13px 15px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateX(-26px);
+  transition:
+    background 0.22s ease,
+    border-color 0.22s ease,
+    transform 0.2s var(--ease-out-quint);
+  will-change: transform, opacity;
+}
+.topic:hover { background: rgba(108, 76, 241, 0.16); border-color: rgba(108, 76, 241, 0.5); }
+.topic[aria-pressed="true"] {
+  background: rgba(34, 211, 238, 0.1);
+  border-color: var(--cyan);
+}
+.topic-ico {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: rgba(108, 76, 241, 0.18);
+  display: grid; place-items: center;
+  flex: none;
+}
+.topic-ico svg { width: 18px; height: 18px; stroke: #A78BFA; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.topic:nth-child(even) .topic-ico { background: rgba(34, 211, 238, 0.14); }
+.topic:nth-child(even) .topic-ico svg { stroke: var(--cyan); }
+.topic-txt { flex: 1; min-width: 0; }
+.topic-txt b { display: block; font-family: var(--font-head); font-weight: 600; font-size: 0.95rem; }
+.topic-txt > span { display: block; font-size: 0.8rem; color: rgba(255, 255, 255, 0.52); margin-top: 1px; }
+.topic-check {
+  margin-left: auto;
+  width: 19px; height: 19px;
+  flex: none;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity 0.2s ease, transform 0.3s var(--ease-out-expo);
+}
+.topic[aria-pressed="true"] .topic-check { opacity: 1; transform: none; }
+.topic-check svg { width: 100%; height: 100%; stroke: var(--cyan); stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+/* --- O celular --- */
+.phone-holder {
+  perspective: 1400px;
+  perspective-origin: 50% 45%;
+  display: grid;
+  place-items: center;
+  height: 100%;
+}
+.phone {
+  position: relative;
+  width: 310px;
+  height: 632px;
+  transform-style: preserve-3d;
+  will-change: transform;
+  transform:
+    rotateY(var(--ry, -26deg))
+    rotateX(var(--rx, 10deg))
+    rotateZ(var(--rz, -4deg))
+    scale(var(--sc, 0.82))
+    translateY(var(--ty, 0px));
+}
+.phone-body {
+  position: absolute;
+  inset: 0;
+  border-radius: 44px;
+  background: linear-gradient(150deg, #2a2f45 0%, #12141f 42%, #0a0c14 100%);
+  padding: 11px;
+  transform-style: preserve-3d;
+  box-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.16) inset,
+    0 60px 90px -30px rgba(0, 0, 0, 0.9),
+    0 0 0 1px rgba(255, 255, 255, 0.07);
+}
+/* Brilho de borda que acompanha a paleta */
+.phone-body::before {
+  content: "";
+  position: absolute;
+  inset: -1.5px;
+  border-radius: 45px;
+  background: linear-gradient(150deg, rgba(108,76,241,0.9), rgba(34,211,238,0.55) 45%, transparent 72%);
+  z-index: -1;
+  opacity: calc(0.25 + var(--glow, 0) * 0.75);
+  filter: blur(calc(2px + var(--glow, 0) * 16px));
+  transition: opacity 0.3s ease;
+}
+/* Face traseira — dá volume real ao girar */
+.phone-back {
+  position: absolute;
+  inset: 0;
+  border-radius: 44px;
+  background: linear-gradient(150deg, #1a1d2b, #0a0c14);
+  transform: translateZ(-15px);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+/* Laterais — 4 tiras que fecham a caixa */
+.phone-edge { position: absolute; background: linear-gradient(#3a3f57, #141621); }
+.phone-edge-l, .phone-edge-r { top: 44px; bottom: 44px; width: 15px; }
+.phone-edge-l { left: 0; transform: rotateY(-90deg); transform-origin: left center; }
+.phone-edge-r { right: 0; transform: rotateY(90deg); transform-origin: right center; }
+.phone-edge-t, .phone-edge-b { left: 44px; right: 44px; height: 15px; }
+.phone-edge-t { top: 0; transform: rotateX(90deg); transform-origin: center top; }
+.phone-edge-b { bottom: 0; transform: rotateX(-90deg); transform-origin: center bottom; }
+/* Botões físicos */
+.phone-btn { position: absolute; right: -2.5px; width: 3px; border-radius: 3px; background: #3d4258; }
+.phone-btn-power { top: 168px; height: 62px; }
+.phone-btn-vol { left: -2.5px; right: auto; top: 132px; height: 40px; }
+.phone-btn-vol2 { left: -2.5px; right: auto; top: 182px; height: 40px; }
+
+/* Tela */
+.phone-screen {
+  position: relative;
+  height: 100%;
+  border-radius: 34px;
+  overflow: hidden;
+  background: var(--wa-panel);
+  display: flex;
+  flex-direction: column;
+  transform: translateZ(1px);
+}
+/* Camada de "desligado" que some conforme o scroll */
+.phone-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #05070c;
+  opacity: calc(1 - var(--wake, 0));
+  pointer-events: none;
+  z-index: 20;
+  transition: opacity 0.25s linear;
+}
+/* Reflexo de vidro */
+.phone-glare {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0.16) 0%,
+    rgba(255, 255, 255, 0.05) 22%,
+    transparent 46%
+  );
+  opacity: calc(0.85 - var(--wake, 0) * 0.55);
+}
+.phone-notch {
+  position: absolute;
+  top: 9px; left: 50%;
+  transform: translateX(-50%);
+  width: 98px; height: 26px;
+  border-radius: 100px;
+  background: #05070c;
+  z-index: 12;
+}
+
+/* Barra de status */
+.wa-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 20px 7px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #fff;
+  font-family: var(--font-head);
+  flex: none;
+}
+.wa-status-icons { display: flex; align-items: center; gap: 5px; }
+.wa-status-icons svg { width: 14px; height: 14px; fill: #fff; }
+
+/* Cabeçalho do app */
+.wa-head {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 8px 14px 11px;
+  background: #1f2c33;
+  flex: none;
+  opacity: 0;
+  transform: translateY(-16px);
+}
+.wa-avatar {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--grad);
+  display: grid; place-items: center;
+  flex: none;
+}
+.wa-avatar svg { width: 21px; height: auto; }
+.wa-head-t { flex: 1; min-width: 0; }
+.wa-head-t b {
+  display: block;
+  font-family: var(--font-head);
+  font-size: 0.79rem;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.wa-head-t span { display: block; font-size: 0.7rem; color: #8fa3ad; }
+.wa-head-t span i { font-style: normal; color: var(--wa-green); }
+.wa-head-act { display: flex; gap: 15px; }
+.wa-head-act svg { width: 17px; height: 17px; stroke: #aebac1; stroke-width: 2; fill: none; }
+
+/* Área de conversa */
+.wa-chat {
+  flex: 1;
+  overflow: hidden;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: #0b141a;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(108, 76, 241, 0.07), transparent 45%),
+    radial-gradient(circle at 80% 70%, rgba(34, 211, 238, 0.05), transparent 45%);
+}
+.wa-day {
+  align-self: center;
+  font-size: 0.63rem;
+  color: #8fa3ad;
+  background: rgba(31, 44, 51, 0.85);
+  padding: 4px 11px;
+  border-radius: 8px;
+  margin-bottom: 2px;
+  opacity: 0;
+}
+.wa-b {
+  max-width: 82%;
+  padding: 8px 11px 7px;
+  border-radius: 9px;
+  font-size: 0.79rem;
+  line-height: 1.42;
+  color: #e9edef;
+  position: relative;
+  opacity: 0;
+  transform: translateY(10px) scale(0.96);
+  transform-origin: bottom left;
+}
+.wa-b.show {
+  animation: wa-pop 0.42s var(--ease-out-expo) forwards;
+}
+@keyframes wa-pop { to { opacity: 1; transform: none; } }
+.wa-in { align-self: flex-start; background: var(--wa-bubble-in); border-top-left-radius: 2px; }
+.wa-out {
+  align-self: flex-end;
+  background: var(--wa-bubble-out);
+  border-top-right-radius: 2px;
+  transform-origin: bottom right;
+}
+.wa-meta {
+  display: block;
+  text-align: right;
+  font-size: 0.58rem;
+  color: rgba(233, 237, 239, 0.5);
+  margin-top: 2px;
+}
+.wa-meta svg { width: 13px; height: 9px; display: inline-block; vertical-align: -1px; margin-left: 2px; fill: #53bdeb; }
+
+/* Indicador de digitando */
+.wa-typing {
+  align-self: flex-start;
+  background: var(--wa-bubble-in);
+  border-radius: 9px;
+  border-top-left-radius: 2px;
+  padding: 11px 13px;
+  display: none;
+  gap: 4px;
+}
+.wa-typing.on { display: flex; }
+.wa-typing i {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #8fa3ad;
+  animation: wa-type 1.3s ease-in-out infinite;
+}
+.wa-typing i:nth-child(2) { animation-delay: 0.18s; }
+.wa-typing i:nth-child(3) { animation-delay: 0.36s; }
+@keyframes wa-type {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.45; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
+/* Barra de envio */
+.wa-send {
+  flex: none;
+  padding: 9px 11px 15px;
+  background: #1f2c33;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(16px);
+}
+.wa-input {
+  flex: 1;
+  background: #2a3942;
+  border-radius: 100px;
+  padding: 9px 14px;
+  font-size: 0.76rem;
+  color: #8fa3ad;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.wa-input.filled { color: #e9edef; }
+.wa-go {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--wa-green);
+  display: grid; place-items: center;
+  flex: none;
+  transition: transform 0.25s var(--ease-out-expo), box-shadow 0.25s ease;
+  box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.5);
+}
+.wa-go svg { width: 19px; height: 19px; fill: #0b141a; }
+.wa-go.ready { animation: wa-ready 2s ease-out infinite; }
+.wa-go:hover { transform: scale(1.1); }
+@keyframes wa-ready {
+  0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.55); }
+  70% { box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+}
+
+/* Dica de scroll */
+.phone-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 26px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.76rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-family: var(--font-head);
+  color: rgba(255, 255, 255, 0.4);
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+.phone-hint i {
+  width: 20px; height: 32px;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  position: relative;
+}
+.phone-hint i::after {
+  content: "";
+  position: absolute;
+  left: 50%; top: 6px;
+  width: 3px; height: 6px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: var(--cyan);
+  animation: hint-scroll 1.7s ease-in-out infinite;
+}
+@keyframes hint-scroll {
+  0%, 100% { transform: translateY(0); opacity: 1; }
+  50% { transform: translateY(9px); opacity: 0.3; }
+}
+
+/* Barra de progresso da cena */
+.scene-rail {
+  position: absolute;
+  right: 26px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 190px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.scene-rail i {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 0%;
+  background: var(--grad);
+  border-radius: 2px;
+}
+
+/* ============================================================
+   7. Cartões com inclinação 3D (port do TiltedCard)
+   ============================================================ */
+.tilt { perspective: 900px; }
+.tilt-inner {
+  transform-style: preserve-3d;
+  transition: transform 0.5s var(--ease-out-quint);
+  will-change: transform;
+}
+.tilt.act .tilt-inner { transition: transform 0.12s linear; }
+
+/* ============================================================
+   8. Responsivo
+   ============================================================ */
+@media (max-width: 1000px) {
+  .phone-sticky > .container { grid-template-columns: 1fr; gap: 26px; }
+  .phone-track { height: 320vh; }
+  .phone { width: 250px; height: 510px; }
+  .phone-holder { order: -1; }
+  .scene-rail { display: none; }
+  .topic-list { max-width: none; }
+}
+
+@media (max-width: 640px) {
+  .phone-track { height: 290vh; }
+  /* padding-top compensa o cabeçalho fixo, senão o topo do celular fica atrás dele */
+  .phone-sticky { min-height: 0; height: 100vh; padding-top: 62px; box-sizing: border-box; }
+  .phone-sticky > .container { gap: 16px; align-content: center; }
+  .phone { width: 170px; height: 346px; }
+  .phone-body { border-radius: 30px; padding: 7px; }
+  .phone-screen { border-radius: 24px; }
+  .phone-notch { width: 66px; height: 19px; top: 7px; }
+  .wa-status { padding: 9px 13px 5px; font-size: 0.6rem; }
+  .wa-head { padding: 5px 9px 7px; gap: 8px; }
+  .wa-avatar { width: 28px; height: 28px; }
+  .wa-head-t b { font-size: 0.68rem; }
+  .wa-head-t span { font-size: 0.6rem; }
+  .wa-head-act { gap: 10px; }
+  .wa-head-act svg { width: 13px; height: 13px; }
+  .wa-chat { padding: 9px 8px; gap: 6px; }
+  .wa-b { font-size: 0.66rem; padding: 6px 8px 5px; }
+  .wa-day { font-size: 0.55rem; }
+  .wa-send { padding: 6px 7px 9px; }
+  .wa-input { font-size: 0.63rem; padding: 7px 10px; }
+  .wa-go { width: 30px; height: 30px; }
+  .wa-go svg { width: 15px; height: 15px; }
+  /* No celular o espaço é curto: some o que é secundário */
+  .phone-copy > p, .live-status { display: none; }
+  .phone-copy h2 { font-size: 1.3rem; margin-bottom: 12px; max-width: none; }
+  .topic { padding: 8px 11px; gap: 10px; border-radius: 12px; font-size: 0.88rem; }
+  .topic-ico { width: 28px; height: 28px; border-radius: 8px; }
+  .topic-ico svg { width: 15px; height: 15px; }
+  .topic-txt b { font-size: 0.85rem; }
+  .topic-txt > span { display: none; }
+  .topic-list { gap: 6px; }
+  .phone-hint { display: none; }
+  .spin-badge { width: 104px; height: 104px; }
+}
+
+/* Notebooks baixos — a cena precisa caber na tela */
+@media (min-width: 1000px) and (max-height: 820px) {
+  .phone { width: 268px; height: 546px; }
+  .phone-copy h2 { font-size: clamp(1.6rem, 2.6vw, 2.2rem); }
+  .phone-copy > p { font-size: 0.97rem; margin-bottom: 20px; }
+  .live-status { margin-bottom: 16px; }
+  .topic { padding: 10px 13px; }
+}
+
+/* ============================================================
+   9. Acessibilidade — respeitar quem pediu menos movimento
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .rv-word, .rise { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .spin-badge svg { animation: none; }
+  .live-dot::after, .wa-typing i, .wa-go.ready, .phone-hint i::after { animation: none; }
+  .phone { transform: none !important; }
+  .rot-char.in, .rot-char.out { animation-duration: 0.01s; }
+  .topic { opacity: 1 !important; transform: none !important; }
+  .wa-head, .wa-send { opacity: 1 !important; transform: none !important; }
+  .phone-track { height: auto; }
+  .phone-sticky { position: static; height: auto; padding: 60px 0; }
+}
