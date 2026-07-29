@@ -22,6 +22,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/assets/css/style.css?v=4" />
   <link rel="stylesheet" href="/assets/css/motion.css?v=10" />
+  <link rel="stylesheet" href="/assets/css/experience.css?v=1" />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -38,6 +39,13 @@
   </script>
 </head>
 <body class="home">
+
+  <div id="tuning" aria-hidden="true"><canvas width="1120" height="240"></canvas></div>
+  <div class="sig-thread" data-sig-thread aria-hidden="true">
+    <span class="sig-thread-track"></span>
+    <span class="sig-thread-fill"></span>
+    <span class="sig-thread-dot"></span>
+  </div>
 
   <header class="site-header">
     <div class="container nav">
@@ -62,7 +70,7 @@
     <div class="container hero-grid">
       <div>
         <span class="kicker k-tag">Agência de marketing digital</span>
-        <h1 data-reveal>Sua empresa crescendo.<br />E você <em>vendo cada resultado</em>.</h1>
+        <h1><span class="sig-line"><span class="sig-line-inner">Sua empresa crescendo.</span></span><span class="sig-line"><span class="sig-line-inner">E você <em>vendo cada resultado</em>.</span></span></h1>
         <p class="lead">A Zyva cuida do seu marketing de ponta a ponta — SEO, redes sociais, anúncios e conteúdo — com relatórios claros do retorno sobre cada real investido.</p>
         <div class="hero-ctas">
           <a href="/contato/" class="btn btn-primary cursor-target">Pedir diagnóstico gratuito</a>
@@ -97,7 +105,7 @@
         <div class="mock mock-roi">Cada real rastreado. <b class="grad-text">ROI visível.</b></div>
       </div>
     </div>
-    <canvas class="particle-z" data-particle-z aria-hidden="true"></canvas>
+    <canvas class="sig-field" data-signal-field aria-hidden="true"></canvas>
   </section>
 
   <div class="trust">
@@ -442,5 +450,6 @@
 
   <script src="/assets/js/main.js?v=4"></script>
   <script src="/assets/js/zyva-motion.js?v=9"></script>
+  <script src="/assets/js/zyva-signal.js?v=1" defer></script>
 </body>
 </html>
