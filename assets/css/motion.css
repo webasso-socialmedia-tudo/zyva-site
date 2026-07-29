@@ -1380,3 +1380,128 @@ body.zcursor-active .cursor-target { cursor: none; }
   .zi-dot { animation: none; }
   .zyva-island { transition: opacity .2s ease; }
 }
+
+/* ============================================================
+   18. Sistema de MARCADORES de seção (kickers) + steppers
+       3 modos por papel: k-tag (tópico da página), k-bar
+       (cabeçalho de seção) e k-index (enumeração). Revelam ao
+       entrar na tela. Sem JS (html sem .js-on) ficam visíveis.
+   ============================================================ */
+
+/* Base — zera a pílula antiga */
+.kicker {
+  display: inline-flex; align-items: center; gap: 11px;
+  font-family: var(--font-head);
+  font-size: 0.74rem; font-weight: 700;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--ink); line-height: 1;
+  margin-bottom: 16px;
+  padding: 0; background: none; border: 0; border-radius: 0;
+}
+/* branco só em contêineres REALMENTE escuros (não .dark-shell, que envolve páginas com sheets claros) */
+.on-dark .kicker, .band .kicker, .pipeline .kicker { color: rgba(255,255,255,0.92); }
+
+/* ---------- Modo A: TAG (tópico da página, no topo) ---------- */
+.kicker.k-tag {
+  padding: 9px 17px 9px 14px; border-radius: 100px;
+  background: linear-gradient(#fff, #fff) padding-box, var(--grad) border-box;
+  border: 1.5px solid transparent; color: var(--ink);
+  box-shadow: 0 8px 22px rgba(108,76,241,0.16);
+}
+/* no escuro: preenchimento OPACO (vidro escuro) — só a borda mostra o gradiente */
+.on-dark .kicker.k-tag, .band .kicker.k-tag {
+  background: linear-gradient(#171b30, #12162a) padding-box, var(--grad) border-box;
+  color: #fff; box-shadow: 0 10px 30px rgba(34,211,238,0.16);
+}
+.kicker.k-tag::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--grad); flex: none;
+  animation: k-ping 2.1s ease-out infinite;
+}
+@keyframes k-ping {
+  0% { box-shadow: 0 0 0 0 rgba(34,211,238,0.5); }
+  70%,100% { box-shadow: 0 0 0 9px rgba(34,211,238,0); }
+}
+
+/* ---------- Modo B: BAR (cabeçalho de seção) ---------- */
+.kicker.k-bar::before {
+  content: ""; width: 28px; height: 3px; border-radius: 3px;
+  background: var(--grad); flex: none; transform-origin: left center;
+}
+
+/* ---------- Modo C: INDEX (enumeração) ---------- */
+.kicker.k-index::before {
+  content: attr(data-i);
+  font-family: var(--font-head); font-weight: 800;
+  font-size: 1.15rem; letter-spacing: 0; -webkit-text-fill-color: transparent;
+  background: var(--grad); -webkit-background-clip: text; background-clip: text;
+  color: transparent;
+}
+.kicker.k-index { gap: 9px; letter-spacing: 0.13em; }
+
+/* ---------- Revelação (só quando há JS: html.js-on) ---------- */
+html.js-on .kicker.k-bar { opacity: 0; transform: translateY(9px); transition: opacity .5s ease, transform .55s var(--ease-out-expo); }
+html.js-on .kicker.k-bar::before { transform: scaleX(0); transition: transform .6s var(--ease-out-expo) .05s; }
+html.js-on .kicker.k-bar.mk-in { opacity: 1; transform: none; }
+html.js-on .kicker.k-bar.mk-in::before { transform: scaleX(1); }
+
+html.js-on .kicker.k-tag { opacity: 0; transform: translateY(-8px) scale(.96); transition: opacity .5s ease, transform .6s var(--ease-out-expo); }
+html.js-on .kicker.k-tag.mk-in { opacity: 1; transform: none; }
+
+html.js-on .kicker.k-index { opacity: 0; transform: translateX(-8px); transition: opacity .45s ease, transform .5s var(--ease-out-expo); }
+html.js-on .kicker.k-index.mk-in { opacity: 1; transform: none; }
+
+/* ============================================================
+   Steppers: os blocos numerados viram uma progressão conectada
+   ============================================================ */
+
+/* Home — "Método" (.timeline): a linha se desenha e os números surgem */
+html.js-on .timeline::before { transform: scaleX(0); transform-origin: left center; transition: transform 1.15s var(--ease-out-expo); opacity: .55; }
+html.js-on .timeline.mk-in::before { transform: scaleX(1); }
+html.js-on .timeline .tl-step .num { opacity: 0; transform: scale(.55); transition: opacity .4s ease, transform .55s var(--ease-out-expo); }
+html.js-on .timeline.mk-in .tl-step:nth-child(1) .num { opacity:1; transform:none; transition-delay:.15s; }
+html.js-on .timeline.mk-in .tl-step:nth-child(2) .num { opacity:1; transform:none; transition-delay:.32s; }
+html.js-on .timeline.mk-in .tl-step:nth-child(3) .num { opacity:1; transform:none; transition-delay:.49s; }
+html.js-on .timeline.mk-in .tl-step:nth-child(4) .num { opacity:1; transform:none; transition-delay:.66s; }
+
+/* Cases — "Padrão de case" (.steps): trilho de progresso + números escalonados */
+.steps { position: relative; }
+.steps::before {
+  content: ""; position: absolute; top: -16px; left: 2px; right: 2px; height: 3px;
+  border-radius: 3px; background: var(--grad); opacity: .6;
+  transform-origin: left center;
+}
+html.js-on .steps::before { transform: scaleX(0); transition: transform 1.1s var(--ease-out-expo); }
+html.js-on .steps.mk-in::before { transform: scaleX(1); }
+html.js-on .steps .step .num { opacity: 0; transform: translateY(10px); transition: opacity .4s ease, transform .5s var(--ease-out-expo); }
+html.js-on .steps.mk-in .step:nth-child(1) .num { opacity:1; transform:none; transition-delay:.12s; }
+html.js-on .steps.mk-in .step:nth-child(2) .num { opacity:1; transform:none; transition-delay:.26s; }
+html.js-on .steps.mk-in .step:nth-child(3) .num { opacity:1; transform:none; transition-delay:.40s; }
+html.js-on .steps.mk-in .step:nth-child(4) .num { opacity:1; transform:none; transition-delay:.54s; }
+
+@media (max-width: 900px) {
+  .steps::before { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.js-on .kicker, html.js-on .kicker::before,
+  html.js-on .timeline::before, html.js-on .timeline .tl-step .num,
+  html.js-on .steps::before, html.js-on .steps .step .num {
+    opacity: 1 !important; transform: none !important; transition: none !important;
+  }
+  .kicker.k-tag::before { animation: none; }
+}
+
+/* ---------- Home: TAG do herói em formato "SELO" (escolha do cliente) ----------
+   Só na home (.hero). Um quadradinho gradiente à esquerda + texto, sem pílula.
+   Vem depois de .on-dark .kicker.k-tag para vencer por ordem de origem. */
+.hero .kicker.k-tag {
+  padding: 0; background: none; border: 0; border-radius: 0;
+  color: #fff; gap: 13px;
+  font-size: 0.84rem; letter-spacing: 0.16em;
+  box-shadow: none;
+}
+.hero .kicker.k-tag::before {
+  content: ""; width: 24px; height: 24px; border-radius: 8px;
+  background: var(--grad); animation: none;
+  box-shadow: 0 6px 18px rgba(108,76,241,0.45);
+}
