@@ -942,6 +942,29 @@
   });
 
   /* ==========================================================
+     13b. Marcadores de seção (kickers) + steppers: revelam
+          ao entrar na tela. html.js-on habilita as animações.
+     ========================================================== */
+  safe("markers", () => {
+    const els = document.querySelectorAll(".kicker, .timeline, .steps");
+    if (!els.length) return;
+    document.documentElement.classList.add("js-on");
+    if (REDUCED || !("IntersectionObserver" in window)) {
+      els.forEach((el) => el.classList.add("mk-in"));
+      return;
+    }
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add("mk-in");
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.25, rootMargin: "0px 0px -8% 0px" });
+    els.forEach((el) => io.observe(el));
+  });
+
+  /* ==========================================================
      14a. Ícones vivos da faixa de confiança (home)
           Dispara ao entrar na tela; refaz a cada nova entrada.
      ========================================================== */
