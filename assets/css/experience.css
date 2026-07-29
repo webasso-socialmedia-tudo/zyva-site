@@ -42,7 +42,7 @@
 }
 
 /* ---------- HERÓI: tipografia cinética (revela por linha) ---------- */
-html.js-sig .sig-line { display: block; overflow: hidden; padding-bottom: 0.08em; margin-bottom: -0.08em; }
+html.js-sig .sig-line { display: block; overflow: hidden; padding-bottom: 0.3em; margin-bottom: -0.3em; }
 html.js-sig .sig-line-inner {
   display: block; transform: translateY(112%);
   transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
@@ -175,4 +175,27 @@ html.js-sig .mf-in .mf-wi { transform: translateY(0); }
   html.js-sig .mf-wi { transform: none !important; transition: none !important; }
   .post-card, .post-card:hover { transform: none; }
   .post-card:hover .post-cat { animation: none; }
+}
+
+/* ============================================================
+   DESTAQUE "ONDA DE SINAL" — substitui o texto-degradê
+   Palavra-chave em cor sólida (herda do título) com uma onda
+   de sinal FLUINDO por baixo: o sinal corre sob o que importa.
+   ============================================================ */
+.grad-text, .hero h1 em, .band h2 em, .pipeline h2 em, .phone-copy h2 em {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 7' preserveAspectRatio='none'%3E%3Cpath d='M0 3.5C3.5 .9 5 .9 8.5 3.5S13.5 6.1 17 3.5 22 .9 25.5 3.5 30.5 6.1 34 3.5' fill='none' stroke='%2322D3EE' stroke-width='1.7' stroke-linecap='round'/%3E%3C/svg%3E") !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
+  -webkit-text-fill-color: currentColor !important;
+  color: inherit !important;
+  font-style: normal;
+  background-repeat: repeat-x !important;
+  background-size: 1.05em 0.22em !important;
+  background-position: 0 100% !important;
+  padding-bottom: 0.16em;
+  animation: sig-wave-flow 7s linear infinite;
+}
+@keyframes sig-wave-flow { to { background-position: 1.05em 100%; } }
+@media (prefers-reduced-motion: reduce) {
+  .grad-text, .hero h1 em, .band h2 em, .pipeline h2 em, .phone-copy h2 em { animation: none; }
 }
