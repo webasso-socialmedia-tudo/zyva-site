@@ -1198,10 +1198,15 @@ body.zcursor-active .cursor-target { cursor: none; }
 }
 .cine-pill svg { width: 22px; height: 22px; fill: currentColor; flex: none; }
 .cine-pill-primary {
-  background: var(--grad); border-color: transparent;
+  /* Gradiente com sobra de 240% centralizado: as pontas arredondadas
+     nascem em tons do meio da transição, sem cor sólida na extremidade. */
+  background-image: linear-gradient(to right, #6C4CF1, #22D3EE);
+  background-size: 240% 100%;
+  background-position: center;
+  border-color: transparent;
   box-shadow: 0 14px 36px rgba(108,76,241,0.42);
 }
-.cine-pill-primary:hover { background: var(--grad); box-shadow: 0 18px 48px rgba(108,76,241,0.58); }
+.cine-pill-primary:hover { box-shadow: 0 18px 48px rgba(108,76,241,0.58); }
 .cine-pill-sm { padding: 11px 22px; font-size: .82rem; font-weight: 600; color: rgba(255,255,255,0.7); }
 .cine-pill-sm:hover { color: #fff; }
 

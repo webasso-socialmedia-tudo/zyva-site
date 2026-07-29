@@ -852,7 +852,9 @@ body.curtain-on .page-curtain {
   font-weight: 600;
   font-size: 0.87rem;
   color: #fff;
-  background: var(--grad);
+  background-image: linear-gradient(to right, #6C4CF1, #22D3EE);
+  background-size: 240% 100%;
+  background-position: center;
   padding: 8px 14px;
   border-radius: 9px;
   text-decoration: none;
