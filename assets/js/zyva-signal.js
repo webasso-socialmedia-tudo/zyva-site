@@ -262,11 +262,16 @@
     let ticking = false;
 
     const update = () => {
+      /* fio e ponto usam a MESMA geometria: y = p * altura da janela.
+         O ponto (10px) anda até (vh - 10) para nunca sair da tela,
+         cravado na ponta do preenchimento. */
       const doc = document.documentElement;
-      const max = doc.scrollHeight - window.innerHeight;
+      const vh = window.innerHeight;
+      const max = doc.scrollHeight - vh;
       const p = max > 0 ? clamp(window.scrollY / max, 0, 1) : 0;
+      const y = p * vh;
       fill.style.transform = "scaleY(" + p.toFixed(4) + ")";
-      dot.style.transform = "translateY(" + (p * (window.innerHeight - 24)).toFixed(1) + "px)";
+      dot.style.transform = "translateY(" + clamp(y - 5, 0, vh - 10).toFixed(1) + "px)";
       dot.style.opacity = p > 0.005 ? "1" : "0";
     };
     window.addEventListener("scroll", () => {
