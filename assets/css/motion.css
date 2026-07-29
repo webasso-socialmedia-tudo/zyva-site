@@ -1046,11 +1046,11 @@ body.zcursor-active .cursor-target { cursor: none; }
 }
 .chip-filter:hover { transform: translateY(-2px); border-color: var(--violet); color: var(--violet); }
 .chip-filter[aria-pressed="true"] {
-  /* O gradiente "sobra" para fora da pílula (background-size 150% centralizado):
-     assim as pontas arredondadas mostram tons do MEIO da transição, e não o
-     violeta/ciano puros das extremidades — nada de cor sólida destoando na borda. */
+  /* O gradiente "sobra" bem para fora (background-size 240% centralizado):
+     as pontas arredondadas nascem em tons já no MEIO da transição — nenhuma
+     extremidade mostra cor sólida destoando. */
   background-image: linear-gradient(to right, #6C4CF1, #22D3EE);
-  background-size: 150% 100%;
+  background-size: 240% 100%;
   background-position: center;
   border-color: transparent;
   color: #fff;

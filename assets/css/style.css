@@ -104,11 +104,11 @@ ul { list-style: none; }
 }
 .btn:hover { transform: translateY(-2px); }
 .btn-primary {
-  /* O gradiente "sobra" para fora (size 150% centralizado): as pontas
-     arredondadas mostram tons do meio da transição, sem o violeta/ciano
-     puros destoando nas bordas. */
+  /* O gradiente "sobra" bem para fora (size 240% centralizado): as pontas
+     arredondadas nascem em tons já no meio da transição — nenhuma
+     extremidade mostra violeta/ciano puros ou cor "chapada". */
   background-image: linear-gradient(to right, #6C4CF1, #22D3EE);
-  background-size: 150% 100%;
+  background-size: 240% 100%;
   background-position: center;
   color: #fff;
   box-shadow: 0 8px 24px rgba(108, 76, 241, 0.35);
