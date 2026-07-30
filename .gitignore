@@ -1,0 +1,19 @@
+
+# scripts de teste locais (não fazem parte do site)
+a11ydiag.py
+audit*.py
+snap.py
+shot*.py
+diag*.py
+presos.py
+erros.py
+ponto.py
+loc.py
+alvos.py
+chk.py
+tabfoco.py
+serv.py
+ab.py
+p.py
+svc.py
+dbg.py
