@@ -11,8 +11,6 @@
   const FINE = window.matchMedia("(pointer: fine)").matches;
   const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
   /* Normaliza p dentro da faixa [a,b] → 0..1 */
-  const range = (p, a, b) => clamp((p - a) / (b - a), 0, 1);
-  const easeOut = (t) => 1 - Math.pow(1 - t, 3);
   const safe = (name, fn) => {
     try { fn(); } catch (e) { console.warn("[zyva-motion] " + name, e); }
   };
@@ -21,96 +19,13 @@
      1. Scroll suave (mini-Lenis: usa window.scrollTo, então
         position:sticky e position:fixed continuam funcionando)
      ========================================================== */
-  safe("smooth-scroll", () => {
-    if (REDUCED || !FINE) return;
-    if (document.documentElement.dataset.noSmooth === "1") return;
 
-    /* CRÍTICO: o CSS tem `html { scroll-behavior: smooth }`. Se ficar ligado,
-       cada window.scrollTo() vira uma animação nativa que a chamada do frame
-       seguinte cancela — a página trava em ~2px. A inércia daqui substitui
-       aquela, então desligamos a nativa e animamos as âncoras nós mesmos. */
-    document.documentElement.style.scrollBehavior = "auto";
 
-    let target = window.scrollY;
-    let current = target;
-    let lastSet = Math.round(current);
-    let running = false;
-
-    const maxScroll = () =>
-      Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-
-    const tick = () => {
-      current += (target - current) * 0.13;
-      if (Math.abs(target - current) < 0.4) {
-        current = target;
-        running = false;
-      }
-      lastSet = Math.round(current);
-      window.scrollTo(0, lastSet);
-      if (running) requestAnimationFrame(tick);
-    };
-
-    const start = () => {
-      if (!running) {
-        running = true;
-        requestAnimationFrame(tick);
-      }
-    };
-
-    window.addEventListener(
-      "wheel",
-      (e) => {
-        if (e.ctrlKey) return;                       /* zoom do navegador */
-        if (e.target.closest("[data-native-scroll]")) return;
-        e.preventDefault();
-        const unit = e.deltaMode === 1 ? 22 : e.deltaMode === 2 ? window.innerHeight : 1;
-        target = clamp(target + e.deltaY * unit, 0, maxScroll());
-        start();
-      },
-      { passive: false }
-    );
-
-    /* Âncoras internas: animadas pela mesma inércia */
-    document.addEventListener("click", (e) => {
-      const a = e.target.closest && e.target.closest('a[href^="#"]');
-      if (!a) return;
-      const id = a.getAttribute("href");
-      if (!id || id.length < 2) return;
-      const dest = document.querySelector(id);
-      if (!dest) return;
-      e.preventDefault();
-      const pad = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 90;
-      target = clamp(dest.getBoundingClientRect().top + window.scrollY - pad, 0, maxScroll());
-      start();
-      history.replaceState(null, "", id);
-    });
-
-    /* Se qualquer outra coisa rolar a página (teclado,
-       barra de rolagem), reassume a posição real. */
-    window.addEventListener(
-      "scroll",
-      () => {
-        if (Math.abs(window.scrollY - lastSet) > 3) {
-          target = current = lastSet = window.scrollY;
-          running = false;
-        }
-      },
-      { passive: true }
-    );
-  });
-
-  /* ==========================================================
-     2. Divisão de texto em palavras + revelação com máscara
-        Preserva a estrutura HTML interna (<em>, <span>, links).
-     ========================================================== */
-  /* Elementos com gradiente recortado no texto (background-clip: text) não
-     podem ser fatiados: cada fatia vira um inline-block e o recorte se perde,
-     deixando o texto invisível. Esses viram UMA peça só. */
+  /* Quebra um título em palavras para a revelação com máscara. */
   const isClipped = (el) => {
     const s = getComputedStyle(el);
     return s.webkitBackgroundClip === "text" || s.backgroundClip === "text";
   };
-
   const splitWords = (el) => {
     const walk = (node) => {
       const kids = Array.from(node.childNodes);
@@ -148,10 +63,28 @@
   };
 
   safe("reveal", () => {
-    const heads = document.querySelectorAll("[data-reveal]");
-    if (!REDUCED) heads.forEach((el) => splitWords(el));
+    /* Regra dura do orçamento de performance: NADA de animação segurando
+       texto da primeira tela. O que já está visível quando a página abre
+       aparece pronto — o título precisa ser o maior conteúdo pintado, e
+       um elemento em opacity:0 simplesmente não conta como LCP. */
+    const vh = window.innerHeight || 800;
+    const primeiraTela = (el) => {
+      const r = el.getBoundingClientRect();
+      return r.top < vh * 0.92;
+    };
 
-    const items = document.querySelectorAll("[data-reveal], .rise");
+    const heads = Array.from(document.querySelectorAll("[data-reveal]"));
+    heads.forEach((el) => {
+      if (primeiraTela(el)) { el.classList.add("rv-in", "rv-now"); return; }
+      if (!REDUCED) splitWords(el);
+    });
+
+    const items = Array.from(document.querySelectorAll("[data-reveal], .rise"))
+      .filter((el) => {
+        if (!primeiraTela(el)) return true;
+        el.classList.add("rv-in", "rv-now");
+        return false;
+      });
     if (!items.length) return;
 
     if (REDUCED || !("IntersectionObserver" in window)) {
@@ -210,19 +143,30 @@
     let lock = 0;                       /* 0 = solto, 1 = travado no alvo */
     const cur = rest.map((r) => r.slice());
 
+    /* O laço não roda para sempre. Ele acorda quando você mexe e dorme
+       quando você para — o cursor girando sozinho num canto da tela era
+       ruído visual e um quadro desperdiçado a cada 16ms. */
+    let running = false;
+    let idleAt = 0;
+    const kick = () => {
+      idleAt = performance.now() + 900;
+      if (!running) { running = true; requestAnimationFrame(loop); }
+    };
+
     window.addEventListener(
       "mousemove",
       (e) => {
         mx = e.clientX;
         my = e.clientY;
         if (!root.classList.contains("on")) root.classList.add("on");
+        kick();
       },
       { passive: true }
     );
 
     window.addEventListener("mouseover", (e) => {
       const t = e.target.closest ? e.target.closest(SEL) : null;
-      if (t !== active) active = t;
+      if (t !== active) { active = t; kick(); }
     }, { passive: true });
 
     window.addEventListener("mouseout", (e) => {
@@ -230,8 +174,8 @@
     }, { passive: true });
 
     let pressed = false;
-    window.addEventListener("mousedown", () => (pressed = true));
-    window.addEventListener("mouseup", () => (pressed = false));
+    window.addEventListener("mousedown", () => { pressed = true; kick(); });
+    window.addEventListener("mouseup", () => { pressed = false; kick(); });
 
     const loop = () => {
       cx += (mx - cx) * 0.19;
@@ -258,7 +202,8 @@
         }
       }
 
-      spin = active ? spin * 0.86 : spin + 0.55;      /* para de girar ao travar */
+      const awake = performance.now() < idleAt;
+      spin = active || !awake ? spin * 0.86 : spin + 0.55;   /* para ao travar e ao descansar */
       const s = pressed ? 0.82 : 1;
 
       corners.forEach((c, i) => {
@@ -275,48 +220,17 @@
         (spin * (1 - lock)).toFixed(2) + "deg)";
       dot.style.transform = "scale(" + (pressed ? 0.6 : 1) + ")";
 
+      /* tudo parado e ninguém mexendo? encerra o laço até o próximo evento. */
+      const still =
+        !awake && !active && !pressed && lock < 0.01 && spin < 0.05 &&
+        Math.abs(mx - cx) < 0.4 && Math.abs(my - cy) < 0.4 &&
+        cur.every((c, i) => Math.abs(c[0] - rest[i][0]) < 0.4 && Math.abs(c[1] - rest[i][1]) < 0.4);
+      if (still) { running = false; return; }
       requestAnimationFrame(loop);
     };
-    requestAnimationFrame(loop);
+    kick();
   });
 
-  /* ==========================================================
-     4. Botões magnéticos
-     ========================================================== */
-  safe("magnetic", () => {
-    if (REDUCED || !FINE) return;
-    document.querySelectorAll(".magnetic").forEach((el) => {
-      const inner = el.firstElementChild || el;
-      let raf = null;
-      let tx = 0, ty = 0, ix = 0, iy = 0;
-
-      const run = () => {
-        ix += (tx - ix) * 0.18;
-        iy += (ty - iy) * 0.18;
-        el.style.transform = "translate(" + ix.toFixed(2) + "px," + iy.toFixed(2) + "px)";
-        if (inner !== el) {
-          inner.style.transform =
-            "translate(" + (ix * 0.35).toFixed(2) + "px," + (iy * 0.35).toFixed(2) + "px)";
-        }
-        if (Math.abs(tx - ix) > 0.1 || Math.abs(ty - iy) > 0.1) raf = requestAnimationFrame(run);
-        else raf = null;
-      };
-      const kick = () => { if (!raf) raf = requestAnimationFrame(run); };
-
-      el.addEventListener("mousemove", (e) => {
-        const r = el.getBoundingClientRect();
-        tx = (e.clientX - r.left - r.width / 2) * 0.32;
-        ty = (e.clientY - r.top - r.height / 2) * 0.42;
-        kick();
-      });
-      el.addEventListener("mouseleave", () => { tx = 0; ty = 0; kick(); });
-    });
-  });
-
-  /* ==========================================================
-     5. Texto rotativo (port do RotatingText do React Bits)
-        <span data-rotate='["a","b"]' data-rotate-interval="2600">
-     ========================================================== */
   safe("rotating-text", () => {
     document.querySelectorAll("[data-rotate]").forEach((host) => {
       let list;
@@ -383,139 +297,27 @@
      6. Inclinação 3D em cartões (port do TiltedCard)
         <div class="tilt" data-tilt="12"><div class="tilt-inner">…
      ========================================================== */
-  safe("tilt", () => {
-    if (REDUCED || !FINE) return;
-    document.querySelectorAll(".tilt").forEach((el) => {
-      const inner = el.querySelector(".tilt-inner");
-      if (!inner) return;
-      const amp = parseFloat(el.getAttribute("data-tilt")) || 12;
-      const scale = parseFloat(el.getAttribute("data-tilt-scale")) || 1.03;
-
-      el.addEventListener("mousemove", (e) => {
-        const r = el.getBoundingClientRect();
-        const ox = e.clientX - r.left - r.width / 2;
-        const oy = e.clientY - r.top - r.height / 2;
-        el.classList.add("act");
-        inner.style.transform =
-          "rotateX(" + ((oy / (r.height / 2)) * -amp).toFixed(2) + "deg) rotateY(" +
-          ((ox / (r.width / 2)) * amp).toFixed(2) + "deg) scale(" + scale + ")";
-      });
-      el.addEventListener("mouseleave", () => {
-        el.classList.remove("act");
-        inner.style.transform = "";
-      });
-    });
-  });
-
-  /* ==========================================================
-     7. Motor de cena: converte scroll em progresso 0→1
-        para qualquer bloco [data-scene] com filho .sticky-like
-     ========================================================== */
-  const scenes = [];
-  const addScene = (track, sticky, onProgress) => {
-    scenes.push({ track, sticky, onProgress, last: -1 });
-  };
-  const runScenes = () => {
-    scenes.forEach((s) => {
-      const r = s.track.getBoundingClientRect();
-      const travel = r.height - s.sticky.offsetHeight;
-      const p = travel > 0 ? clamp(-r.top / travel, 0, 1) : r.top <= 0 ? 1 : 0;
-      if (Math.abs(p - s.last) > 0.0004) {
-        s.last = p;
-        s.onProgress(p);
-      }
-    });
-  };
-  let sceneTicking = false;
-  const scheduleScenes = () => {
-    if (sceneTicking) return;
-    sceneTicking = true;
-    requestAnimationFrame(() => {
-      sceneTicking = false;
-      runScenes();
-    });
-  };
-  window.addEventListener("scroll", scheduleScenes, { passive: true });
-  window.addEventListener("resize", scheduleScenes);
-
-  /* ==========================================================
-     8. Cena do celular 3D (página de Contato)
-     ========================================================== */
   safe("phone-scene", () => {
     const track = document.querySelector("[data-phone-track]");
     if (!track) return;
-    const sticky = track.querySelector(".phone-sticky");
-    const phone = track.querySelector(".phone");
-    const head = track.querySelector(".wa-head");
-    const sendbar = track.querySelector(".wa-send");
-    const hint = track.querySelector(".phone-hint");
-    const rail = track.querySelector(".scene-rail i");
-    const greet = track.querySelector("[data-greet]");
-    const day = track.querySelector(".wa-day");
     const topics = Array.from(track.querySelectorAll(".topic"));
-    if (!sticky || !phone) return;
+    if (!topics.length) return;
 
-    /* inclinação extra seguindo o mouse (some quando trava de frente) */
-    let mrx = 0, mry = 0, tmrx = 0, tmry = 0;
-    if (FINE && !REDUCED) {
-      sticky.addEventListener("mousemove", (e) => {
-        const r = sticky.getBoundingClientRect();
-        tmry = ((e.clientX - r.left) / r.width - 0.5) * 13;
-        tmrx = ((e.clientY - r.top) / r.height - 0.5) * -9;
+    /* A cena nao e mais dirigida por rolagem. Ela ja nasce pronta:
+       o repouso do aparelho vem do CSS e os assuntos entram uma vez,
+       quando a secao aparece. Sem loop, sem trilho de 380vh. */
+    const io = new IntersectionObserver((es) => {
+      es.forEach((e) => {
+        if (!e.isIntersecting) return;
+        topics.forEach((el, i) => {
+          el.style.transitionDelay = (i * 0.06).toFixed(2) + "s";
+          el.style.opacity = "1";
+          el.style.transform = "none";
+        });
+        io.disconnect();
       });
-      sticky.addEventListener("mouseleave", () => { tmry = 0; tmrx = 0; });
-    }
-
-    let progress = 0;
-
-    const paint = () => {
-      const p = progress;
-      const open = easeOut(range(p, 0, 0.3));       /* abrir/girar de frente */
-      const wake = range(p, 0.17, 0.34);            /* tela acendendo */
-
-      mrx += (tmrx - mrx) * 0.08;
-      mry += (tmry - mry) * 0.08;
-      const mouseMix = 0.35 + 0.65 * open;          /* mouse pesa mais já aberto */
-
-      phone.style.setProperty("--ry", (-26 * (1 - open) + mry * mouseMix).toFixed(2) + "deg");
-      phone.style.setProperty("--rx", (10 * (1 - open) + mrx * mouseMix).toFixed(2) + "deg");
-      phone.style.setProperty("--rz", (-4 * (1 - open)).toFixed(2) + "deg");
-      phone.style.setProperty("--sc", (0.82 + 0.18 * open).toFixed(3));
-      phone.style.setProperty("--ty", (26 * (1 - open)).toFixed(1) + "px");
-      phone.style.setProperty("--wake", wake.toFixed(3));
-      phone.style.setProperty("--glow", wake.toFixed(3));
-
-      if (head) {
-        const t = easeOut(range(p, 0.3, 0.42));
-        head.style.opacity = t;
-        head.style.transform = "translateY(" + (-16 * (1 - t)).toFixed(1) + "px)";
-      }
-      if (day) day.style.opacity = range(p, 0.36, 0.44);
-      if (greet && range(p, 0.42, 0.5) > 0.35) greet.classList.add("show");
-      if (sendbar) {
-        const t = easeOut(range(p, 0.5, 0.62));
-        sendbar.style.opacity = t;
-        sendbar.style.transform = "translateY(" + (16 * (1 - t)).toFixed(1) + "px)";
-      }
-      topics.forEach((el, i) => {
-        const a = 0.42 + i * 0.07;
-        const t = easeOut(range(p, a, a + 0.11));
-        el.style.opacity = t;
-        el.style.transform = "translateX(" + (-26 * (1 - t)).toFixed(1) + "px)";
-        el.style.pointerEvents = t > 0.85 ? "auto" : "none";
-      });
-      if (hint) hint.style.opacity = 1 - range(p, 0.02, 0.14);
-      if (rail) rail.style.height = (p * 100).toFixed(1) + "%";
-    };
-
-    addScene(track, sticky, (p) => { progress = p; paint(); });
-
-    /* loop leve só para a inclinação do mouse continuar suave */
-    const idle = () => {
-      if (Math.abs(tmrx - mrx) > 0.02 || Math.abs(tmry - mry) > 0.02) paint();
-      requestAnimationFrame(idle);
-    };
-    if (FINE && !REDUCED) requestAnimationFrame(idle);
+    }, { threshold: 0.2 });
+    io.observe(track);
 
     /* ---- Conversa: escolher assunto monta a mensagem de verdade ---- */
     const chat = track.querySelector(".wa-chat");
@@ -533,10 +335,7 @@
       const msg = btn.getAttribute("data-msg") || "";
       topics.forEach((t) => t.setAttribute("aria-pressed", String(t === btn)));
 
-      if (input) {
-        input.textContent = msg;
-        input.classList.add("filled");
-      }
+      if (input) { input.textContent = msg; input.classList.add("filled"); }
       if (go) {
         go.href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(msg);
         go.classList.add("ready");
@@ -564,28 +363,12 @@
         type();
       };
 
-      if (typing && !REDUCED) {
-        typing.classList.add("on");
-        timer = setTimeout(write, 620);
-      } else {
-        write();
-      }
+      if (typing && !REDUCED) { typing.classList.add("on"); timer = setTimeout(write, 620); }
+      else { write(); }
     };
 
-    topics.forEach((btn) => {
-      btn.addEventListener("click", () => pick(btn));
-      if (FINE) btn.addEventListener("mouseenter", () => {
-        if (!topics.some((t) => t.getAttribute("aria-pressed") === "true")) pick(btn);
-      });
-    });
-
-    paint();
-    scheduleScenes();
+    topics.forEach((btn) => btn.addEventListener("click", () => pick(btn)));
   });
-
-  /* ==========================================================
-     9. Relógio e status de atendimento ao vivo (America/Sao_Paulo)
-     ========================================================== */
   safe("live-status", () => {
     const clocks = document.querySelectorAll("[data-clock]");
     const status = document.querySelector("[data-live-status]");
@@ -621,152 +404,6 @@
   /* ==========================================================
      10. Campo de partículas que se organiza no "Z" da marca (Home)
          Metáfora do trabalho: atenção dispersa vira marca.
-     ========================================================== */
-  safe("particle-logo", () => {
-    const cv = document.querySelector("[data-particle-z]");
-    if (!cv) return;
-    const host = cv.parentElement;
-    if (REDUCED) { cv.style.display = "none"; return; }
-    const ctx = cv.getContext("2d", { alpha: true });
-    if (!ctx) return;
-
-    const Z_POLY = "10,10 54,10 54,20 38,31 46,31 30,44 54,44 54,54 10,54 10,44 26,33 18,33 34,20 10,20";
-
-    /* Rasteriza o polígono do Z e amostra pontos internos: é a forma exata
-       do logo, sem precisar embutir coordenadas à mão. */
-    const sampleLogo = () => {
-      const S = 200;
-      const off = document.createElement("canvas");
-      off.width = off.height = S;
-      const c = off.getContext("2d");
-      c.fillStyle = "#fff";
-      c.beginPath();
-      Z_POLY.split(" ").forEach((pair, i) => {
-        const xy = pair.split(",");
-        const px = (+xy[0] / 64) * S;
-        const py = (+xy[1] / 64) * S;
-        if (i) c.lineTo(px, py); else c.moveTo(px, py);
-      });
-      c.closePath();
-      c.fill();
-      const d = c.getImageData(0, 0, S, S).data;
-      const out = [];
-      for (let y = 0; y < S; y += 3) {
-        for (let x = 0; x < S; x += 3) {
-          if (d[(y * S + x) * 4 + 3] > 140) out.push([x / S - 0.5, y / S - 0.5]);
-        }
-      }
-      return out;
-    };
-
-    const targets = sampleLogo();
-    if (!targets.length) return;
-
-    let W = 0, H = 0, dpr = 1, box = 0, cxp = 0, cyp = 0;
-    let mouse = { x: -9999, y: -9999 };
-    let gather = 0;          /* 0 = disperso, 1 = formado */
-    let started = 0;
-    const parts = [];
-
-    const layout = () => {
-      const r = host.getBoundingClientRect();
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      W = r.width; H = r.height;
-      cv.width = Math.round(W * dpr);
-      cv.height = Math.round(H * dpr);
-      cv.style.width = W + "px";
-      cv.style.height = H + "px";
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      /* Posição medida, não chutada: o Z ocupa o corredor livre entre o
-         texto e o painel branco — assim nenhum trecho do traço fica
-         escondido atrás do cartão e a letra se lê inteira. */
-      const mock = host.querySelector(".mock");
-      if (mock && W > 860) {
-        const m = mock.getBoundingClientRect();
-        const cardLeft = Math.max(360, m.left - r.left);
-        box = Math.max(300, Math.min(H * 1.02, (cardLeft + 60) * 0.55));
-        cxp = (cardLeft + 60) - box * 0.36;
-        cyp = H * 0.54;
-      } else {
-        /* layout empilhado: vira um selo no alto, perto do título */
-        box = Math.min(W * 0.55, H * 0.6);
-        cxp = W * 0.80;
-        cyp = H * 0.30;
-      }
-    };
-    window.addEventListener("load", layout);
-
-    layout();
-    targets.forEach((t) => {
-      parts.push({
-        tx: t[0], ty: t[1],
-        x: Math.random() * W, y: Math.random() * H,
-        vx: 0, vy: 0,
-        ph: Math.random() * Math.PI * 2,
-        sz: 1.1 + Math.random() * 1.7
-      });
-    });
-
-    host.addEventListener("mousemove", (e) => {
-      const r = host.getBoundingClientRect();
-      mouse.x = e.clientX - r.left;
-      mouse.y = e.clientY - r.top;
-    });
-    host.addEventListener("mouseleave", () => { mouse.x = mouse.y = -9999; });
-    window.addEventListener("resize", layout);
-
-    const draw = (t) => {
-      if (!started) started = t;
-      /* forma sozinho na entrada (sem exigir scroll) */
-      gather = Math.min(1, (t - started) / 2200);
-      const g = 1 - Math.pow(1 - gather, 3);
-
-      /* some conforme sai da tela — não gasta bateria fora de vista */
-      const r = host.getBoundingClientRect();
-      if (r.bottom < 0 || r.top > window.innerHeight) {
-        requestAnimationFrame(draw);
-        return;
-      }
-
-      ctx.clearRect(0, 0, W, H);
-      const time = t * 0.001;
-
-      for (let i = 0; i < parts.length; i++) {
-        const p = parts[i];
-        const hx = cxp + p.tx * box + Math.sin(time * 0.6 + p.ph) * 2.2;
-        const hy = cyp + p.ty * box + Math.cos(time * 0.5 + p.ph) * 2.2;
-        const gx = p.x + (hx - p.x) * 0.055 * (0.25 + g);
-        const gy = p.y + (hy - p.y) * 0.055 * (0.25 + g);
-
-        /* o cursor empurra as partículas */
-        let dx = p.x - mouse.x, dy = p.y - mouse.y;
-        const d2 = dx * dx + dy * dy;
-        let push = 0;
-        if (d2 < 13000) {
-          const d = Math.sqrt(d2) || 1;
-          push = (1 - d / 114) * 5.5;
-          dx /= d; dy /= d;
-        }
-        p.x = gx + (push ? dx * push : 0);
-        p.y = gy + (push ? dy * push : 0);
-
-        const mix = (p.tx + 0.5);
-        ctx.fillStyle =
-          "rgba(" + Math.round(108 + mix * (34 - 108)) + "," +
-          Math.round(76 + mix * (211 - 76)) + "," +
-          Math.round(241 + mix * (238 - 241)) + "," +
-          (0.16 + g * 0.6) + ")";
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.sz, 0, 6.283);
-        ctx.fill();
-      }
-      requestAnimationFrame(draw);
-    };
-    requestAnimationFrame(draw);
-  });
-
-  /* ==========================================================
-     11. Máquina de marketing: o fluxo se desenha no scroll (Serviços)
      ========================================================== */
   safe("pipeline", () => {
     const wrap = document.querySelector("[data-pipeline]");
@@ -968,38 +605,6 @@
      14a. Ícones vivos da faixa de confiança (home)
           Dispara ao entrar na tela; refaz a cada nova entrada.
      ========================================================== */
-  safe("trust-icons", () => {
-    const trust = document.querySelector(".trust");
-    if (!trust) return;
-    /* Sem movimento: deixa no estado final (--p = 1). */
-    if (REDUCED) { trust.style.setProperty("--p", "1"); return; }
-
-    let ticking = false;
-    const update = () => {
-      ticking = false;
-      const vh = window.innerHeight || 1;
-      const r = trust.getBoundingClientRect();
-      /* p = 0 quando a faixa está entrando por baixo (topo em vh);
-         p = 1 quando ela já subiu (topo em ~38% da tela).
-         Descer aumenta p (avança), subir diminui (volta). */
-      const p = clamp((vh - r.top) / (vh * 0.62), 0, 1);
-      trust.style.setProperty("--p", p.toFixed(4));
-    };
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(update);
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    window.addEventListener("load", update);
-    update();
-  });
-
-  /* ==========================================================
-     14b. Marquee 3D (Cases): clique/toque traz a peça à frente
-          — no celular não há hover, então isto é essencial
-     ========================================================== */
   safe("marquee-front", () => {
     const stage = document.querySelector(".m3-stage");
     if (!stage) return;
@@ -1033,6 +638,7 @@
   safe("cine-footer", () => {
     const wrap = document.querySelector("[data-cine-reveal]");
     if (!wrap) return;
+    document.documentElement.classList.add("cine-on");
     const giant = wrap.querySelector("[data-cine-giant]");
     const title = wrap.querySelector("[data-cine-title]");
     const links = wrap.querySelector("[data-cine-links]");
@@ -1100,6 +706,225 @@
   });
 
   /* Recalcula depois que fontes/imagens assentam */
-  window.addEventListener("load", () => setTimeout(scheduleScenes, 120));
-  scheduleScenes();
+
+  /* ==========================================================
+     Máquina de marketing: energia correndo pelo trilho (Serviços)
+     ========================================================== */
+  safe("machine-flow", () => {
+    if (REDUCED) return;
+    const svg = document.querySelector(".pipe-svg");
+    const rail = svg && svg.querySelector(".pipe-rail");
+    if (!rail) return;
+    const flow = rail.cloneNode(false);
+    flow.setAttribute("class", "pipe-flow");
+    svg.insertBefore(flow, rail.nextSibling);
+  });
+
+  /* ==========================================================
+     Manifesto cinético, palavra a palavra (Sobre)
+     ========================================================== */
+  safe("manifesto", () => {
+    const h1 = document.querySelector(".manifesto");
+    if (!h1) return;
+    const words = h1.textContent.trim().split(/\s+/);
+    h1.textContent = "";
+    words.forEach((w, i) => {
+      const o = document.createElement("span");
+      o.className = "mf-w";
+      const inner = document.createElement("span");
+      inner.className = "mf-wi";
+      inner.textContent = w;
+      inner.style.transitionDelay = REDUCED ? "0s" : (0.12 + i * 0.055) + "s";
+      o.appendChild(inner);
+      h1.appendChild(o);
+      h1.appendChild(document.createTextNode(" "));
+    });
+    requestAnimationFrame(() => requestAnimationFrame(() => h1.classList.add("mf-in")));
+  });
+
+
+  /* ==========================================================
+     DIAGNÓSTICO NO HERÓI (home)
+     Três perguntas e a pessoa lê o próprio negócio antes de
+     falar com alguém. O WhatsApp abre já com as respostas dela.
+     ========================================================== */
+  safe("diagnostico", () => {
+    const raiz = document.querySelector("[data-diag]");
+    if (!raiz) return;
+
+    const WA = window.ZYVA_WA || "5598984337265";
+    const track = (ev, d) => { try { window.zt && window.zt(ev, d); } catch (e) {} };
+
+    const NEGOCIO = {
+      comercio:     { artigo: "sua", rotulo: "loja",          busca: "o que você vende, na sua cidade", reforco: "trafego" },
+      servico:      { artigo: "seu", rotulo: "serviço local", busca: "seu serviço perto de mim",        reforco: "seo" },
+      profissional: { artigo: "sua", rotulo: "consultoria",   busca: "o problema que você resolve",     reforco: "conteudo" },
+      restaurante:  { artigo: "seu", rotulo: "restaurante",   busca: "onde comer perto de mim",         reforco: "redes" }
+    };
+    const TRAVA = {
+      google:  { curto: "não apareço no Google",
+                 frase: "você não está aparecendo para quem já está procurando o que você vende",
+                 base: ["seo", "sites", "conteudo"] },
+      social:  { curto: "seguidor não vira venda",
+                 frase: "você tem audiência, mas ela não está virando conversa de venda",
+                 base: ["redes", "conteudo", "whatsapp"] },
+      anuncio: { curto: "gasto sem saber o retorno",
+                 frase: "você está investindo no escuro, sem saber qual real trouxe cliente",
+                 base: ["relatorios", "trafego", "sites"] },
+      venda:   { curto: "perco a venda depois do contato",
+                 frase: "o contato chega, mas se perde antes de virar venda",
+                 base: ["whatsapp", "sites", "relatorios"] }
+    };
+    const VERBA = {
+      zero:   { curto: "nada ainda",
+                prazo: "Começando do zero, os primeiros 90 dias são de <b>estrutura</b>: ser encontrado, responder rápido e medir. Sem gastar em anúncio ainda — primeiro a casa em ordem, depois a torneira." },
+      ate500: { curto: "até R$ 500/mês",
+                prazo: "Com até R$ 500 por mês dá para montar a base e fazer <b>um teste pequeno</b> de anúncio. Em 90 dias você deve saber qual canal responde — e só então aumentar." },
+      ate2k:  { curto: "R$ 500 a R$ 2.000/mês",
+                prazo: "Nessa faixa os 90 dias já cabem base <b>e</b> anúncio rodando de verdade. A meta do mês 3 é você saber quanto custa cada contato que chega." },
+      acima:  { curto: "acima de R$ 2.000/mês",
+                prazo: "Com essa verba o problema raramente é dinheiro — é direção. Em 90 dias a meta é <b>cortar o que não dá retorno</b> e concentrar no que dá." }
+    };
+    const FRENTE = {
+      seo:        { nome: "Aparecer no Google",
+                    por: (n) => "Quem procura " + n.busca + " precisa achar você antes do concorrente. É o cliente que já quer comprar." },
+      sites:      { nome: "Uma página que vende",
+                    por: () => "Não é vitrine bonita: é uma página que responde a dúvida e leva ao WhatsApp em um toque." },
+      conteudo:   { nome: "Conteúdo que responde",
+                    por: () => "Cada dúvida do cliente vira um conteúdo. Isso te acha no Google e te faz confiável antes da conversa começar." },
+      redes:      { nome: "Redes que geram conversa",
+                    por: () => "Parar de postar para seguidor e passar a postar para quem compra. Menos volume, mais direção." },
+      trafego:    { nome: "Anúncio com verba controlada",
+                    por: () => "Google e Instagram com teto de gasto e um número de retorno no fim do mês. Nada de torneira aberta." },
+      whatsapp:   { nome: "WhatsApp organizado",
+                    por: () => "Resposta rápida, mensagem pronta, ninguém esquecido. É no WhatsApp que a venda se ganha ou se perde no Brasil." },
+      relatorios: { nome: "Relatório todo mês",
+                    por: () => "Em português, sem gráfico enfeitado: quanto entrou, de onde veio e o que fazer no mês seguinte." },
+      branding:   { nome: "Identidade visual",
+                    por: () => "Marca que parece profissional cobra mais caro e é lembrada depois." }
+    };
+
+    const resp = {};
+    const perguntas = Array.from(raiz.querySelectorAll(".diag-q"));
+    const body = raiz.querySelector("[data-diag-body]");
+    const saida = raiz.querySelector("[data-diag-out]");
+    const conta = raiz.querySelector("[data-diag-n]");
+    const barra = raiz.querySelector("[data-diag-bar]");
+    const voltar = raiz.querySelector("[data-diag-back]");
+    const topo = raiz.querySelector(".diag-top");
+    let atual = 0;
+    let comecou = false;
+
+    const mostra = (i) => {
+      atual = i;
+      perguntas.forEach((q, k) => { q.hidden = k !== i; });
+      if (conta) conta.textContent = String(i + 1);
+      if (barra) barra.style.width = ((i + 1) / perguntas.length * 100).toFixed(1) + "%";
+      if (voltar) voltar.hidden = i === 0;
+      const lg = perguntas[i].querySelector("legend");
+      if (lg && i > 0) lg.setAttribute("tabindex", "-1"), lg.focus({ preventScroll: true });
+    };
+
+    const monta = () => {
+      const n = NEGOCIO[resp.negocio];
+      const tr = TRAVA[resp.trava];
+      const vb = VERBA[resp.verba];
+
+      /* ordem das frentes: a trava manda, o tipo de negócio reforça,
+         e a verba pode tirar o anúncio de cena. */
+      let ordem = tr.base.slice();
+      if (ordem.indexOf(n.reforco) === -1) ordem.splice(1, 0, n.reforco);
+      if (resp.verba === "zero") {
+        ordem = ordem.filter((f) => f !== "trafego");
+        ["seo", "whatsapp", "sites"].forEach((f) => { if (ordem.indexOf(f) === -1) ordem.push(f); });
+      }
+      ordem = ordem.slice(0, 3);
+
+      const frentes = ordem.map((f, i) =>
+        '<div class="diag-frente"><i>' + (i + 1) + "</i><div><b>" +
+        FRENTE[f].nome + "</b><span>" + FRENTE[f].por(n) + "</span></div></div>").join("");
+
+      const msg =
+        "Olá, Zyva! Fiz o diagnóstico rápido no site.\n" +
+        "Meu negócio: " + n.rotulo + "\n" +
+        "O que mais trava: " + tr.curto + "\n" +
+        "Invisto hoje: " + vb.curto + "\n" +
+        "O site sugeriu começar por: " + ordem.map((f) => FRENTE[f].nome).join(", ") + ".\n" +
+        "Quero aprofundar isso.";
+
+      saida.innerHTML =
+        "<h3>Pelo que você respondeu, " + n.artigo + " " + n.rotulo +
+        " tem um problema claro: <b>" + tr.frase + "</b>.</h3>" +
+        '<div class="diag-frentes">' + frentes + "</div>" +
+        '<p class="diag-prazo">' + vb.prazo + "</p>" +
+        '<div class="diag-cta">' +
+        '<a class="btn btn-primary cursor-target" target="_blank" rel="noopener" href="https://wa.me/' +
+        WA + "?text=" + encodeURIComponent(msg) + '" data-diag-wa>Quero aprofundar no WhatsApp</a>' +
+        '<a class="btn btn-ghost cursor-target" href="/contato/">Prefiro escrever pelo formulário</a>' +
+        '<button type="button" class="diag-refaz" data-diag-refaz>Responder de novo</button>' +
+        "</div>";
+
+      body.hidden = true;
+      if (voltar) voltar.hidden = true;
+      if (topo) topo.hidden = true;
+      saida.hidden = false;
+
+      /* A leitura é o momento da conversão: nada pode ficar por cima
+         do botão. O aviso do blog sai de cena. */
+      const toast = document.querySelector(".zyva-toast");
+      if (toast) toast.remove();
+
+      track("diagnostico_fim", { negocio: resp.negocio, trava: resp.trava, verba: resp.verba,
+                                 frentes: ordem.join(",") });
+
+      const wa = saida.querySelector("[data-diag-wa]");
+      if (wa) wa.addEventListener("click", () =>
+        track("lead_diagnostico", { negocio: resp.negocio, trava: resp.trava, verba: resp.verba }));
+      const refaz = saida.querySelector("[data-diag-refaz]");
+      if (refaz) refaz.addEventListener("click", () => {
+        delete resp.negocio; delete resp.trava; delete resp.verba;
+        raiz.querySelectorAll(".diag-opt").forEach((b) => b.removeAttribute("aria-pressed"));
+        saida.hidden = true; saida.innerHTML = "";
+        body.hidden = false; if (topo) topo.hidden = false;
+        mostra(0);
+      });
+    };
+
+    const avanca = () => {
+      if (atual < perguntas.length - 1) {
+        if (REDUCED) { mostra(atual + 1); return; }
+        body.classList.add("diag-swap");
+        setTimeout(() => { mostra(atual + 1); body.classList.remove("diag-swap"); }, 200);
+      } else {
+        monta();
+      }
+    };
+
+    raiz.querySelectorAll(".diag-opt").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const campo = btn.closest(".diag-q").getAttribute("data-q");
+        resp[campo] = btn.getAttribute("data-v");
+        btn.closest(".diag-opts").querySelectorAll(".diag-opt")
+          .forEach((o) => o.setAttribute("aria-pressed", String(o === btn)));
+        if (!comecou) { comecou = true; track("diagnostico_inicio", {}); }
+        setTimeout(avanca, REDUCED ? 0 : 130);
+      });
+    });
+
+    if (voltar) voltar.addEventListener("click", () => { if (atual > 0) mostra(atual - 1); });
+
+    /* Enquanto o diagnóstico estiver na tela, o aviso do blog recua.
+       No celular ele cobria a última opção — e nada pode ficar na
+       frente do caminho de conversão. */
+    if ("IntersectionObserver" in window) {
+      const guard = new IntersectionObserver((es) => {
+        const perto = es.some((e) => e.isIntersecting);
+        document.documentElement.classList.toggle("diag-na-tela", perto);
+      }, { threshold: 0.25 });
+      guard.observe(raiz);
+    }
+
+    mostra(0);
+  });
+
 })();

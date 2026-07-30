@@ -1,15 +1,72 @@
 /* ZYVA — main.js */
 
-/* ⚠️ TROQUE AQUI: número do WhatsApp da Zyva no formato 55 + DDD + número (só dígitos) */
 const WHATSAPP_NUMBER = "5598984337265";
 const WHATSAPP_DEFAULT_MSG = "Olá, Zyva! Quero um diagnóstico gratuito para minha empresa.";
+const GA_ID = "G-8LGZNFHB8D";
 
-/* Aplica o número em todos os links de WhatsApp */
+/* ================================================================
+   MEDIÇÃO
+   O Analytics do Google pesa mais que o site inteiro. Carregá-lo no
+   começo custaria a primeira impressão — e performance vem antes de
+   captação na ordem de prioridade. Então ele entra depois: quando a
+   página termina de carregar e a linha principal fica livre, ou no
+   primeiro toque da pessoa, o que vier antes. Eventos disparados
+   nesse meio-tempo ficam na fila e sobem quando ele chega, então
+   nenhuma conversão se perde.
+   ================================================================ */
+window.dataLayer = window.dataLayer || [];
+function gtag() { window.dataLayer.push(arguments); }
+
+const zt = (evento, dados) => {
+  try { gtag("event", evento, dados || {}); } catch (e) {}
+};
+/* exposto para os outros módulos poderem contar eventos */
+window.zt = zt;
+
+(() => {
+  if (!GA_ID || GA_ID.indexOf("G-") !== 0) return;
+  let carregado = false;
+  const carregar = () => {
+    if (carregado) return;
+    carregado = true;
+    const s = document.createElement("script");
+    s.async = true;
+    s.src = "https://www.googletagmanager.com/gtag/js?id=" + GA_ID;
+    document.head.appendChild(s);
+    gtag("js", new Date());
+    gtag("config", GA_ID);
+  };
+  const agendar = () => {
+    if ("requestIdleCallback" in window) requestIdleCallback(carregar, { timeout: 2500 });
+    else setTimeout(carregar, 1200);
+  };
+  if (document.readyState === "complete") agendar();
+  else addEventListener("load", agendar, { once: true });
+  ["pointerdown", "keydown", "touchstart"].forEach((ev) =>
+    addEventListener(ev, carregar, { once: true, passive: true })
+  );
+})();
+
+/* ================================================================
+   WHATSAPP — o caminho da conversão não pode falhar em silêncio
+   Cada link [data-wa] já nasce com o endereço real no HTML, então
+   funciona mesmo se este arquivo não carregar. Aqui o JS só refina
+   a mensagem e conta o clique.
+   ================================================================ */
+const waLink = (msg) =>
+  "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(msg || WHATSAPP_DEFAULT_MSG);
+
 document.querySelectorAll("[data-wa]").forEach((el) => {
   const msg = el.getAttribute("data-wa-msg") || WHATSAPP_DEFAULT_MSG;
-  el.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+  el.href = waLink(msg);
   el.target = "_blank";
   el.rel = "noopener";
+  el.addEventListener("click", () => {
+    zt("clique_whatsapp", {
+      origem: el.getAttribute("data-wa") || "link",
+      pagina: location.pathname,
+    });
+  });
 });
 
 /* Menu mobile */
@@ -22,7 +79,13 @@ if (toggle && links) {
   );
 }
 
-/* Animação de entrada */
+/* ================================================================
+   Animação de entrada
+   O que já está na primeira tela aparece na hora, sem esperar o
+   observador. Esperar custava meio segundo do LCP na página de
+   Serviços: o parágrafo estava lá, mas em opacity 0 aguardando um
+   callback que só rodava depois de todo o resto.
+   ================================================================ */
 const observer = new IntersectionObserver(
   (entries) => {
     entries.forEach((e) => {
@@ -34,30 +97,57 @@ const observer = new IntersectionObserver(
   },
   { threshold: 0.12 }
 );
-document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+document.querySelectorAll(".reveal").forEach((el) => {
+  if (el.getBoundingClientRect().top < (window.innerHeight || 800) * 0.98) {
+    el.classList.add("visible", "reveal-now");
+    return;
+  }
+  observer.observe(el);
+});
 
-/* Formulário de contato → abre WhatsApp com a mensagem montada */
+/* ================================================================
+   FORMULÁRIO DE CONTATO
+   Antes isto chamava window.open — e o Safari do iPhone e o navegador
+   interno do Instagram bloqueiam janelas abertas por script. A pessoa
+   preenchia tudo, via "enviado" e o lead sumia. Agora a navegação é
+   normal, na própria aba, que nenhum bloqueador impede. E a confirmação
+   só aparece junto com um link manual de verdade: se por qualquer motivo
+   o WhatsApp não abrir, o caminho continua visível na tela.
+   ================================================================ */
 const form = document.querySelector("#form-contato");
 if (form) {
   form.addEventListener("submit", (ev) => {
     ev.preventDefault();
     const v = (name) => (form.querySelector(`[name="${name}"]`)?.value || "").trim();
+
     if (!form.querySelector('[name="consent"]').checked) {
       alertBox("Para enviar, confirme que leu a Política de Privacidade.");
       return;
     }
+
     const msg =
       `Olá, Zyva! Meu nome é ${v("nome")}, da empresa ${v("empresa")}.\n` +
       `Tenho interesse em: ${v("servico")}.\n` +
       `${v("mensagem")}\n` +
       `Meu WhatsApp: ${v("whatsapp")}`;
-    window.open(
-      `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`,
-      "_blank",
-      "noopener"
-    );
+    const url = waLink(msg);
+
+    zt("lead_formulario", { servico: v("servico"), pagina: location.pathname });
+
     const ok = document.querySelector("#form-ok");
-    if (ok) ok.hidden = false;
+    if (ok) {
+      ok.hidden = false;
+      ok.innerHTML =
+        '<strong>Abrindo o WhatsApp com sua mensagem pronta.</strong><br>' +
+        'Não abriu? <a href="' + url + '" target="_blank" rel="noopener" data-wa-manual>Toque aqui para abrir</a> ' +
+        'ou chame direto no <a href="tel:+' + WHATSAPP_NUMBER + '">(98) 98433-7265</a>.';
+      const manual = ok.querySelector("[data-wa-manual]");
+      if (manual) manual.addEventListener("click", () => zt("whatsapp_manual", { pagina: location.pathname }));
+      ok.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }
+
+    /* Navegação na própria aba: nunca é bloqueada. */
+    setTimeout(() => { location.href = url; }, 120);
   });
 }
 
@@ -93,13 +183,16 @@ document.querySelectorAll("[data-year]").forEach((el) => {
   let wrap = null;
   const build = () => {
     if (wrap) return;
-    wrap = document.createElement("main");
+    /* div, não main: a página já tem seu <main id="conteudo">.
+       Dois landmarks main deixam o leitor de tela sem referência. */
+    wrap = document.createElement("div");
     wrap.className = "page-curtain";
     const move = [...document.body.children].filter(
       (el) =>
         el !== footer &&
         el.tagName !== "SCRIPT" &&
         !el.classList.contains("wa-float") &&
+        !el.classList.contains("skip-link") &&
         el.id !== "alert-box"
     );
     document.body.insertBefore(wrap, footer);
@@ -419,3 +512,11 @@ document.querySelectorAll("[data-year]").forEach((el) => {
     });
   } catch (e) {}
 })();
+
+/* Rede de segurança do rodapé: se o zyva-motion.js não carregar,
+   nada de rodapé invisível para sempre. */
+setTimeout(() => {
+  if (!document.documentElement.classList.contains("cine-on")) {
+    document.documentElement.classList.add("cine-fallback");
+  }
+}, 2500);
