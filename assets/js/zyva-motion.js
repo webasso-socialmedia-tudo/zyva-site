@@ -105,6 +105,106 @@
   });
 
 
+  /* ==========================================================
+     3. Cursor-alvo — SEMPRE um quadrado
+        Um retículo de 4 cantos que segue o mouse e cresce (sem
+        deixar de ser quadrado) ao passar sobre algo clicável.
+        Antes ele se esticava para caber no retângulo do elemento,
+        virando um retângulo largo nos links de texto; agora nunca.
+     ========================================================== */
+  safe("target-cursor", () => {
+    if (REDUCED || !FINE || window.innerWidth <= 900) return;
+
+    const SEL = ".cursor-target";
+    const SIZE = 13;
+    const sq = (H) => [
+      [-H, -H],
+      [H - SIZE, -H],
+      [H - SIZE, H - SIZE],
+      [-H, H - SIZE],
+    ];
+    const rest = sq(SIZE * 1.45);   /* quadrado pequeno em repouso */
+    const hover = sq(SIZE * 2.7);   /* quadrado maior sobre um alvo */
+
+    const root = document.createElement("div");
+    root.className = "zcursor";
+    root.innerHTML =
+      '<div class="zcursor-dot"></div>' +
+      '<div class="zcursor-c zc-tl"></div><div class="zcursor-c zc-tr"></div>' +
+      '<div class="zcursor-c zc-br"></div><div class="zcursor-c zc-bl"></div>';
+    document.body.appendChild(root);
+    document.body.classList.add("zcursor-active");
+
+    const dot = root.querySelector(".zcursor-dot");
+    const corners = Array.from(root.querySelectorAll(".zcursor-c"));
+    const cur = rest.map((r) => r.slice());
+
+    let mx = window.innerWidth / 2, my = window.innerHeight / 2;
+    let cx = mx, cy = my;
+    let active = null, lock = 0, pressed = false;
+    let running = false, idleAt = 0;
+
+    const kick = () => {
+      idleAt = performance.now() + 700;
+      if (!running) { running = true; requestAnimationFrame(loop); }
+    };
+
+    window.addEventListener("mousemove", (e) => {
+      mx = e.clientX; my = e.clientY;
+      if (!root.classList.contains("on")) root.classList.add("on");
+      kick();
+    }, { passive: true });
+
+    window.addEventListener("mouseover", (e) => {
+      const t = e.target.closest ? e.target.closest(SEL) : null;
+      if (t !== active) { active = t; kick(); }
+    }, { passive: true });
+
+    window.addEventListener("mouseout", (e) => {
+      if (active && !e.relatedTarget) { active = null; kick(); }
+    }, { passive: true });
+
+    window.addEventListener("mousedown", () => { pressed = true; kick(); }, { passive: true });
+    window.addEventListener("mouseup", () => { pressed = false; kick(); }, { passive: true });
+
+    function loop() {
+      cx += (mx - cx) * 0.2;
+      cy += (my - cy) * 0.2;
+
+      if (active && !document.body.contains(active)) active = null;
+      const want = active ? 1 : 0;
+      lock += (want - lock) * 0.18;
+      const s = pressed ? 0.8 : 1;
+
+      corners.forEach((c, i) => {
+        const gx = rest[i][0] + (hover[i][0] - rest[i][0]) * lock;
+        const gy = rest[i][1] + (hover[i][1] - rest[i][1]) * lock;
+        cur[i][0] += (gx - cur[i][0]) * 0.3;
+        cur[i][1] += (gy - cur[i][1]) * 0.3;
+        c.style.transform =
+          "translate(" + cur[i][0].toFixed(2) + "px," + cur[i][1].toFixed(2) + "px) scale(" + s + ")";
+      });
+
+      /* sem rotação: o quadrado fica sempre alinhado, nunca vira losango */
+      root.style.transform = "translate(" + cx.toFixed(2) + "px," + cy.toFixed(2) + "px)";
+      dot.style.transform = "scale(" + (pressed ? 0.6 : 1) + ")";
+
+      const awake = performance.now() < idleAt;
+      const parado =
+        !awake &&
+        Math.abs(mx - cx) < 0.4 && Math.abs(my - cy) < 0.4 &&
+        Math.abs(lock - want) < 0.01 &&
+        corners.every((c, i) => {
+          const gx = rest[i][0] + (hover[i][0] - rest[i][0]) * lock;
+          const gy = rest[i][1] + (hover[i][1] - rest[i][1]) * lock;
+          return Math.abs(cur[i][0] - gx) < 0.4 && Math.abs(cur[i][1] - gy) < 0.4;
+        });
+      if (parado) { running = false; return; }
+      requestAnimationFrame(loop);
+    }
+    kick();
+  });
+
   safe("rotating-text", () => {
     document.querySelectorAll("[data-rotate]").forEach((host) => {
       let list;
