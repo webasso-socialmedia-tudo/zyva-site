@@ -180,6 +180,16 @@ document.querySelectorAll("[data-year]").forEach((el) => {
   const footer = document.querySelector(".site-footer");
   if (!footer) return;
 
+  /* A cortina do rodapé só faz sentido em página de FUNDO ESCURO: o
+     conteúdo escuro desliza revelando o rodapé escuro por baixo. Num
+     post de blog (fundo claro) ela virava uma cortina CLARA com cantos
+     arredondados por cima de um rodapé escuro — a emenda quebrada. Aqui
+     ela fica desligada, e o post ganha um rodapé estático normal. */
+  const fundoEscuro =
+    document.body.classList.contains("home") ||
+    document.body.classList.contains("dark-shell");
+  if (!fundoEscuro) return;
+
   let wrap = null;
   const build = () => {
     if (wrap) return;
