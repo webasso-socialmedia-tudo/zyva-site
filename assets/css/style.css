@@ -897,8 +897,14 @@ body.curtain-on .page-curtain {
 .wa-float svg { width: 30px; height: 30px; fill: #fff; }
 
 /* ---------- Animações de entrada ---------- */
-.reveal { opacity: 0; transform: translateY(22px); transition: opacity .6s ease, transform .6s ease; }
-.reveal.visible { opacity: 1; transform: none; }
+/* Só esconde se o JS estiver de pé — senão uma falha de rede deixaria
+   metade do site invisível esperando um script que não veio. */
+html.js-on .reveal { opacity: 0; transform: translateY(22px); transition: opacity .6s ease, transform .6s ease; }
+/* Mesma especificidade da regra que esconde (html.js-on .reveal),
+   senão o "visible" perde a disputa e o conteúdo nunca aparece. */
+html.js-on .reveal.visible, .reveal.visible { opacity: 1; transform: none; }
+/* Primeira tela: já nasce pronta, sem transição. */
+.reveal-now { opacity: 1 !important; transform: none !important; transition: none !important; }
 .grid .reveal:nth-child(2) { transition-delay: .07s; }
 .grid .reveal:nth-child(3) { transition-delay: .14s; }
 .grid .reveal:nth-child(4) { transition-delay: .21s; }
@@ -939,7 +945,11 @@ body.curtain-on .page-curtain {
   .contact-grid { grid-template-columns: 1fr; }
   .service-cols { grid-template-columns: 1fr; }
   .hero-grid { grid-template-columns: 1fr; gap: 40px; }
-  .hero-visual { display: none; }
+  /* O visual do herói deixou de ser enfeite: agora é o diagnóstico,
+     que é o ato de conversão. No celular ele aparece EMBAIXO da
+     promessa e dos botões — quem já decidiu não precisa responder
+     nada, quem está pesquisando começa aqui. */
+  .hero-visual { display: block; min-height: 0; margin-top: 30px; }
   .timeline::before { display: none; }
   .tl-step .num { box-shadow: none; }
   .stats { grid-template-columns: repeat(2, 1fr); gap: 28px 18px; }
@@ -972,3 +982,117 @@ body.curtain-on .page-curtain {
   .service-block { padding: 28px 22px; }
   .form-card { padding: 26px 20px; }
 }
+
+/* ============================================================
+   ACESSIBILIDADE — base
+   Primeiro guardrail do projeto: nada aqui é negociável.
+   ============================================================ */
+
+/* Pular direto para o conteúdo (primeira parada do teclado) */
+.skip-link {
+  position: absolute;
+  left: 12px;
+  top: -60px;
+  z-index: 300;
+  padding: 12px 20px;
+  border-radius: 0 0 12px 12px;
+  background: var(--night, #0B0E1A);
+  color: #fff;
+  font-family: var(--font-head);
+  font-weight: 600;
+  text-decoration: none;
+  border: 2px solid var(--cyan, #22D3EE);
+  transition: top 0.18s ease;
+}
+.skip-link:focus { top: 0; }
+
+/* Foco visível da marca — o anel padrão do navegador é fino demais
+   e some no fundo escuro. Este funciona nos dois fundos. */
+:focus-visible {
+  outline: 3px solid var(--cyan, #22D3EE);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.btn:focus-visible,
+.nav-links a:focus-visible,
+.chip-filter:focus-visible,
+.diag-opt:focus-visible,
+.topic:focus-visible {
+  outline: 3px solid var(--cyan, #22D3EE);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px rgba(34, 211, 238, 0.22);
+}
+/* Só remove o anel de quem clica com o mouse — o teclado sempre vê. */
+:focus:not(:focus-visible) { outline: none; }
+
+/* Alvos de toque: 44px é o mínimo para o polegar acertar de primeira.
+   Feito com padding de verdade (não pseudo-elemento), porque vários
+   destes links já usam ::after para a setinha. O recuo negativo
+   devolve o espaço, então o desenho da página não muda. */
+@media (pointer: coarse) {
+  .nav-links a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .logo { padding: 4px 0; min-height: 44px; display: inline-flex; align-items: center; }
+
+  .card a.more,
+  .post-card a.more,
+  .footer-grid a,
+  .footer-bottom a,
+  .footer-links a,
+  .hint a,
+  .article a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-top: -10px;
+    margin-bottom: -10px;
+  }
+  .card a.more { margin-top: 3px; }
+  .post-card a.more { margin-top: 6px; }
+
+  .article a { min-height: 0; padding: 6px 0; margin: 0; }
+
+  .zt-close { min-width: 44px; min-height: 44px; display: grid; place-items: center; }
+  /* No menu empilhado a linha inteira é o alvo — o dedo não precisa
+     mirar na palavra. */
+  .nav-links { align-items: stretch; }
+  .nav-links a:not(.nav-cta) { width: 100%; }
+  .zt-link { min-height: 44px; }
+  .chip-filter { min-height: 44px; display: inline-flex; align-items: center; }
+  .btn { min-height: 46px; }
+  .nav-toggle { min-width: 46px; min-height: 46px; }
+  .topic { min-height: 56px; }
+}
+
+/* O leitor de tela precisa saber onde começa o conteúdo */
+main:focus { outline: none; }
+
+/* Sem JavaScript o formulário não tem como montar a mensagem do WhatsApp.
+   Em vez de recarregar a página jogando nome e telefone na barra de
+   endereço, ele sai de cena e o caminho direto aparece no lugar. */
+html:not(.js-on) #form-contato { display: none; }
+html.js-on .sem-js { display: none; }
+.sem-js {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+  padding: 22px;
+  background: rgba(255, 255, 255, 0.04);
+}
+.sem-js p { margin-bottom: 14px; }
+#form-ok {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(37, 211, 102, 0.12);
+  border: 1px solid rgba(37, 211, 102, 0.4);
+  color: #fff;
+  line-height: 1.5;
+  text-align: left;
+}
+#form-ok a { color: var(--cyan); font-weight: 600; }
+

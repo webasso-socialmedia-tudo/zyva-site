@@ -18,6 +18,10 @@
    1. Revelação de texto (palavra a palavra, com máscara)
    ============================================================ */
 .rv-line { display: block; overflow: hidden; }
+
+/* Só esconde se o JS estiver de pé. Sem isso, uma falha de rede
+   deixaria o site inteiro em branco — texto invisível esperando
+   um script que nunca chega. */
 .rv-word {
   display: inline-block;
   transform: translateY(110%) rotate(2.5deg);
@@ -30,7 +34,7 @@
 .rv-in .rv-word { transform: none; opacity: 1; }
 
 /* Fade simples com subida — para blocos não-título */
-.rise {
+html.js-on .rise {
   opacity: 0;
   transform: translateY(26px);
   transition:
@@ -38,7 +42,17 @@
     transform 0.9s var(--ease-out-expo) var(--rv-d, 0s);
   will-change: transform, opacity;
 }
-.rise.rv-in { opacity: 1; transform: none; }
+html.js-on .rise.rv-in, .rise.rv-in { opacity: 1; transform: none; }
+
+/* Primeira tela: aparece pronto, sem transição nenhuma. */
+.rv-now, .rv-now .rv-word { opacity: 1 !important; transform: none !important; transition: none !important; }
+
+/* Cinto de segurança: título de herói jamais nasce invisível. */
+.hero h1, .page-hero h1, .hero .lead, .page-hero p,
+.hero .kicker, .page-hero .kicker, .hero .hero-ctas, .page-hero .hero-ctas {
+  opacity: 1 !important;
+  transform: none !important;
+}
 
 /* ============================================================
    2. Cursor-alvo (port do TargetCursor — JS puro)
@@ -80,73 +94,14 @@ body.zcursor-active button,
 body.zcursor-active .cursor-target { cursor: none; }
 
 /* ============================================================
-   3. Botões magnéticos
-   ============================================================ */
-.magnetic { will-change: transform; }
-.magnetic > * { display: inline-block; will-change: transform; }
-
-/* ============================================================
-   4. Selo circular rotativo
-   ============================================================ */
-.spin-badge {
-  position: relative;
-  width: 132px; height: 132px;
-  display: grid;
-  place-items: center;
-  flex: none;
-}
-.spin-badge svg {
-  position: absolute;
-  inset: 0;
-  width: 100%; height: 100%;
-  animation: spin-badge 18s linear infinite;
-}
-.spin-badge text {
-  font-family: var(--font-head);
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  fill: var(--cyan);
-}
-.spin-badge-core {
-  width: 62px; height: 62px;
-  border-radius: 50%;
-  background: var(--grad);
-  display: grid;
-  place-items: center;
-  box-shadow: 0 10px 30px rgba(108, 76, 241, 0.45);
-  transition: transform 0.4s var(--ease-out-expo);
-}
-.spin-badge:hover .spin-badge-core { transform: scale(1.12); }
-.spin-badge-core svg {
-  position: static;
-  width: 22px; height: 22px;
-  animation: none;
-  stroke: #fff;
-  stroke-width: 2.2;
-  fill: none;
-}
-@keyframes spin-badge { to { transform: rotate(360deg); } }
-
-/* ============================================================
    5. Texto rotativo (port do RotatingText — JS puro)
    ============================================================ */
-.rot-text {
-  display: inline-flex;
-  overflow: hidden;
-  vertical-align: bottom;
-  position: relative;
-}
+
 /* Cor sólida: um gradiente recortado por caractere ficaria ruidoso,
    porque cada letra reiniciaria o degradê. */
-.rot-accent { color: var(--cyan); }
-.rot-text-inner { display: inline-flex; }
-.rot-char {
-  display: inline-block;
-  white-space: pre;
-  will-change: transform, opacity;
-}
+
+
+
 .rot-char.out {
   animation: rot-out 0.42s var(--ease-out-quint) forwards;
   animation-delay: var(--rc-d, 0s);
@@ -163,26 +118,11 @@ body.zcursor-active .cursor-target { cursor: none; }
 /* ============================================================
    6. Cena do celular 3D (Contato)
    ============================================================ */
-.phone-scene {
-  position: relative;
-  background:
-    radial-gradient(900px 500px at 78% 8%, rgba(108, 76, 241, 0.3), transparent 62%),
-    radial-gradient(700px 460px at 6% 92%, rgba(34, 211, 238, 0.14), transparent 60%),
-    var(--night);
-  color: #fff;
-}
-.phone-track { height: 380vh; position: relative; }
-.phone-sticky {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  min-height: 620px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
-  gap: 40px;
-  overflow: hidden;
-}
+
+/* Sem trilho de 380vh: a página de conversão não pede 4 telas de rolagem
+   antes do formulário. A cena vira um bloco de altura normal. */
+
+
 .phone-sticky > .container {
   grid-column: 1 / -1;
   display: grid;
@@ -193,408 +133,119 @@ body.zcursor-active .cursor-target { cursor: none; }
 }
 
 /* Coluna de texto */
-.phone-copy h2 {
-  color: #fff;
-  font-size: clamp(1.5rem, 2.5vw, 2.05rem);
-  margin-bottom: 14px;
-  max-width: 15ch;
-}
-.phone-copy h2 em {
-  font-style: normal;
-  background: var(--grad);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-.phone-copy > p {
-  color: rgba(255, 255, 255, 0.68);
-  font-size: 1.04rem;
-  max-width: 440px;
-  margin-bottom: 26px;
-}
+
+
+
 
 /* Status ao vivo */
-.live-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 16px 8px 13px;
-  border-radius: 100px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  font-size: 0.86rem;
-  color: rgba(255, 255, 255, 0.82);
-  margin-bottom: 22px;
-}
-.live-dot {
-  width: 9px; height: 9px;
-  border-radius: 50%;
-  background: var(--wa-green);
-  position: relative;
-  flex: none;
-}
-.live-dot::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: inherit;
-  animation: live-pulse 2s ease-out infinite;
-}
+
+
+
 .live-status.off .live-dot { background: #F59E0B; }
-@keyframes live-pulse {
-  0% { transform: scale(1); opacity: 0.7; }
-  100% { transform: scale(2.8); opacity: 0; }
-}
+
 
 /* Lista de assuntos */
-.topic-list { display: flex; flex-direction: column; gap: 9px; max-width: 460px; }
-.topic {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  width: 100%;
-  text-align: left;
-  padding: 13px 15px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.045);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #fff;
-  font-family: var(--font-body);
-  font-size: 0.95rem;
-  cursor: pointer;
-  opacity: 0;
-  transform: translateX(-26px);
-  transition:
-    background 0.22s ease,
-    border-color 0.22s ease,
-    transform 0.2s var(--ease-out-quint);
-  will-change: transform, opacity;
-}
-.topic:hover { background: rgba(108, 76, 241, 0.16); border-color: rgba(108, 76, 241, 0.5); }
-.topic[aria-pressed="true"] {
-  background: rgba(34, 211, 238, 0.1);
-  border-color: var(--cyan);
-}
-.topic-ico {
-  width: 36px; height: 36px;
-  border-radius: 10px;
-  background: rgba(108, 76, 241, 0.18);
-  display: grid; place-items: center;
-  flex: none;
-}
-.topic-ico svg { width: 18px; height: 18px; stroke: #A78BFA; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
-.topic:nth-child(even) .topic-ico { background: rgba(34, 211, 238, 0.14); }
-.topic:nth-child(even) .topic-ico svg { stroke: var(--cyan); }
-.topic-txt { flex: 1; min-width: 0; }
-.topic-txt b { display: block; font-family: var(--font-head); font-weight: 600; font-size: 0.95rem; }
-.topic-txt > span { display: block; font-size: 0.8rem; color: rgba(255, 255, 255, 0.52); margin-top: 1px; }
-.topic-check {
-  margin-left: auto;
-  width: 19px; height: 19px;
-  flex: none;
-  opacity: 0;
-  transform: scale(0.5);
-  transition: opacity 0.2s ease, transform 0.3s var(--ease-out-expo);
-}
-.topic[aria-pressed="true"] .topic-check { opacity: 1; transform: none; }
-.topic-check svg { width: 100%; height: 100%; stroke: var(--cyan); stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* --- O celular --- */
-.phone-holder {
-  perspective: 1400px;
-  perspective-origin: 50% 45%;
-  display: grid;
-  place-items: center;
-  height: 100%;
-}
-.phone {
-  position: relative;
-  width: 310px;
-  height: 632px;
-  transform-style: preserve-3d;
-  will-change: transform;
-  transform:
-    rotateY(var(--ry, -26deg))
-    rotateX(var(--rx, 10deg))
-    rotateZ(var(--rz, -4deg))
-    scale(var(--sc, 0.82))
-    translateY(var(--ty, 0px));
-}
-.phone-body {
-  position: absolute;
-  inset: 0;
-  border-radius: 44px;
-  background: linear-gradient(150deg, #2a2f45 0%, #12141f 42%, #0a0c14 100%);
-  padding: 11px;
-  transform-style: preserve-3d;
-  box-shadow:
-    0 2px 0 rgba(255, 255, 255, 0.16) inset,
-    0 60px 90px -30px rgba(0, 0, 0, 0.9),
-    0 0 0 1px rgba(255, 255, 255, 0.07);
-}
+
+
+
 /* Brilho de borda que acompanha a paleta */
-.phone-body::before {
-  content: "";
-  position: absolute;
-  inset: -1.5px;
-  border-radius: 45px;
-  background: linear-gradient(150deg, rgba(108,76,241,0.9), rgba(34,211,238,0.55) 45%, transparent 72%);
-  z-index: -1;
-  opacity: calc(0.25 + var(--glow, 0) * 0.75);
-  filter: blur(calc(2px + var(--glow, 0) * 16px));
-  transition: opacity 0.3s ease;
-}
+
 /* Face traseira — dá volume real ao girar */
-.phone-back {
-  position: absolute;
-  inset: 0;
-  border-radius: 44px;
-  background: linear-gradient(150deg, #1a1d2b, #0a0c14);
-  transform: translateZ(-16px);
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05);
-}
+
 /* Espessura por extrusão em camadas.
    Tiras planas nas laterais saltavam para fora nos cantos arredondados;
    empilhar cópias do mesmo retângulo arredondado mantém a silhueta lisa
    em toda a volta, inclusive nos cantos. */
-.phone-depth {
-  position: absolute;
-  inset: 0;
-  transform-style: preserve-3d;
-  pointer-events: none;
-}
-.phone-depth i {
-  position: absolute;
-  inset: 0;
-  display: block;
-  border-radius: 44px;
-  background: linear-gradient(150deg, #454a63 0%, #23273a 45%, #10121c 100%);
-}
-.phone-depth i:nth-child(1) { transform: translateZ(-1.8px); }
-.phone-depth i:nth-child(2) { transform: translateZ(-3.6px); }
-.phone-depth i:nth-child(3) { transform: translateZ(-5.4px); }
-.phone-depth i:nth-child(4) { transform: translateZ(-7.2px); }
-.phone-depth i:nth-child(5) { transform: translateZ(-9px); }
-.phone-depth i:nth-child(6) { transform: translateZ(-10.8px); }
-.phone-depth i:nth-child(7) { transform: translateZ(-12.6px); }
-.phone-depth i:nth-child(8) { transform: translateZ(-14.4px); }
+
+
+
+
+
+
+
+
+
+
 /* Botões físicos */
-.phone-btn { position: absolute; right: -2.5px; width: 3px; border-radius: 3px; background: #3d4258; }
-.phone-btn-power { top: 168px; height: 62px; }
-.phone-btn-vol { left: -2.5px; right: auto; top: 132px; height: 40px; }
-.phone-btn-vol2 { left: -2.5px; right: auto; top: 182px; height: 40px; }
+
+
+
+
 
 /* Tela */
-.phone-screen {
-  position: relative;
-  height: 100%;
-  border-radius: 34px;
-  overflow: hidden;
-  background: var(--wa-panel);
-  display: flex;
-  flex-direction: column;
-  transform: translateZ(1px);
-}
+
 /* Camada de "desligado" que some conforme o scroll */
-.phone-screen::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: #05070c;
-  opacity: calc(1 - var(--wake, 0));
-  pointer-events: none;
-  z-index: 20;
-  transition: opacity 0.25s linear;
-}
+
 /* Reflexo de vidro */
-.phone-glare {
-  position: absolute;
-  inset: 0;
-  z-index: 15;
-  pointer-events: none;
-  background: linear-gradient(
-    115deg,
-    rgba(255, 255, 255, 0.16) 0%,
-    rgba(255, 255, 255, 0.05) 22%,
-    transparent 46%
-  );
-  opacity: calc(0.85 - var(--wake, 0) * 0.55);
-}
-.phone-notch {
-  position: absolute;
-  top: 9px; left: 50%;
-  transform: translateX(-50%);
-  width: 98px; height: 26px;
-  border-radius: 100px;
-  background: #05070c;
-  z-index: 12;
-}
+
+
 
 /* Barra de status */
-.wa-status {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 13px 20px 7px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: #fff;
-  font-family: var(--font-head);
-  flex: none;
-}
-.wa-status-icons { display: flex; align-items: center; gap: 5px; }
-.wa-status-icons svg { width: 14px; height: 14px; fill: #fff; }
+
+
+
 
 /* Cabeçalho do app */
-.wa-head {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  padding: 8px 14px 11px;
-  background: #1f2c33;
-  flex: none;
-  opacity: 0;
-  transform: translateY(-16px);
-}
-.wa-avatar {
-  width: 38px; height: 38px;
-  border-radius: 50%;
-  background: var(--grad);
-  display: grid; place-items: center;
-  flex: none;
-}
-.wa-avatar svg { width: 21px; height: auto; }
-.wa-head-t { flex: 1; min-width: 0; }
-.wa-head-t b {
-  display: block;
-  font-family: var(--font-head);
-  font-size: 0.79rem;
-  color: #fff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.wa-head-t span { display: block; font-size: 0.7rem; color: #8fa3ad; }
-.wa-head-t span i { font-style: normal; color: var(--wa-green); }
-.wa-head-act { display: flex; gap: 15px; }
-.wa-head-act svg { width: 17px; height: 17px; stroke: #aebac1; stroke-width: 2; fill: none; }
+
+
+
+
+
+
+
+
+
 
 /* Área de conversa */
-.wa-chat {
-  flex: 1;
-  overflow: hidden;
-  padding: 14px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  background-color: #0b141a;
-  background-image:
-    radial-gradient(circle at 20% 30%, rgba(108, 76, 241, 0.07), transparent 45%),
-    radial-gradient(circle at 80% 70%, rgba(34, 211, 238, 0.05), transparent 45%);
-}
-.wa-day {
-  align-self: center;
-  font-size: 0.63rem;
-  color: #8fa3ad;
-  background: rgba(31, 44, 51, 0.85);
-  padding: 4px 11px;
-  border-radius: 8px;
-  margin-bottom: 2px;
-  opacity: 0;
-}
-.wa-b {
-  max-width: 82%;
-  padding: 8px 11px 7px;
-  border-radius: 9px;
-  font-size: 0.79rem;
-  line-height: 1.42;
-  color: #e9edef;
-  position: relative;
-  opacity: 0;
-  transform: translateY(10px) scale(0.96);
-  transform-origin: bottom left;
-}
+
+
+
 .wa-b.show {
   animation: wa-pop 0.42s var(--ease-out-expo) forwards;
 }
 @keyframes wa-pop { to { opacity: 1; transform: none; } }
-.wa-in { align-self: flex-start; background: var(--wa-bubble-in); border-top-left-radius: 2px; }
+
 .wa-out {
   align-self: flex-end;
   background: var(--wa-bubble-out);
   border-top-right-radius: 2px;
   transform-origin: bottom right;
 }
-.wa-meta {
-  display: block;
-  text-align: right;
-  font-size: 0.58rem;
-  color: rgba(233, 237, 239, 0.5);
-  margin-top: 2px;
-}
-.wa-meta svg { width: 13px; height: 9px; display: inline-block; vertical-align: -1px; margin-left: 2px; fill: #53bdeb; }
+
+
 
 /* Indicador de digitando */
-.wa-typing {
-  align-self: flex-start;
-  background: var(--wa-bubble-in);
-  border-radius: 9px;
-  border-top-left-radius: 2px;
-  padding: 11px 13px;
-  display: none;
-  gap: 4px;
-}
+
 .wa-typing.on { display: flex; }
-.wa-typing i {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: #8fa3ad;
-  animation: wa-type 1.3s ease-in-out infinite;
-}
-.wa-typing i:nth-child(2) { animation-delay: 0.18s; }
-.wa-typing i:nth-child(3) { animation-delay: 0.36s; }
-@keyframes wa-type {
-  0%, 60%, 100% { transform: translateY(0); opacity: 0.45; }
-  30% { transform: translateY(-4px); opacity: 1; }
-}
+
+
+
+
 
 /* Barra de envio */
-.wa-send {
-  flex: none;
-  padding: 9px 11px 15px;
-  background: #1f2c33;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  opacity: 0;
-  transform: translateY(16px);
-}
-.wa-input {
-  flex: 1;
-  background: #2a3942;
-  border-radius: 100px;
-  padding: 9px 14px;
-  font-size: 0.76rem;
-  color: #8fa3ad;
-  min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+
+
 .wa-input.filled { color: #e9edef; }
-.wa-go {
-  width: 38px; height: 38px;
-  border-radius: 50%;
-  background: var(--wa-green);
-  display: grid; place-items: center;
-  flex: none;
-  transition: transform 0.25s var(--ease-out-expo), box-shadow 0.25s ease;
-  box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.5);
-}
-.wa-go svg { width: 19px; height: 19px; fill: #0b141a; }
+
+
 .wa-go.ready { animation: wa-ready 2s ease-out infinite; }
-.wa-go:hover { transform: scale(1.1); }
+
 @keyframes wa-ready {
   0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.55); }
   70% { box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); }
@@ -602,215 +253,100 @@ body.zcursor-active .cursor-target { cursor: none; }
 }
 
 /* Dica de scroll */
-.phone-hint {
-  position: absolute;
-  left: 50%;
-  bottom: 26px;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 0.76rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  font-family: var(--font-head);
-  color: rgba(255, 255, 255, 0.4);
-  transition: opacity 0.4s ease;
-  pointer-events: none;
-}
-.phone-hint i {
-  width: 20px; height: 32px;
-  border: 1.5px solid rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
-  position: relative;
-}
-.phone-hint i::after {
-  content: "";
-  position: absolute;
-  left: 50%; top: 6px;
-  width: 3px; height: 6px;
-  margin-left: -1.5px;
-  border-radius: 2px;
-  background: var(--cyan);
-  animation: hint-scroll 1.7s ease-in-out infinite;
-}
-@keyframes hint-scroll {
-  0%, 100% { transform: translateY(0); opacity: 1; }
-  50% { transform: translateY(9px); opacity: 0.3; }
-}
+
+
+
+
 
 /* Barra de progresso da cena */
-.scene-rail {
-  position: absolute;
-  right: 26px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 2px;
-  height: 190px;
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 2px;
-  overflow: hidden;
-}
-.scene-rail i {
-  position: absolute;
-  inset: 0 0 auto;
-  height: 0%;
-  background: var(--grad);
-  border-radius: 2px;
-}
 
-/* ============================================================
-   7. Cartões com inclinação 3D (port do TiltedCard)
-   ============================================================ */
-.tilt { perspective: 900px; }
-.tilt-inner {
-  transform-style: preserve-3d;
-  transition: transform 0.5s var(--ease-out-quint);
-  will-change: transform;
-}
-.tilt.act .tilt-inner { transition: transform 0.12s linear; }
+
 
 /* ============================================================
    8. Responsivo
    ============================================================ */
 @media (max-width: 1000px) {
   .phone-sticky > .container { grid-template-columns: 1fr; gap: 26px; }
-  .phone-track { height: 320vh; }
-  .phone { width: 250px; height: 510px; }
-  .phone-holder { order: -1; }
-  .scene-rail { display: none; }
-  .topic-list { max-width: none; }
+  
+  
+  
+  
+  
+
 }
 
 @media (max-width: 640px) {
-  .phone-track { height: 290vh; }
+  
   /* padding-top compensa o cabeçalho fixo, senão o topo do celular fica atrás dele */
-  .phone-sticky { min-height: 0; height: 100vh; padding-top: 62px; box-sizing: border-box; }
+  
   .phone-sticky > .container { gap: 16px; align-content: center; }
-  .phone { width: 170px; height: 346px; }
-  .phone-body { border-radius: 30px; padding: 7px; }
-  .phone-screen { border-radius: 24px; }
-  .phone-notch { width: 66px; height: 19px; top: 7px; }
-  .wa-status { padding: 9px 13px 5px; font-size: 0.6rem; }
-  .wa-head { padding: 5px 9px 7px; gap: 8px; }
-  .wa-avatar { width: 28px; height: 28px; }
-  .wa-head-t b { font-size: 0.68rem; }
-  .wa-head-t span { font-size: 0.6rem; }
-  .wa-head-act { gap: 10px; }
-  .wa-head-act svg { width: 13px; height: 13px; }
-  .wa-chat { padding: 9px 8px; gap: 6px; }
-  .wa-b { font-size: 0.66rem; padding: 6px 8px 5px; }
-  .wa-day { font-size: 0.55rem; }
-  .wa-send { padding: 6px 7px 9px; }
-  .wa-input { font-size: 0.63rem; padding: 7px 10px; }
-  .wa-go { width: 30px; height: 30px; }
-  .wa-go svg { width: 15px; height: 15px; }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   /* No celular o espaço é curto: some o que é secundário */
-  .phone-copy > p, .live-status { display: none; }
-  .phone-copy h2 { font-size: 1.3rem; margin-bottom: 12px; max-width: none; }
-  .topic { padding: 8px 11px; gap: 10px; border-radius: 12px; font-size: 0.88rem; }
-  .topic-ico { width: 28px; height: 28px; border-radius: 8px; }
-  .topic-ico svg { width: 15px; height: 15px; }
-  .topic-txt b { font-size: 0.85rem; }
-  .topic-txt > span { display: none; }
-  .topic-list { gap: 6px; }
-  .phone-hint { display: none; }
-  .spin-badge { width: 104px; height: 104px; }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
 }
 
 /* Notebooks baixos — a cena precisa caber na tela */
-@media (min-width: 1000px) and (max-height: 820px) {
-  .phone { width: 268px; height: 546px; }
-  .phone-copy h2 { font-size: clamp(1.6rem, 2.6vw, 2.2rem); }
-  .phone-copy > p { font-size: 0.97rem; margin-bottom: 20px; }
-  .live-status { margin-bottom: 16px; }
-  .topic { padding: 10px 13px; }
-}
+
 
 /* ============================================================
    9. Acessibilidade — respeitar quem pediu menos movimento
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
   .rv-word, .rise { opacity: 1 !important; transform: none !important; transition: none !important; }
-  .spin-badge svg { animation: none; }
+  
   .live-dot::after, .wa-typing i, .wa-go.ready, .phone-hint i::after { animation: none; }
-  .phone { transform: none !important; }
+  
   .rot-char.in, .rot-char.out { animation-duration: 0.01s; }
-  .topic { opacity: 1 !important; transform: none !important; }
-  .wa-head, .wa-send { opacity: 1 !important; transform: none !important; }
-  .phone-track { height: auto; }
-  .phone-sticky { position: static; height: auto; padding: 60px 0; }
-}
+  
+  
+  
+  
 
-/* ============================================================
-   10. Campo de partículas do Z (Home)
-   ============================================================ */
-.hero { position: relative; }
-.particle-z {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 0;
 }
-.hero > .container { position: relative; z-index: 1; }
 
 /* ============================================================
    11. Máquina de marketing (Serviços)
    ============================================================ */
-.pipeline {
-  position: relative;
-  background:
-    radial-gradient(700px 340px at 20% 0%, rgba(108, 76, 241, 0.26), transparent 62%),
-    radial-gradient(620px 340px at 92% 100%, rgba(34, 211, 238, 0.13), transparent 60%),
-    var(--night);
-  color: #fff;
-  border-radius: var(--radius-sheet);
-  padding: clamp(38px, 5vw, 62px) clamp(22px, 4vw, 52px);
-  overflow: hidden;
-}
-.pipeline h2 { color: #fff; max-width: 18ch; }
-.pipeline h2 em {
-  font-style: normal;
-  background: var(--grad);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-.pipeline > p { color: rgba(255, 255, 255, 0.66); max-width: 54ch; margin: 12px 0 34px; }
-.pipe-stage { position: relative; }
-.pipe-svg { width: 100%; height: auto; display: block; overflow: visible; }
-.pipe-line {
-  fill: none;
-  stroke: url(#pipeGrad);
-  stroke-width: 2.5;
-  stroke-linecap: round;
-}
-.pipe-rail {
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.1);
-  stroke-width: 2.5;
-  stroke-linecap: round;
-}
-.pipe-dot { fill: var(--cyan); opacity: 0; filter: drop-shadow(0 0 6px var(--cyan)); }
-.pipe-nodes {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 14px;
-  margin-top: -8px;
-}
-.pipe-node { text-align: center; opacity: 0.32; transition: opacity 0.45s ease; }
+
+
+
+
+
+
+
+
+
+
+
 .pipe-node.on { opacity: 1; }
-.pipe-ico {
-  width: 48px; height: 48px;
-  margin: 0 auto 12px;
-  border-radius: 14px;
-  display: flex; align-items: center; justify-content: center;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  transition: transform 0.5s var(--ease-out-expo), background 0.45s ease, border-color 0.45s ease, box-shadow 0.45s ease;
-}
+
 .pipe-node.on .pipe-ico {
   transform: translateY(-5px) scale(1.06);
   background: rgba(108, 76, 241, 0.2);
@@ -822,53 +358,20 @@ body.zcursor-active .cursor-target { cursor: none; }
   border-color: rgba(34, 211, 238, 0.55);
   box-shadow: 0 0 26px rgba(34, 211, 238, 0.28);
 }
-.pipe-ico svg { display: block; width: 22px; height: 22px; stroke: #fff; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
-.pipe-node b { display: block; font-family: var(--font-head); font-size: 0.95rem; margin-bottom: 3px; }
+
+
 /* Só o subtítulo (o span depois do <b>). Antes era ".pipe-node span", que
    também pegava o .pipe-ico e o .pipe-step (ambos são <span>) e quebrava a
    centralização do ícone ao forçar display:block. */
-.pipe-node b ~ span { display: block; font-size: 0.8rem; color: rgba(255, 255, 255, 0.55); }
-.pipe-step {
-  display: inline-block;
-  font-family: var(--font-head);
-  font-size: 0.66rem;
-  letter-spacing: 0.16em;
-  color: var(--cyan);
-  margin-bottom: 6px;
-}
+
+
 
 /* ============================================================
    12. ZYVA — quatro letras, quatro valores (Sobre)
    ============================================================ */
-.brand-letters {
-  display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  gap: 44px;
-  align-items: center;
-}
-.bl-word { display: flex; gap: 8px; }
-.bl-letter {
-  flex: 1;
-  aspect-ratio: 3 / 4;
-  border: 0;
-  cursor: pointer;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--line);
-  font-family: var(--font-head);
-  font-weight: 700;
-  font-size: clamp(2.4rem, 6vw, 4.4rem);
-  line-height: 1;
-  color: var(--muted);
-  display: grid;
-  place-items: center;
-  transition:
-    transform 0.5s var(--ease-out-expo),
-    background 0.35s ease,
-    border-color 0.35s ease,
-    color 0.35s ease,
-    box-shadow 0.35s ease;
-}
+
+
+
 .bl-letter.on {
   transform: translateY(-10px);
   background: linear-gradient(var(--white), var(--white)) padding-box, var(--grad) border-box;
@@ -883,48 +386,23 @@ body.zcursor-active .cursor-target { cursor: none; }
   background-clip: text;
   color: transparent;
 }
-.bl-panels { position: relative; min-height: 210px; }
-.bl-value {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  transform: translateY(16px);
-  pointer-events: none;
-  transition: opacity 0.4s ease, transform 0.55s var(--ease-out-expo);
-}
+
+
 .bl-value.on { opacity: 1; transform: none; pointer-events: auto; }
 .bl-value .kicker { margin-bottom: 10px; }
-.bl-value h3 { font-size: 1.5rem; margin-bottom: 10px; }
-.bl-value p { font-size: 1rem; }
+
+
 
 /* ============================================================
    13. Vitrine 3D dos projetos (Cases)
    ============================================================ */
-.marquee3d {
-  height: 560px;
-  overflow: hidden;
-  border-radius: 26px;
-  background: var(--night);
-  position: relative;
-  -webkit-mask-image: radial-gradient(ellipse 78% 72% at 50% 50%, #000 55%, transparent 100%);
-  mask-image: radial-gradient(ellipse 78% 72% at 50% 50%, #000 55%, transparent 100%);
-}
-.m3-stage {
-  position: absolute;
-  top: 50%; left: 50%;
-  width: 1500px; height: 1500px;
-  margin: -750px 0 0 -750px;
-  transform: rotateX(52deg) rotateZ(-44deg) scale(0.62);
-  transform-style: preserve-3d;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 26px;
-}
-.m3-col { display: flex; flex-direction: column; gap: 26px; }
-.m3-col:nth-child(odd) { animation: m3-up 22s ease-in-out infinite alternate; }
-.m3-col:nth-child(even) { animation: m3-down 28s ease-in-out infinite alternate; }
-@keyframes m3-up { from { transform: translateY(-90px); } to { transform: translateY(90px); } }
-@keyframes m3-down { from { transform: translateY(90px); } to { transform: translateY(-90px); } }
+
+
+
+
+
+
+
 .m3-card {
   aspect-ratio: 97 / 70;
   border-radius: 12px;
@@ -949,20 +427,11 @@ body.zcursor-active .cursor-target { cursor: none; }
 }
 /* congela a coluna enquanto uma peça está à frente, para dar tempo de ler */
 .m3-col:has(.m3-front) { animation-play-state: paused; }
-.m3-a { background: var(--grad); }
-.m3-b { background: linear-gradient(140deg, #0B0E1A, #35307a); }
-.m3-c { background: linear-gradient(140deg, #0e7490, #22D3EE); }
-.m3-d { background: linear-gradient(140deg, #241b52, #6C4CF1); }
-.marquee-cap {
-  position: absolute;
-  inset: auto 0 0;
-  z-index: 3;
-  padding: 26px;
-  text-align: center;
-  background: linear-gradient(transparent, rgba(11, 14, 26, 0.9) 55%);
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 0.92rem;
-}
+
+
+
+
+
 
 /* ============================================================
    14. Barra de progresso de leitura (artigos)
@@ -987,47 +456,14 @@ body.zcursor-active .cursor-target { cursor: none; }
 /* ============================================================
    15. Responsivo dos módulos novos
    ============================================================ */
-@media (max-width: 1000px) {
-  .brand-letters { grid-template-columns: 1fr; gap: 26px; }
-  .bl-panels { min-height: 178px; }
-  .marquee3d { height: 420px; }
-  .m3-stage { transform: rotateX(52deg) rotateZ(-44deg) scale(0.42); }
-  /* No celular o pipeline vira uma linha do tempo vertical: o "gráfico"
-     passa a ser a linha em gradiente que conecta os ícones. */
-  .pipe-stage .pipe-svg { display: none; }
-  .pipe-nodes { grid-template-columns: 1fr; gap: 0; margin-top: 24px; }
-  .pipe-node {
-    opacity: 1; text-align: left;
-    display: grid;
-    grid-template-columns: 48px 1fr;
-    column-gap: 18px;
-    align-items: center;
-    padding-bottom: 30px;
-    position: relative;
-  }
-  .pipe-node:last-child { padding-bottom: 0; }
-  .pipe-ico { grid-column: 1; grid-row: 1 / span 3; align-self: start; margin: 0; }
-  .pipe-step { grid-column: 2; grid-row: 1; }
-  .pipe-node b { grid-column: 2; grid-row: 2; }
-  .pipe-node b ~ span { grid-column: 2; grid-row: 3; }
-  .pipe-node:not(:last-child)::before {
-    content: ""; position: absolute;
-    left: 23px; top: 54px; bottom: -2px; width: 2px;
-    border-radius: 2px;
-    background: linear-gradient(to bottom, rgba(108,76,241,.75), rgba(34,211,238,.55));
-  }
-}
-@media (max-width: 640px) {
-  .marquee3d { height: 330px; }
-  .m3-stage { transform: rotateX(52deg) rotateZ(-44deg) scale(0.3); }
-  .bl-letter { border-radius: 13px; font-size: 2rem; }
-  .pipeline { border-radius: 22px; }
-}
+
+
 @media (prefers-reduced-motion: reduce) {
-  .m3-col { animation: none; }
+  
   .particle-z { display: none; }
-  .bl-letter, .bl-value { transition: none; }
+  
   .read-bar { display: none; }
+
 }
 
 /* Filtro de categorias do blog */
@@ -1256,6 +692,7 @@ body.zcursor-active .cursor-target { cursor: none; }
   .cine-title { margin-bottom: 30px; }
   .cine-pill { padding: 15px 26px; font-size: .9rem; }
   .cine-bottom { flex-direction: column; text-align: center; gap: 16px; padding-bottom: 24px; }
+
 }
 
 /* Sem movimento: vira um rodapé estático, sem cortina nem parallax */
@@ -1263,59 +700,8 @@ body.zcursor-active .cursor-target { cursor: none; }
   .cine-reveal { height: auto; clip-path: none; }
   .cine-foot { position: relative; height: auto; min-height: 82vh; }
   .cine-aurora, .cine-marquee-track, .cine-heart { animation: none; }
+
 }
-
-/* ============================================================
-   16. Ícones da faixa de confiança (home) — CONTROLADOS PELO SCROLL
-       Truque: cada animação fica pausada e o "frame" é escolhido por
-       um animation-delay negativo proporcional a --p (0→1). O JS
-       atualiza --p conforme o scroll, então a animação avança ao
-       descer e volta ao subir. Sem JS, --p = 1 (ícone normal).
-   ============================================================ */
-.trust { --p: 1; }
-.trust .ti-bar { fill: var(--cyan); stroke: none; }
-.trust .ti-plane { fill: var(--cyan); stroke: none; }
-
-/* Todos os elementos animados: mesma "régua" dirigida por --p */
-.trust .ti-checkg,
-.trust .ti-check path,
-.trust .ti-hands,
-.trust .ti-clock,
-.trust .ti-chart .ti-bar,
-.trust .ti-orbit {
-  animation-duration: 1s;
-  animation-timing-function: linear;
-  animation-fill-mode: both;
-  animation-play-state: paused;
-  animation-delay: calc(var(--p) * -1s);
-}
-
-/* origens de transformação */
-.trust .ti-checkg { transform-box: fill-box; transform-origin: center; animation-name: ti-pop; }
-.trust .ti-check path { stroke-dasharray: 26; animation-name: ti-draw; }
-.trust .ti-hands { transform-box: view-box; transform-origin: center; animation-name: ti-spin; }
-.trust .ti-clock { animation-name: ti-flash; }
-.trust .ti-bar { transform-box: fill-box; transform-origin: bottom; }
-.trust .ti-chart .ti-bar:nth-child(2) { animation-name: ti-grow1; }
-.trust .ti-chart .ti-bar:nth-child(3) { animation-name: ti-grow2; }
-.trust .ti-chart .ti-bar:nth-child(4) { animation-name: ti-grow3; }
-.trust .ti-orbit { transform-box: view-box; transform-origin: center; animation-name: ti-fly; }
-
-/* 1. Verificado: grande -> normal, com o traço se desenhando */
-@keyframes ti-pop { 0% { transform: scale(1.85); } 72% { transform: scale(.95); } 100% { transform: scale(1); } }
-@keyframes ti-draw { 0% { stroke-dashoffset: 26; } 60%,100% { stroke-dashoffset: 0; } }
-
-/* 2. Relógio: gira (3 voltas) e assenta, com um brilho perto do fim */
-@keyframes ti-spin { 0% { transform: rotate(-1080deg); } 100% { transform: rotate(0deg); } }
-@keyframes ti-flash { 0%,72% { filter: none; } 86% { filter: drop-shadow(0 0 5px var(--cyan)); } 100% { filter: none; } }
-
-/* 3. Gráfico: barras sobem escalonadas (stagger embutido no tempo) */
-@keyframes ti-grow1 { 0% { transform: scaleY(0); } 55%,100% { transform: scaleY(1); } }
-@keyframes ti-grow2 { 0%,16% { transform: scaleY(0); } 72%,100% { transform: scaleY(1); } }
-@keyframes ti-grow3 { 0%,32% { transform: scaleY(0); } 88%,100% { transform: scaleY(1); } }
-
-/* 4. Globo: o aviãozinho dá a volta */
-@keyframes ti-fly { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
 /* ============================================================
    17. Notificação do blog: gestos, dicas e Ilha Dinâmica
@@ -1384,6 +770,7 @@ body.zcursor-active .cursor-target { cursor: none; }
   .zyva-toast.zt-hint .zt-hint-right { animation: none; }
   .zi-dot { animation: none; }
   .zyva-island { transition: opacity .2s ease; }
+
 }
 
 /* ============================================================
@@ -1470,12 +857,8 @@ html.js-on .timeline.mk-in .tl-step:nth-child(3) .num { opacity:1; transform:non
 html.js-on .timeline.mk-in .tl-step:nth-child(4) .num { opacity:1; transform:none; transition-delay:.66s; }
 
 /* Cases — "Padrão de case" (.steps): trilho de progresso + números escalonados */
-.steps { position: relative; }
-.steps::before {
-  content: ""; position: absolute; top: -16px; left: 2px; right: 2px; height: 3px;
-  border-radius: 3px; background: var(--grad); opacity: .6;
-  transform-origin: left center;
-}
+
+
 html.js-on .steps::before { transform: scaleX(0); transition: transform 1.1s var(--ease-out-expo); }
 html.js-on .steps.mk-in::before { transform: scaleX(1); }
 html.js-on .steps .step .num { opacity: 0; transform: translateY(10px); transition: opacity .4s ease, transform .5s var(--ease-out-expo); }
@@ -1484,9 +867,7 @@ html.js-on .steps.mk-in .step:nth-child(2) .num { opacity:1; transform:none; tra
 html.js-on .steps.mk-in .step:nth-child(3) .num { opacity:1; transform:none; transition-delay:.40s; }
 html.js-on .steps.mk-in .step:nth-child(4) .num { opacity:1; transform:none; transition-delay:.54s; }
 
-@media (max-width: 900px) {
-  .steps::before { display: none; }
-}
+
 @media (prefers-reduced-motion: reduce) {
   html.js-on .kicker, html.js-on .kicker::before,
   html.js-on .timeline::before, html.js-on .timeline .tl-step .num,
@@ -1494,6 +875,7 @@ html.js-on .steps.mk-in .step:nth-child(4) .num { opacity:1; transform:none; tra
     opacity: 1 !important; transform: none !important; transition: none !important;
   }
   .kicker.k-tag::before { animation: none; }
+
 }
 
 /* ---------- Home: TAG do herói em formato "SELO" (escolha do cliente) ----------
@@ -1509,4 +891,240 @@ html.js-on .steps.mk-in .step:nth-child(4) .num { opacity:1; transform:none; tra
   content: ""; width: 24px; height: 24px; border-radius: 8px;
   background: var(--grad); animation: none;
   box-shadow: 0 6px 18px rgba(108,76,241,0.45);
+}
+
+/* ============================================================
+   19. Sobreviventes da camada de experiência
+   (o que passou no filtro "prova clareza, método ou resultado?")
+   ============================================================ */
+
+/* Transições de página nativas — custo zero, continuidade real */
+@view-transition { navigation: auto; }
+::view-transition-old(root) { animation: vt-out 0.26s ease both; }
+::view-transition-new(root) { animation: vt-in 0.4s var(--ease-out-expo) both; }
+@keyframes vt-out { to { opacity: 0; transform: translateY(-10px); } }
+@keyframes vt-in  { from { opacity: 0; transform: translateY(14px); } }
+
+/* Holofote nos cartões — agora só CSS, sem seguir o ponteiro.
+   O efeito era quase idêntico e custava um pointermove por cartão. */
+.case-card, .m3-card, .post-card { position: relative; }
+.case-card::before, .m3-card::before, .post-card::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit;
+  background: radial-gradient(340px circle at 50% 40%,
+              rgba(34, 211, 238, 0.14), rgba(108, 76, 241, 0.08) 40%, transparent 65%);
+  opacity: 0; transition: opacity 0.35s ease;
+  pointer-events: none; z-index: 1;
+}
+.case-card:hover::before, .m3-card:hover::before, .post-card:hover::before { opacity: 1; }
+
+/* Serviços: energia correndo pelo trilho da máquina */
+
+
+
+/* Sobre: manifesto cinético */
+
+
+
+
+/* Blog: sinal vivo nos cartões */
+.post-card { transition: transform 0.4s var(--ease-out-expo), box-shadow 0.4s ease; }
+.post-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 44px rgba(108, 76, 241, 0.18), 0 0 0 1.5px rgba(34, 211, 238, 0.35);
+}
+.post-card:hover .post-cat { animation: cat-pulse 1.4s ease-out infinite; }
+@keyframes cat-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(34, 211, 238, 0.45); }
+  70%, 100% { box-shadow: 0 0 0 8px rgba(34, 211, 238, 0); }
+}
+
+/* ============================================================
+   20. DESTAQUE "ONDA DE SINAL" — no lugar do texto-degradê
+   Palavra-chave em cor sólida com uma onda correndo por baixo.
+   ============================================================ */
+.grad-text, .hero h1 em, .band h2 em, .pipeline h2 em, .phone-copy h2 em {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 7' preserveAspectRatio='none'%3E%3Cpath d='M0 3.5C3.5 .9 5 .9 8.5 3.5S13.5 6.1 17 3.5 22 .9 25.5 3.5 30.5 6.1 34 3.5' fill='none' stroke='%2322D3EE' stroke-width='1.7' stroke-linecap='round'/%3E%3C/svg%3E") !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
+  -webkit-text-fill-color: currentColor !important;
+  color: inherit !important;
+  font-style: normal;
+  background-repeat: repeat-x !important;
+  background-size: 1.05em 0.22em !important;
+  background-position: 0 100% !important;
+  padding-bottom: 0.16em;
+  animation: sig-wave-flow 7s linear infinite;
+}
+@keyframes sig-wave-flow { to { background-position: 1.05em 100%; } }
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+  
+  
+  .post-card, .post-card:hover { transform: none; }
+  .post-card:hover .post-cat { animation: none; }
+  .grad-text, .hero h1 em, .band h2 em, .pipeline h2 em, .phone-copy h2 em { animation: none; }
+
+}
+
+/* ------------------------------------------------------------
+   O rodapé cinematográfico é `position: fixed` ocupando 100vh —
+   ou seja, ele já está DENTRO da tela desde o primeiro quadro,
+   atrás do conteúdo. O título gigante virava o "maior conteúdo
+   pintado" e roubava a métrica de LCP do título do herói.
+   Agora ele nasce transparente e só acende quando a cortina sobe.
+   ------------------------------------------------------------ */
+html.js-on [data-cine-giant],
+html.js-on [data-cine-title],
+html.js-on [data-cine-links] { opacity: 0; }
+
+/* Rede de segurança: se o motor de movimento não subir em 2,5s,
+   o main.js marca isto e o rodapé aparece do mesmo jeito. */
+html.cine-fallback [data-cine-giant],
+html.cine-fallback [data-cine-title],
+html.cine-fallback [data-cine-links] {
+  opacity: 1 !important;
+  transform: none !important;
+}
+html.cine-fallback [data-cine-giant] { transform: translateX(-50%) !important; }
+
+/* ============================================================
+   21. DIAGNÓSTICO NO HERÓI (home)
+   O ato de conversão deixa de ser um botão que leva a um
+   formulário. Três toques e a pessoa lê o próprio negócio.
+   ============================================================ */
+.diag {
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 22px;
+  padding: 22px 22px 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  max-width: 460px;
+}
+.diag-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+/* display:flex ignora o atributo hidden — sem isto o contador
+   "3 de 3" continua na tela junto com a leitura pronta. */
+.diag-top[hidden], .diag-body[hidden] { display: none; }
+.diag-count {
+  font-family: var(--font-head);
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+.diag-count b { color: var(--cyan); }
+.diag-bar {
+  display: block; height: 3px; border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1); overflow: hidden;
+}
+.diag-bar i {
+  display: block; height: 100%; width: 33.33%;
+  background: var(--grad); border-radius: 3px;
+  transition: width 0.45s var(--ease-out-expo);
+}
+
+.diag-q { border: 0; margin: 0; padding: 0; min-width: 0; }
+.diag-q legend {
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 1.16rem;
+  color: #fff;
+  margin-bottom: 14px;
+  padding: 0;
+}
+.diag-opts { display: flex; flex-direction: column; gap: 8px; }
+.diag-opt {
+  width: 100%;
+  text-align: left;
+  padding: 13px 16px;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  line-height: 1.35;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s var(--ease-out-quint);
+}
+.diag-opt small {
+  display: block;
+  font-size: 0.79rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 2px;
+}
+.diag-opt:hover { background: rgba(108, 76, 241, 0.2); border-color: rgba(108, 76, 241, 0.6); transform: translateX(3px); }
+.diag-opt[aria-pressed="true"] { background: rgba(34, 211, 238, 0.13); border-color: var(--cyan); }
+
+/* troca de pergunta */
+.diag-q[hidden] { display: none; }
+.diag-body.diag-swap .diag-q { opacity: 0; transform: translateX(14px); }
+.diag-body .diag-q { transition: opacity 0.22s ease, transform 0.28s var(--ease-out-expo); }
+
+.diag-back {
+  margin-top: 14px;
+  background: none; border: 0; padding: 6px 0;
+  color: rgba(255, 255, 255, 0.55);
+  font-family: var(--font-body); font-size: 0.86rem;
+  cursor: pointer;
+}
+.diag-back:hover { color: #fff; }
+
+/* ---- a leitura ---- */
+.diag-out h3 {
+  font-family: var(--font-head); font-size: 1.1rem; color: #fff;
+  line-height: 1.35; margin-bottom: 16px;
+}
+.diag-out h3 b { color: var(--cyan); font-weight: 700; }
+.diag-frentes { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+.diag-frente {
+  display: grid; grid-template-columns: 26px 1fr; gap: 12px;
+  align-items: start;
+  padding: 11px 13px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+}
+.diag-frente i {
+  font-style: normal;
+  font-family: var(--font-head); font-weight: 700; font-size: 0.8rem;
+  width: 26px; height: 26px; border-radius: 8px;
+  display: grid; place-items: center;
+  background: var(--grad); color: #fff;
+}
+.diag-frente b { display: block; font-family: var(--font-head); font-size: 0.94rem; color: #fff; }
+.diag-frente span { display: block; font-size: 0.83rem; color: rgba(255, 255, 255, 0.6); margin-top: 2px; line-height: 1.45; }
+
+.diag-prazo {
+  font-size: 0.87rem; color: rgba(255, 255, 255, 0.72);
+  padding: 12px 14px; border-radius: 12px; margin-bottom: 16px;
+  background: rgba(34, 211, 238, 0.08);
+  border: 1px solid rgba(34, 211, 238, 0.25);
+  line-height: 1.5;
+}
+.diag-prazo b { color: #fff; }
+.diag-cta { display: flex; flex-direction: column; gap: 9px; }
+.diag-cta .btn { width: 100%; justify-content: center; }
+.diag-refaz {
+  background: none; border: 0; color: rgba(255, 255, 255, 0.5);
+  font-family: var(--font-body); font-size: 0.84rem; cursor: pointer; padding: 4px;
+}
+.diag-refaz:hover { color: #fff; }
+
+@media (max-width: 1000px) {
+  .diag { max-width: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .diag-body .diag-q { transition: none; }
+  .diag-bar i { transition: none; }
+  .diag-opt:hover { transform: none; }
+}
+
+/* O aviso do blog recua enquanto o diagnóstico está na tela */
+html.diag-na-tela .zyva-toasts {
+  opacity: 0;
+  transform: translateY(24px);
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.35s var(--ease-out-expo);
 }
