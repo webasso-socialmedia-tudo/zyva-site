@@ -55,44 +55,6 @@ html.js-on .rise.rv-in, .rise.rv-in { opacity: 1; transform: none; }
 }
 
 /* ============================================================
-   2. Cursor-alvo — sempre em formato de QUADRADO
-   ============================================================ */
-.zcursor {
-  position: fixed;
-  top: 0; left: 0;
-  width: 0; height: 0;
-  pointer-events: none;
-  z-index: 9999;
-  mix-blend-mode: difference;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-.zcursor.on { opacity: 1; }
-.zcursor-dot {
-  position: absolute;
-  left: 0; top: 0;
-  width: 5px; height: 5px;
-  margin: -2.5px 0 0 -2.5px;
-  background: #fff;
-  border-radius: 50%;
-  will-change: transform;
-}
-.zcursor-c {
-  position: absolute;
-  left: 0; top: 0;
-  width: 13px; height: 13px;
-  border: 2.5px solid #fff;
-  will-change: transform;
-}
-.zc-tl { border-right: 0; border-bottom: 0; }
-.zc-tr { border-left: 0; border-bottom: 0; }
-.zc-br { border-left: 0; border-top: 0; }
-.zc-bl { border-right: 0; border-top: 0; }
-/* Enquanto o cursor-quadrado está ativo, o ponteiro NATIVO some em TODO
-   elemento — senão a mãozinha do navegador aparecia junto (cursor duplo). */
-body.zcursor-active, body.zcursor-active * { cursor: none !important; }
-
-/* ============================================================
    5. Texto rotativo (port do RotatingText — JS puro)
    ============================================================ */
 
