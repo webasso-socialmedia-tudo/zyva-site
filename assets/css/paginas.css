@@ -328,8 +328,6 @@
   padding: 8px 14px 11px;
   background: #1f2c33;
   flex: none;
-  opacity: 0;
-  transform: translateY(-16px);
 }
 
 .wa-avatar {
@@ -383,7 +381,6 @@
   padding: 4px 11px;
   border-radius: 8px;
   margin-bottom: 2px;
-  opacity: 0;
 }
 
 .wa-b {
@@ -439,8 +436,6 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  opacity: 0;
-  transform: translateY(16px);
 }
 
 .wa-input {
@@ -773,3 +768,8 @@
 @keyframes m3-up { from { transform: translateY(-90px); } to { transform: translateY(90px); } }
 @keyframes m3-down { from { transform: translateY(90px); } to { transform: translateY(-90px); } }
 @keyframes pipe-energy { to { stroke-dashoffset: -66; } }
+
+/* A cena do celular deixou de ser dirigida por rolagem, então a dica
+   "Role para abrir" e o trilho de progresso lateral não fazem mais
+   sentido — saem de cena. O balão de saudação aparece via .show (JS). */
+.phone-hint, .scene-rail { display: none !important; }

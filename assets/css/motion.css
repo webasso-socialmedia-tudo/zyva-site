@@ -993,7 +993,7 @@ html.cine-fallback [data-cine-giant] { transform: translateX(-50%) !important; }
    O ato de conversão deixa de ser um botão que leva a um
    formulário. Três toques e a pessoa lê o próprio negócio.
    ============================================================ */
-.diag {
+.dquiz {
   background: rgba(255, 255, 255, 0.045);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 22px;
@@ -1113,7 +1113,7 @@ html.cine-fallback [data-cine-giant] { transform: translateX(-50%) !important; }
 .diag-refaz:hover { color: #fff; }
 
 @media (max-width: 1000px) {
-  .diag { max-width: none; }
+  .dquiz { max-width: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .diag-body .diag-q { transition: none; }
