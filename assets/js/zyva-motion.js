@@ -306,14 +306,29 @@
     /* A cena nao e mais dirigida por rolagem. Ela ja nasce pronta:
        o repouso do aparelho vem do CSS e os assuntos entram uma vez,
        quando a secao aparece. Sem loop, sem trilho de 380vh. */
+    const greet = track.querySelector("[data-greet]");
+    const typingEl = track.querySelector(".wa-typing");
     const io = new IntersectionObserver((es) => {
       es.forEach((e) => {
         if (!e.isIntersecting) return;
+        /* os assuntos entram escalonados */
         topics.forEach((el, i) => {
           el.style.transitionDelay = (i * 0.06).toFixed(2) + "s";
           el.style.opacity = "1";
           el.style.transform = "none";
         });
+        /* o balao de saudacao aparece logo depois (antes ficava preso
+           em opacity:0 porque quem o revelava era a rolagem, ja removida) */
+        if (greet) {
+          if (REDUCED) { greet.classList.add("show"); if (typingEl) typingEl.style.display = "none"; }
+          else {
+            if (typingEl) typingEl.classList.add("on");
+            setTimeout(() => {
+              if (typingEl) { typingEl.classList.remove("on"); typingEl.style.display = "none"; }
+              greet.classList.add("show");
+            }, 640);
+          }
+        }
         io.disconnect();
       });
     }, { threshold: 0.2 });
