@@ -983,10 +983,17 @@
         marcar(alvo);
         alvo.classList.add("svc-chegada");
 
+        /* Só desiste se a pessoa demonstrar intenção de rolar. Antes eu
+           escutava qualquer `keydown` — aí um Ctrl, um Tab ou um atalho
+           qualquer já cancelava o reposicionamento sem motivo. */
         let rolouSozinho = false;
+        const TECLAS_DE_ROLAGEM = ["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "];
         const marcaUsuario = () => { rolouSozinho = true; };
-        ["wheel", "touchstart", "keydown"].forEach((ev) =>
-          addEventListener(ev, marcaUsuario, { once: true, passive: true }));
+        addEventListener("wheel", marcaUsuario, { once: true, passive: true });
+        addEventListener("touchmove", marcaUsuario, { once: true, passive: true });
+        addEventListener("keydown", (e) => {
+          if (TECLAS_DE_ROLAGEM.indexOf(e.key) !== -1) marcaUsuario();
+        }, { passive: true });
 
         const reancora = () => {
           if (rolouSozinho) return;
