@@ -1225,7 +1225,10 @@ html.js-on .sem-js { display: none; }
   .svc-nav-in { scroll-behavior: auto; }
 }
 
-/* O navegador não precisa calcular estilo e layout do que ainda está
-   longe da tela. Com a altura reservada, nada "pula" quando entra
-   (CLS continua zero) — só o custo do primeiro desenho cai. */
-.service-block { content-visibility: auto; contain-intrinsic-size: auto 520px; }
+/* NOTA: aqui havia `content-visibility: auto` nos blocos de serviço.
+   Economizava alguns milissegundos no primeiro desenho, MAS quebrava o
+   que a sub-nav existe para fazer: ao chegar por link direto
+   (/servicos/#trafego-pago) as alturas reservadas não batiam com as
+   reais, a página parava num vazio e marcava a seção errada por um
+   instante. Medido ao vivo, não em teoria. Correção vale mais que o
+   ganho — a regra saiu. Não reintroduzir sem resolver a âncora. */
