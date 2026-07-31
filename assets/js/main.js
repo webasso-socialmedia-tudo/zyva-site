@@ -23,6 +23,18 @@ const zt = (evento, dados) => {
 /* exposto para os outros módulos poderem contar eventos */
 window.zt = zt;
 
+/* ================================================================
+   CAPTURA — o carteiro dos leads (captura.js) entra logo cedo.
+   É ele quem grava cada lead no servidor antes do WhatsApp e
+   segura na fila local o que o servidor não puder receber.
+   ================================================================ */
+(() => {
+  const s = document.createElement("script");
+  s.src = "/assets/js/captura.js?v=1";
+  s.defer = true;
+  document.head.appendChild(s);
+})();
+
 (() => {
   if (!GA_ID || GA_ID.indexOf("G-") !== 0) return;
   let carregado = false;
@@ -114,8 +126,21 @@ document.querySelectorAll(".reveal").forEach((el) => {
    só aparece junto com um link manual de verdade: se por qualquer motivo
    o WhatsApp não abrir, o caminho continua visível na tela.
    ================================================================ */
+const POLITICA_VERSAO = "2026-07-31";
+
 const form = document.querySelector("#form-contato");
 if (form) {
+  /* O quiz do herói pré-preenche: ninguém digita duas vezes. */
+  try {
+    const diag = JSON.parse(sessionStorage.getItem("zyva_diag") || "null");
+    if (diag && diag.msg) {
+      const m = form.querySelector('[name="mensagem"]');
+      if (m && !m.value) m.value = "Fiz o diagnóstico rápido no site. " +
+        "O que mais trava: " + (diag.rotuloTrava || "") + ". " +
+        "Sugestão do site: " + (diag.nomesFrentes || "") + ".";
+    }
+  } catch (e) {}
+
   form.addEventListener("submit", (ev) => {
     ev.preventDefault();
     const v = (name) => (form.querySelector(`[name="${name}"]`)?.value || "").trim();
@@ -134,11 +159,25 @@ if (form) {
 
     zt("lead_formulario", { servico: v("servico"), pagina: location.pathname });
 
+    /* CAPTURA PRIMEIRO: o lead é gravado no servidor (ou na fila
+       local, se o servidor falhar) ANTES de qualquer redirecionamento.
+       O keepalive garante que o envio sobrevive à navegação. */
+    if (window.zCap) {
+      window.zCap.send("contato", {
+        nome: v("nome"), empresa: v("empresa"), whatsapp: v("whatsapp"),
+        servico: v("servico"), mensagem: v("mensagem")
+      }, {
+        consent: { ok: true, versao: POLITICA_VERSAO, ts: new Date().toISOString() },
+        site: v("site") /* honeypot */
+      });
+    }
+
     const ok = document.querySelector("#form-ok");
     if (ok) {
       ok.hidden = false;
       ok.innerHTML =
-        '<strong>Abrindo o WhatsApp com sua mensagem pronta.</strong><br>' +
+        '<strong>Recebido! Sua mensagem já está registrada com a gente.</strong><br>' +
+        'Abrindo o WhatsApp com ela pronta — o Weba responde em até 1 dia útil.<br>' +
         'Não abriu? <a href="' + url + '" target="_blank" rel="noopener" data-wa-manual>Toque aqui para abrir</a> ' +
         'ou chame direto no <a href="tel:+' + WHATSAPP_NUMBER + '">(98) 98433-7265</a>.';
       const manual = ok.querySelector("[data-wa-manual]");
@@ -146,8 +185,9 @@ if (form) {
       ok.scrollIntoView({ block: "nearest", behavior: "smooth" });
     }
 
-    /* Navegação na própria aba: nunca é bloqueada. */
-    setTimeout(() => { location.href = url; }, 120);
+    /* Navegação na própria aba: nunca é bloqueada. A pequena espera
+       dá tempo de o POST com keepalive sair do portão. */
+    setTimeout(() => { location.href = url; }, 400);
   });
 }
 

@@ -280,9 +280,12 @@
         const label = status.querySelector("[data-live-label]");
         status.classList.toggle("off", !open);
         if (label) {
+          /* Promessa única do site inteiro: até 1 dia útil.
+             Prometer "minutos" e falhar corrói a confiança na hora
+             exata da decisão — melhor prometer menos e cumprir. */
           label.textContent = open
-            ? "Atendendo agora — resposta em minutos"
-            : "Fora do horário — respondemos no próximo dia útil";
+            ? "Atendendo agora — resposta em até 1 dia útil"
+            : "Fora do horário — respondemos em até 1 dia útil";
         }
       }
     };
@@ -766,6 +769,19 @@
       track("diagnostico_fim", { negocio: resp.negocio, trava: resp.trava, verba: resp.verba,
                                  frentes: ordem.join(",") });
 
+      /* Conclusão vira lead-sinal no servidor e pré-preenche o
+         formulário de contato: ninguém digita duas vezes. */
+      try {
+        sessionStorage.setItem("zyva_diag", JSON.stringify({
+          resp: resp, msg: msg,
+          rotuloTrava: tr.curto,
+          nomesFrentes: ordem.map((f) => FRENTE[f].nome).join(", ")
+        }));
+        document.dispatchEvent(new CustomEvent("zyva:diag", {
+          detail: { fim: true, resp: Object.assign({}, resp), frentes: ordem }
+        }));
+      } catch (e) {}
+
       const wa = saida.querySelector("[data-diag-wa]");
       if (wa) wa.addEventListener("click", () =>
         track("lead_diagnostico", { negocio: resp.negocio, trava: resp.trava, verba: resp.verba }));
@@ -796,6 +812,13 @@
         btn.closest(".diag-opts").querySelectorAll(".diag-opt")
           .forEach((o) => o.setAttribute("aria-pressed", String(o === btn)));
         if (!comecou) { comecou = true; track("diagnostico_inicio", {}); }
+        /* Cada resposta é um sinal capturado: abandono no passo 2
+           ainda vira dado (captura.js escuta este evento). */
+        try {
+          document.dispatchEvent(new CustomEvent("zyva:diag", {
+            detail: { fim: false, passo: campo, resp: Object.assign({}, resp) }
+          }));
+        } catch (e) {}
         setTimeout(avanca, REDUCED ? 0 : 130);
       });
     });
