@@ -1149,3 +1149,83 @@ html.js-on .sem-js { display: none; }
 /* --- Micro-CTA no fim de cada serviço: agir no pico do interesse --- */
 .svc-cta { display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
   margin-top: 24px; padding-top: 20px; border-top: 1px dashed var(--line); }
+
+/* ================================================================
+   FASE 3 — NAVEGAÇÃO (breadcrumbs, sub-nav, blog que escala,
+   relacionados e barra de ação no celular)
+   ================================================================ */
+
+/* ---------- Breadcrumbs (N4): onde estou, sem ocupar espaço ---------- */
+.crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  font-size: 0.85rem; margin-bottom: 14px; color: var(--muted); }
+.crumbs a { color: inherit; text-decoration: none; border-bottom: 1px solid transparent; }
+.crumbs a:hover { color: var(--ink); border-bottom-color: currentColor; }
+.crumbs [aria-current="page"] { color: var(--ink); font-weight: 600; }
+.crumb-sep { opacity: 0.5; }
+.on-dark .crumbs, .page-hero .crumbs { color: rgba(255,255,255,0.62); }
+.on-dark .crumbs a:hover, .page-hero .crumbs a:hover { color: #fff; }
+.on-dark .crumbs [aria-current="page"], .page-hero .crumbs [aria-current="page"] { color: #fff; }
+
+/* ---------- Blog que escala: busca, vazio e carregar mais (N3) ---------- */
+.blog-tools { margin-bottom: 16px; }
+.blog-search { position: relative; display: flex; align-items: center; max-width: 460px; }
+.blog-search svg { position: absolute; left: 14px; width: 18px; height: 18px;
+  color: var(--muted); pointer-events: none; }
+.blog-search input { width: 100%; padding: 12px 14px 12px 42px; min-height: 44px;
+  border: 1px solid var(--line); border-radius: 999px; font: inherit; font-size: 0.95rem;
+  background: #fff; color: var(--ink); }
+.blog-search input:focus-visible { outline: 3px solid rgba(108,76,241,0.5); outline-offset: 1px; }
+.blog-search input::-webkit-search-cancel-button { cursor: pointer; }
+.blog-vazio { margin-top: 22px; color: var(--muted); font-size: 0.97rem; }
+.blog-mais { display: flex; justify-content: center; margin-top: 30px; }
+
+/* ---------- "Continue lendo" (relacionados) ---------- */
+.relacionados { margin-top: 42px; padding-top: 30px; border-top: 1px solid var(--line); }
+.relacionados h2 { font-size: 1.25rem; margin-bottom: 18px; }
+.rel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.rel-card { display: flex; flex-direction: column; gap: 8px; padding: 18px;
+  background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+  text-decoration: none; color: inherit; min-height: 44px;
+  transition: transform .28s var(--ease-out-expo, ease), box-shadow .28s ease, border-color .28s ease; }
+.rel-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: rgba(108,76,241,0.4); }
+.rel-card:focus-visible { outline: 3px solid rgba(108,76,241,0.55); outline-offset: 2px; }
+.rel-card b { font-family: var(--font-head); font-size: 1rem; line-height: 1.35; }
+.rel-resumo { color: var(--muted); font-size: 0.88rem; line-height: 1.5; }
+
+/* 404: bloco de recuperação */
+.rec-busca { text-align: center; }
+.rec-busca h2 { font-size: clamp(1.4rem, 3vw, 1.9rem); }
+.rec-busca > p { color: var(--muted); margin: 10px 0 20px; }
+.rec-form { margin: 0 auto 26px; }
+.rec-busca .rel-grid { text-align: left; }
+
+/* ---------- Barra de ação fixa no celular (N7) ---------- */
+.barra-mobile { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 58;
+  display: flex; gap: 10px; align-items: stretch;
+  padding: 10px; border-radius: 16px;
+  background: rgba(17,20,34,0.94); backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 12px 34px rgba(0,0,0,0.34);
+  transform: translateY(140%); opacity: 0; pointer-events: none;
+  transition: transform .28s cubic-bezier(.16,1,.3,1), opacity .2s ease; }
+.barra-mobile.on { transform: none; opacity: 1; pointer-events: auto; }
+.barra-mobile .bm-cta { flex: 1; display: inline-flex; align-items: center; justify-content: center;
+  min-height: 46px; padding: 0 16px; border-radius: 12px; background: var(--grad);
+  color: #fff; font-weight: 700; font-size: 0.95rem; text-decoration: none; }
+.barra-mobile .bm-wa { flex: 0 0 auto; width: 46px; min-height: 46px; border-radius: 12px;
+  background: var(--wa); display: grid; place-items: center; }
+.barra-mobile .bm-wa svg { width: 24px; height: 24px; fill: #fff; }
+.barra-mobile a:focus-visible { outline: 3px solid rgba(34,211,238,0.75); outline-offset: 2px; }
+/* Onde a barra existe, o balão flutuante sai: dois botões de WhatsApp
+   na mesma tela é ruído, não ajuda. */
+@media (max-width: 780px) { body.tem-barra-mobile .wa-float { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .barra-mobile { transition: opacity .2s ease; transform: none; }
+  .svc-chegada { animation: none; }
+  .svc-nav-in { scroll-behavior: auto; }
+}
+
+/* O navegador não precisa calcular estilo e layout do que ainda está
+   longe da tela. Com a altura reservada, nada "pula" quando entra
+   (CLS continua zero) — só o custo do primeiro desenho cai. */
+.service-block { content-visibility: auto; contain-intrinsic-size: auto 520px; }
