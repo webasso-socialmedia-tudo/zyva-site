@@ -968,10 +968,38 @@
     }, { rootMargin: "-35% 0px -55% 0px", threshold: 0 });
     secoes.forEach(({ el }) => io.observe(el));
 
-    /* Chegou por link direto (#seo): destaca de cara. */
+    /* Chegou por link direto (#seo): destaca de cara E garante que o
+       bloco pare ABAIXO da barra.
+       Por que reancorar: o navegador rola para a âncora assim que lê o
+       HTML — antes de fontes e imagens assentarem. Como a altura do que
+       vem acima ainda vai mudar, o alvo escorrega: medido ao vivo, ora
+       o título ficava escondido sob a barra, ora a página nem saía do
+       topo. Então recolocamos no lugar quando tudo terminou de carregar.
+       Se a pessoa já começou a rolar por conta própria, não mexemos —
+       roubar a rolagem de alguém é pior que a âncora torta. */
     if (location.hash) {
       const alvo = document.getElementById(location.hash.slice(1));
-      if (alvo) { marcar(alvo); alvo.classList.add("svc-chegada"); }
+      if (alvo && alvo.classList.contains("service-block")) {
+        marcar(alvo);
+        alvo.classList.add("svc-chegada");
+
+        let rolouSozinho = false;
+        const marcaUsuario = () => { rolouSozinho = true; };
+        ["wheel", "touchstart", "keydown"].forEach((ev) =>
+          addEventListener(ev, marcaUsuario, { once: true, passive: true }));
+
+        const reancora = () => {
+          if (rolouSozinho) return;
+          const off = parseInt(getComputedStyle(document.documentElement)
+            .getPropertyValue("--svc-nav-offset"), 10) || 128;
+          const y = alvo.getBoundingClientRect().top + window.scrollY - off;
+          if (Math.abs(y - window.scrollY) > 4) window.scrollTo({ top: y, behavior: "auto" });
+        };
+        reancora();
+        if (document.readyState !== "complete") addEventListener("load", reancora, { once: true });
+        setTimeout(reancora, 600);
+        setTimeout(() => { rolouSozinho = true; }, 1600); /* depois disso, a página é do usuário */
+      }
     }
     links.forEach((a) => a.addEventListener("click", () => {
       try { window.zt && window.zt("svc_nav", { alvo: a.getAttribute("href") }); } catch (e) {}
