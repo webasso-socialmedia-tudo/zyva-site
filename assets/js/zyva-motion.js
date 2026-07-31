@@ -11,8 +11,31 @@
   const FINE = window.matchMedia("(pointer: fine)").matches;
   const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
   /* Normaliza p dentro da faixa [a,b] → 0..1 */
-  const safe = (name, fn) => {
+
+  /* ----------------------------------------------------------
+     Os módulos entram numa fila em vez de rodar todos de uma vez.
+     Rodando em bloco, a soma dava uma trava de 213ms na linha
+     principal — e trava é justamente o que estoura o INP se a
+     pessoa tocar em algo nesse instante. A fila roda em fatias de
+     ~24ms e devolve o controle ao navegador entre elas: o mesmo
+     trabalho, sem nenhum toque preso esperando. A ORDEM é
+     preservada, então quem revela a primeira tela continua sendo
+     o primeiro a rodar.
+     ---------------------------------------------------------- */
+  const fila = [];
+  const safe = (name, fn) => { fila.push([name, fn]); };
+  const executa = (name, fn) => {
     try { fn(); } catch (e) { console.warn("[zyva-motion] " + name, e); }
+  };
+  const roda = () => {
+    const t0 = performance.now();
+    while (fila.length && performance.now() - t0 < 24) {
+      const item = fila.shift();
+      executa(item[0], item[1]);
+    }
+    if (!fila.length) return;
+    if (window.requestIdleCallback) requestIdleCallback(roda, { timeout: 120 });
+    else setTimeout(roda, 0);
   };
 
   /* ==========================================================
@@ -379,10 +402,17 @@
      13. Filtro do blog com animação FLIP (posições animam de verdade)
      ========================================================== */
   safe("blog-filter", () => {
-    const bar = document.querySelector("[data-blog-filter]");
     const grid = document.querySelector("[data-blog-grid]");
-    if (!bar || !grid) return;
-    const cards = Array.from(grid.children);
+    if (!grid) return;
+    const bar    = document.querySelector("[data-blog-filter]");
+    const campo  = document.querySelector("[data-blog-busca]");
+    const vazio  = document.querySelector("[data-blog-vazio]");
+    const btnMais= document.querySelector("[data-blog-mais]");
+    const cards  = Array.from(grid.children);
+    const PASSO  = 6;
+
+    /* Busca sem acento: quem digita "anuncio" tem que achar "anúncio". */
+    const simples = (s) => (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
     /* A categoria vem do próprio chip do card. Assim os posts que a
        automação diária publica entram no filtro sozinhos, sem precisar
@@ -391,60 +421,97 @@
       const chip = c.querySelector(".post-cat");
       return (chip ? chip.textContent : "").trim();
     };
-
-    const cats = [];
+    /* Índice de texto: título + resumo + categoria, calculado uma vez só. */
+    const textoDe = new Map();
     cards.forEach((c) => {
-      const k = catOf(c);
-      if (k && cats.indexOf(k) === -1) cats.push(k);
+      const t = c.querySelector("h3"), p = c.querySelector("p");
+      textoDe.set(c, simples([(t && t.textContent) || "", (p && p.textContent) || "", catOf(c)].join(" ")));
     });
-    if (cats.length < 2) return;
 
-    const mk = (label, value, pressed) => {
-      const b = document.createElement("button");
-      b.type = "button";
-      b.className = "chip-filter cursor-target";
-      b.textContent = label;
-      b.setAttribute("data-cat", value);
-      b.setAttribute("aria-pressed", String(pressed));
-      bar.appendChild(b);
-      return b;
-    };
+    let cat = "*", termo = "", mostrando = PASSO;
 
-    bar.textContent = "";
-    const btns = [mk("Todos", "*", true)];
-    cats.forEach((k) => btns.push(mk(k, k, false)));
+    const elegivel = (c) =>
+      (cat === "*" || catOf(c) === cat) && (!termo || textoDe.get(c).indexOf(termo) !== -1);
 
-    const apply = (cat) => {
-      const first = new Map();
-      cards.forEach((c) => first.set(c, c.getBoundingClientRect()));
+    const pinta = (animar) => {
+      const antes = animar && !REDUCED ? new Map(cards.map((c) => [c, c.getBoundingClientRect()])) : null;
+      const lista = cards.filter(elegivel);
+      const visiveis = lista.slice(0, mostrando);
+      cards.forEach((c) => { c.hidden = visiveis.indexOf(c) === -1; });
 
-      cards.forEach((c) => {
-        c.hidden = !(cat === "*" || catOf(c) === cat);
-      });
-
-      if (REDUCED) return;
-      cards.forEach((c) => {
-        if (c.hidden) return;
-        const a = first.get(c);
-        const b = c.getBoundingClientRect();
-        const dx = a.left - b.left;
-        const dy = a.top - b.top;
-        if (!a.width) {
-          c.animate([{ opacity: 0, transform: "scale(.94)" }, { opacity: 1, transform: "none" }],
-            { duration: 340, easing: "cubic-bezier(.16,1,.3,1)" });
-        } else if (dx || dy) {
-          c.animate([{ transform: "translate(" + dx + "px," + dy + "px)" }, { transform: "none" }],
-            { duration: 480, easing: "cubic-bezier(.16,1,.3,1)" });
+      if (vazio) vazio.hidden = lista.length > 0;
+      if (btnMais) {
+        btnMais.hidden = lista.length <= mostrando;
+        const restam = lista.length - mostrando;
+        if (restam > 0) btnMais.textContent = "Carregar mais " + (restam > PASSO ? PASSO : restam) +
+          (restam === 1 ? " artigo" : " artigos");
+      }
+      if (!antes) return;
+      visiveis.forEach((c) => {
+        const a = antes.get(c), b = c.getBoundingClientRect();
+        if (!a || !a.width) {
+          c.animate([{ opacity: 0, transform: "scale(.96)" }, { opacity: 1, transform: "none" }],
+            { duration: 320, easing: "cubic-bezier(.16,1,.3,1)" });
+        } else if (a.left - b.left || a.top - b.top) {
+          c.animate([{ transform: "translate(" + (a.left - b.left) + "px," + (a.top - b.top) + "px)" }, { transform: "none" }],
+            { duration: 440, easing: "cubic-bezier(.16,1,.3,1)" });
         }
       });
     };
 
-    btns.forEach((b) => {
-      b.addEventListener("click", () => {
-        btns.forEach((o) => o.setAttribute("aria-pressed", String(o === b)));
-        apply(b.getAttribute("data-cat"));
+    /* ---- chips de categoria ---- */
+    if (bar) {
+      const cats = [];
+      cards.forEach((c) => { const k = catOf(c); if (k && cats.indexOf(k) === -1) cats.push(k); });
+      if (cats.length >= 2) {
+        const mk = (label, valor, ativo) => {
+          const b = document.createElement("button");
+          b.type = "button";
+          b.className = "chip-filter cursor-target";
+          b.textContent = label;
+          b.setAttribute("data-cat", valor);
+          b.setAttribute("aria-pressed", String(ativo));
+          bar.appendChild(b);
+          return b;
+        };
+        bar.textContent = "";
+        const btns = [mk("Todos", "*", true)];
+        cats.forEach((k) => btns.push(mk(k, k, false)));
+        btns.forEach((b) => b.addEventListener("click", () => {
+          btns.forEach((o) => o.setAttribute("aria-pressed", String(o === b)));
+          cat = b.getAttribute("data-cat");
+          mostrando = PASSO;
+          pinta(true);
+        }));
+      }
+    }
+
+    /* ---- busca (com respiro para não repintar a cada tecla) ---- */
+    if (campo) {
+      let t;
+      campo.addEventListener("input", () => {
+        clearTimeout(t);
+        t = setTimeout(() => {
+          termo = simples(campo.value.trim());
+          mostrando = PASSO;
+          pinta(true);
+          try { window.zt && termo.length > 2 && window.zt("blog_busca", { termo: termo.slice(0, 40) }); } catch (e) {}
+        }, 160);
       });
+      campo.addEventListener("keydown", (e) => { if (e.key === "Escape") { campo.value = ""; campo.dispatchEvent(new Event("input")); } });
+    }
+
+    /* ---- carregar mais ---- */
+    if (btnMais) btnMais.addEventListener("click", () => {
+      mostrando += PASSO;
+      pinta(true);
+      const novos = cards.filter((c) => !c.hidden);
+      const alvo = novos[Math.max(0, novos.length - PASSO)];
+      if (alvo) alvo.querySelectorAll("h3")[0] && alvo.querySelectorAll("h3")[0].focus &&
+        alvo.setAttribute("tabindex", "-1"), alvo.focus && alvo.focus({ preventScroll: true });
     });
+
+    pinta(false);
   });
 
   /* ==========================================================
@@ -838,5 +905,220 @@
 
     mostra(0);
   });
+
+
+  /* ==========================================================
+     16. Sub-navegação dos Serviços com indicador de seção (N2)
+         A página é longa: quem chega por #trafego-pago precisa
+         saber onde está e como chegar no resto sem rolar tudo.
+     ========================================================== */
+  safe("svc-nav", () => {
+    const nav = document.querySelector("[data-svc-nav]");
+    if (!nav) return;
+    const links = Array.from(nav.querySelectorAll("a[href^='#']"));
+    const secoes = links
+      .map((a) => ({ a, el: document.getElementById(a.getAttribute("href").slice(1)) }))
+      .filter((x) => x.el);
+    if (!secoes.length) return;
+
+    const trilho = nav.querySelector(".svc-nav-in") || nav;
+
+    /* O cabeçalho é sticky e sua altura muda com a tela. Chutar um valor
+       fixo deixava a sub-nav 5px escondida atrás dele — então medimos. */
+    const cabecalho = document.querySelector(".site-header");
+    const encaixa = () => {
+      const alt = cabecalho ? Math.round(cabecalho.getBoundingClientRect().height) : 64;
+      nav.style.top = alt + "px";
+      document.documentElement.style.setProperty("--svc-nav-offset",
+        (alt + Math.round(nav.getBoundingClientRect().height) + 16) + "px");
+    };
+    encaixa();
+    addEventListener("resize", () => { clearTimeout(nav._t); nav._t = setTimeout(encaixa, 150); });
+    const marcar = (alvo) => {
+      secoes.forEach(({ a, el }) => {
+        const on = el === alvo;
+        a.classList.toggle("on", on);
+        if (on) a.setAttribute("aria-current", "true");
+        else a.removeAttribute("aria-current");
+      });
+      /* no celular a barra rola: o item ativo tem que estar à vista */
+      const ativo = nav.querySelector("a.on");
+      if (ativo && trilho.scrollWidth > trilho.clientWidth) {
+        const r = ativo.getBoundingClientRect(), t = trilho.getBoundingClientRect();
+        if (r.left < t.left + 8 || r.right > t.right - 8) {
+          trilho.scrollTo({ left: ativo.offsetLeft - trilho.clientWidth / 2 + ativo.offsetWidth / 2,
+                            behavior: REDUCED ? "auto" : "smooth" });
+        }
+      }
+    };
+
+    if (!("IntersectionObserver" in window)) return;
+    /* A "linha de leitura" fica a ~35% da tela: a seção ativa é a que
+       cruza essa linha, não a que tem mais pixels visíveis. */
+    const visiveis = new Set();
+    const io = new IntersectionObserver((entradas) => {
+      entradas.forEach((e) => (e.isIntersecting ? visiveis.add(e.target) : visiveis.delete(e.target)));
+      if (!visiveis.size) return;
+      let melhor = null, topo = Infinity;
+      visiveis.forEach((el) => {
+        const t = Math.abs(el.getBoundingClientRect().top);
+        if (t < topo) { topo = t; melhor = el; }
+      });
+      if (melhor) marcar(melhor);
+    }, { rootMargin: "-35% 0px -55% 0px", threshold: 0 });
+    secoes.forEach(({ el }) => io.observe(el));
+
+    /* Chegou por link direto (#seo): destaca de cara. */
+    if (location.hash) {
+      const alvo = document.getElementById(location.hash.slice(1));
+      if (alvo) { marcar(alvo); alvo.classList.add("svc-chegada"); }
+    }
+    links.forEach((a) => a.addEventListener("click", () => {
+      try { window.zt && window.zt("svc_nav", { alvo: a.getAttribute("href") }); } catch (e) {}
+    }));
+  });
+
+  /* ==========================================================
+     17. "Continue lendo" nos posts + busca da 404 (N3/N5)
+         Lê /assets/data/posts.json, gerado pelo mesmo script que
+         faz o sitemap. O post de amanhã entra aqui sozinho —
+         a publicação diária continua sem passo manual.
+     ========================================================== */
+  safe("relacionados", () => {
+    const caixa = document.querySelector("[data-relacionados]");
+    const grade404 = document.querySelector("[data-404-resultados]");
+    const busca404 = document.querySelector("[data-404-busca]");
+    if (!caixa && !grade404) return;
+
+    const simples = (s) => (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+    const cartao = (p) => {
+      const a = document.createElement("a");
+      a.className = "rel-card cursor-target";
+      a.href = p.url;
+      const cat = document.createElement("span"); cat.className = "post-cat"; cat.textContent = p.cat;
+      const h = document.createElement("b"); h.textContent = p.titulo;
+      const d = document.createElement("span"); d.className = "rel-resumo";
+      d.textContent = (p.resumo || "").slice(0, 105) + ((p.resumo || "").length > 105 ? "…" : "");
+      a.append(cat, h, d);
+      return a;
+    };
+
+    fetch("/assets/data/posts.json", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((dados) => {
+        if (!dados || !dados.posts || !dados.posts.length) return;
+        const posts = dados.posts;
+
+        /* ---- fim do artigo: mesma categoria primeiro, depois os mais novos ---- */
+        if (caixa) {
+          const aqui = location.pathname.replace(/\/?$/, "/");
+          const atual = posts.filter((p) => p.url === aqui)[0];
+          const outros = posts.filter((p) => p.url !== aqui);
+          const mesma = atual ? outros.filter((p) => p.cat === atual.cat) : [];
+          const resto = outros.filter((p) => mesma.indexOf(p) === -1);
+          const escolha = mesma.concat(resto).slice(0, 3);
+          if (escolha.length) {
+            const grade = caixa.querySelector("[data-rel-grid]");
+            escolha.forEach((p) => grade.appendChild(cartao(p)));
+            caixa.hidden = false;
+          }
+        }
+
+        /* ---- 404: busca ao vivo, começando pelos mais recentes ---- */
+        if (grade404) {
+          const pinta = (lista) => {
+            grade404.textContent = "";
+            if (!lista.length) {
+              const p = document.createElement("p");
+              p.className = "blog-vazio";
+              p.textContent = "Nada com esse termo — tente outra palavra ou fale com a gente.";
+              grade404.appendChild(p);
+              return;
+            }
+            lista.slice(0, 3).forEach((p) => grade404.appendChild(cartao(p)));
+          };
+          pinta(posts);
+          const campo = busca404 && busca404.querySelector("input");
+          if (campo) {
+            let t;
+            busca404.addEventListener("submit", (e) => e.preventDefault());
+            campo.addEventListener("input", () => {
+              clearTimeout(t);
+              t = setTimeout(() => {
+                const q = simples(campo.value.trim());
+                pinta(!q ? posts : posts.filter((p) =>
+                  simples(p.titulo + " " + p.resumo + " " + p.cat).indexOf(q) !== -1));
+              }, 160);
+            });
+          }
+        }
+      })
+      .catch(() => {});
+  });
+
+  /* ==========================================================
+     18. Barra de ação fixa no celular (N7)
+         É no celular que a decisão acontece — e é lá que o CTA
+         some ao rolar. Ela entra depois da primeira tela e sai
+         de cena quando um CTA de verdade está à vista, para
+         nunca competir com ele nem cobrir conteúdo.
+     ========================================================== */
+  safe("barra-mobile", () => {
+    const ehToque = window.matchMedia("(max-width: 780px)").matches;
+    if (!ehToque || document.querySelector("[data-barra-mobile]")) return;
+
+    const WA = window.ZYVA_WA || "5598984337265";
+    const barra = document.createElement("div");
+    barra.className = "barra-mobile";
+    barra.setAttribute("data-barra-mobile", "");
+    barra.innerHTML =
+      '<a class="bm-cta" href="/contato/">Diagnóstico gratuito</a>' +
+      '<a class="bm-wa" href="https://wa.me/' + WA +
+      '?text=' + encodeURIComponent("Olá, Zyva! Quero um diagnóstico gratuito para minha empresa.") +
+      '" target="_blank" rel="noopener" data-wa aria-label="Falar no WhatsApp">' +
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 14.4c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.46-2.4-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.91-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.03 1.02-1.03 2.48s1.06 2.87 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2-1.41.25-.7.25-1.29.18-1.42-.08-.12-.28-.2-.57-.35M12.05 21.8h-.01a9.9 9.9 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.89 9.89-9.89 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.43 9.89-9.88 9.89m8.41-18.3A11.8 11.8 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.9 11.9 0 0 0 5.69 1.45c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.17-3.48-8.41Z"/></svg>' +
+      "</a>";
+    document.body.appendChild(barra);
+    document.body.classList.add("tem-barra-mobile");
+
+    /* Enquanto um CTA principal está na tela, a barra recolhe. */
+    const rivais = Array.from(document.querySelectorAll(
+      ".hero-ctas, .cta-final, .cine-reveal, #form-contato, .dquiz, .svc-cta, .news-cta"));
+    const naTela = new Set();
+    let passouDobra = false;
+
+    const decide = () => {
+      barra.classList.toggle("on", passouDobra && naTela.size === 0);
+    };
+
+    if ("IntersectionObserver" in window) {
+      if (rivais.length) {
+        const io = new IntersectionObserver((es) => {
+          es.forEach((e) => (e.isIntersecting ? naTela.add(e.target) : naTela.delete(e.target)));
+          decide();
+        }, { threshold: 0.01 });
+        rivais.forEach((el) => io.observe(el));
+      }
+      /* sentinela da dobra: sem listener de scroll */
+      const marco = document.createElement("div");
+      marco.setAttribute("aria-hidden", "true");
+      marco.style.cssText = "position:absolute;top:70vh;height:1px;width:1px;pointer-events:none";
+      document.body.appendChild(marco);
+      new IntersectionObserver((es) => {
+        passouDobra = !es[0].isIntersecting && es[0].boundingClientRect.top < 0;
+        decide();
+      }, { threshold: 0 }).observe(marco);
+    }
+
+    barra.addEventListener("click", (e) => {
+      const a = e.target.closest("a");
+      if (!a) return;
+      try { window.zt && window.zt("barra_mobile", { acao: a.classList.contains("bm-wa") ? "whatsapp" : "diagnostico" }); } catch (err) {}
+    });
+  });
+
+
+  /* Dispara a fila: a primeira fatia roda já, o resto entre quadros. */
+  roda();
 
 })();

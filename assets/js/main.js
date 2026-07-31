@@ -297,6 +297,21 @@ document.querySelectorAll("[data-year]").forEach((el) => {
 })();
 
 /* ================================================================
+   /assets/data/latest.json é lido por dois módulos (o card da home e
+   o aviso do blog). Buscar duas vezes o mesmo arquivo é desperdício
+   puro — a promessa abaixo é criada uma vez e os dois esperam nela.
+   ================================================================ */
+let ultimoJson = null;
+const lerLatest = () => {
+  if (!ultimoJson) {
+    ultimoJson = fetch("/assets/data/latest.json", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .catch(() => null);
+  }
+  return ultimoJson;
+};
+
+/* ================================================================
    Card "post do dia" na home: preenche com o último post do blog
    a partir de /assets/data/latest.json (com fallback estático).
    ================================================================ */
@@ -304,9 +319,8 @@ document.querySelectorAll("[data-year]").forEach((el) => {
   const slot = document.querySelector("[data-latest-slot]");
   if (!slot) return;
   try {
-    const res = await fetch("/assets/data/latest.json", { cache: "no-store" });
-    if (!res.ok) return;
-    const data = await res.json();
+    const data = await lerLatest();
+    if (!data) return;
     const p = (data.special && data.special.slug ? data.special : null) || data.latest;
     if (!p || !p.slug || !p.title) return;
     const chip = slot.querySelector(".post-cat");
@@ -360,9 +374,8 @@ document.querySelectorAll("[data-year]").forEach((el) => {
    ================================================================ */
 (async () => {
   try {
-    const res = await fetch("/assets/data/latest.json", { cache: "no-store" });
-    if (!res.ok) return;
-    const data = await res.json();
+    const data = await lerLatest();
+    if (!data) return;
     const items = [];
     if (data.special && data.special.slug) items.push({ ...data.special, kind: "special" });
     if (data.latest && data.latest.slug) items.push({ ...data.latest, kind: "news" });
