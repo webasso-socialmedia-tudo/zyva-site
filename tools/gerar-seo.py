@@ -8,7 +8,7 @@ coisas saem da mesma fonte: os arquivos.
 
 Uso:  python3 tools/gerar-seo.py
 """
-import os, re, glob, html
+import os, re, glob, html, json
 from datetime import datetime, timezone
 
 BASE = "https://agenciazyva.com.br"
@@ -61,6 +61,20 @@ def data_do_post(rota, txt):
     if m:
         return m.group(1)
     return datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+
+def categoria(txt):
+    """A categoria vem do chip do próprio artigo — mesma fonte do filtro do blog."""
+    m = re.search(r'<span class="post-cat">(.*?)</span>', txt, re.S)
+    return html.unescape(re.sub(r"\s+", " ", m.group(1))).strip() if m else "Blog"
+
+
+def titulo_curto(txt):
+    """O <h1> do artigo: sem o sufixo '| Blog Zyva' que vai no <title>."""
+    m = re.search(r"<h1[^>]*>(.*?)</h1>", txt, re.S)
+    if m:
+        return html.unescape(re.sub(r"<[^>]+>", "", re.sub(r"\s+", " ", m.group(1)))).strip()
+    return titulo(txt).split("|")[0].strip()
 
 
 def rotas():
@@ -133,8 +147,29 @@ def main():
     with open(os.path.join(RAIZ, "feed.xml"), "w", encoding="utf-8") as f:
         f.write("\n".join(rss) + "\n")
 
+    # ---------- índice de posts (alimenta "relacionados" e o 404) ----------
+    # Sai da MESMA fonte que o sitemap: os arquivos. Assim o post de amanhã
+    # entra nos relacionados sozinho, sem ninguém editar HTML à mão.
+    indice = []
+    for rota, caminho, txt in todas:
+        if not rota.startswith("/blog/") or rota == "/blog/":
+            continue
+        indice.append({
+            "url": rota,
+            "titulo": titulo_curto(txt),
+            "cat": categoria(txt),
+            "data": data_do_post(rota, txt),
+            "resumo": meta(txt, "description", "og:description"),
+        })
+    indice.sort(key=lambda p: p["data"], reverse=True)
+    destino = os.path.join(RAIZ, "assets", "data", "posts.json")
+    os.makedirs(os.path.dirname(destino), exist_ok=True)
+    with open(destino, "w", encoding="utf-8") as f:
+        json.dump({"posts": indice}, f, ensure_ascii=False, separators=(",", ":"))
+
     print(f"sitemap.xml: {len(todas)} endereços")
     print(f"feed.xml:    {len(posts)} posts")
+    print(f"posts.json:  {len(indice)} posts indexados")
     for data, rota, tit, _ in posts:
         print(f"  {data}  {rota}")
 
