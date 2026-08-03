@@ -380,21 +380,33 @@
     let active = 0;
     const show = (i) => {
       active = i;
-      letters.forEach((l, k) => l.classList.toggle("on", k === i));
+      letters.forEach((l, k) => {
+        const on = k === i;
+        l.classList.toggle("on", on);
+        l.setAttribute("aria-pressed", String(on));
+      });
       panels.forEach((v, k) => v.classList.toggle("on", k === i));
     };
     show(0);
 
+    /* No celular as letras giram sozinhas, senão quem não tem mouse
+       nunca veria os outros valores. Mas no instante em que a pessoa
+       escolhe uma letra, a rotação PARA — antes ela continuava girando
+       e roubava a escolha 2 segundos depois do toque, o que fazia a
+       interação parecer quebrada. Escolha do usuário manda. */
+    let giro = null;
+    const paraDeGirar = () => { if (giro) { clearInterval(giro); giro = null; } };
+
     letters.forEach((l, i) => {
       l.addEventListener("mouseenter", () => show(i));
       l.addEventListener("focus", () => show(i));
-      l.addEventListener("click", () => show(i));
+      l.addEventListener("click", () => { paraDeGirar(); show(i); });
     });
 
-    /* sem mouse (celular), o scroll conduz a troca */
     if (!FINE && !REDUCED) {
       let t = 0;
-      setInterval(() => { t = (t + 1) % letters.length; show(t); }, 2600);
+      giro = setInterval(() => { t = (t + 1) % letters.length; show(t); }, 2600);
+      wrap.addEventListener("touchstart", paraDeGirar, { once: true, passive: true });
     }
   });
 
