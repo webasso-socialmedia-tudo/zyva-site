@@ -1,8 +1,9 @@
 /* ============================================================
-   ZYVA — Motion Engine v1
+   ZYVA — Motion Engine v2
    Zero dependências. Sem GSAP, sem Three.js, sem React.
-   Portes em JS puro de: TargetCursor, RotatingText, TiltedCard.
    Cada módulo é isolado — se um falhar, os outros continuam.
+   A curva assinatura do site é --ease-zyva (style.css); aqui o
+   equivalente em JS é o outCubic dos módulos de scroll.
    ============================================================ */
 (() => {
   "use strict";
@@ -89,40 +90,52 @@
     /* Regra dura do orçamento de performance: NADA de animação segurando
        texto da primeira tela. O que já está visível quando a página abre
        aparece pronto — o título precisa ser o maior conteúdo pintado, e
-       um elemento em opacity:0 simplesmente não conta como LCP. */
+       um elemento em opacity:0 simplesmente não conta como LCP.
+
+       Sistema ÚNICO de entrada: [data-reveal]/.rise (vocabulário rv-*)
+       e .reveal (vocabulário .visible, que era do main.js) dividem o
+       mesmo observador e a mesma isenção de primeira tela. */
+    document.documentElement.classList.add("rv-on"); /* p/ rede de segurança do main.js */
     const vh = window.innerHeight || 800;
     const primeiraTela = (el) => {
       const r = el.getBoundingClientRect();
-      return r.top < vh * 0.92;
+      return r.top < vh * 0.96;
+    };
+    const entra = (el) => {
+      el.classList.add(el.classList.contains("reveal") ? "visible" : "rv-in");
+    };
+    const entraJa = (el) => {
+      if (el.classList.contains("reveal")) el.classList.add("visible", "reveal-now");
+      else el.classList.add("rv-in", "rv-now");
     };
 
     const heads = Array.from(document.querySelectorAll("[data-reveal]"));
     heads.forEach((el) => {
-      if (primeiraTela(el)) { el.classList.add("rv-in", "rv-now"); return; }
+      if (primeiraTela(el)) { entraJa(el); return; }
       if (!REDUCED) splitWords(el);
     });
 
-    const items = Array.from(document.querySelectorAll("[data-reveal], .rise"))
+    const items = Array.from(document.querySelectorAll("[data-reveal], .rise, .reveal"))
       .filter((el) => {
         if (!primeiraTela(el)) return true;
-        el.classList.add("rv-in", "rv-now");
+        entraJa(el);
         return false;
       });
     if (!items.length) return;
 
     if (REDUCED || !("IntersectionObserver" in window)) {
-      items.forEach((el) => el.classList.add("rv-in"));
+      items.forEach(entra);
       return;
     }
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           if (!e.isIntersecting) return;
-          e.target.classList.add("rv-in");
+          entra(e.target);
           io.unobserve(e.target);
         });
       },
-      { threshold: 0.15, rootMargin: "0px 0px -8% 0px" }
+      { threshold: 0.12, rootMargin: "0px 0px -8% 0px" }
     );
     items.forEach((el) => io.observe(el));
   });
@@ -191,8 +204,7 @@
   });
 
   /* ==========================================================
-     6. Inclinação 3D em cartões (port do TiltedCard)
-        <div class="tilt" data-tilt="12"><div class="tilt-inner">…
+     6. Cena do celular 3D (Contato): conversa simulada
      ========================================================== */
   safe("phone-scene", () => {
     const track = document.querySelector("[data-phone-track]");
@@ -355,16 +367,23 @@
        scroll: assim a linha não termina cedo demais — ela vai se desenhando
        enquanto cruza a tela e completa perto do topo. */
     const stage = wrap.querySelector(".pipe-stage") || wrap;
-    const onScroll = () => {
+    const mede = () => {
       const vh = window.innerHeight || 1;
       const r = stage.getBoundingClientRect();
       if (r.bottom < -200 || r.top > vh + 200) return;
       const p = clamp((vh - r.top) / (vh * 0.9), 0, 1);
       paint(p);
     };
+    /* rAF + trava: no máximo uma medição por quadro (protege o INP). */
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => { ticking = false; mede(); });
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
-    onScroll();
+    mede();
   });
 
   /* ==========================================================
@@ -479,7 +498,7 @@
         const mk = (label, valor, ativo) => {
           const b = document.createElement("button");
           b.type = "button";
-          b.className = "chip-filter cursor-target";
+          b.className = "chip-filter";
           b.textContent = label;
           b.setAttribute("data-cat", valor);
           b.setAttribute("aria-pressed", String(ativo));
@@ -538,15 +557,22 @@
     document.body.appendChild(bar);
     const fill = bar.firstElementChild;
 
-    const onScroll = () => {
+    const mede = () => {
       const r = art.getBoundingClientRect();
       const total = r.height - window.innerHeight;
       const p = total > 0 ? clamp((-r.top) / total, 0, 1) : (r.top <= 0 ? 1 : 0);
       fill.style.transform = "scaleX(" + p.toFixed(4) + ")";
     };
+    /* rAF + trava: no máximo uma medição por quadro (protege o INP). */
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => { ticking = false; mede(); });
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
-    onScroll();
+    mede();
   });
 
   /* ==========================================================
@@ -647,9 +673,11 @@
       if (giant) {
         const gp = outCubic(clamp(p * 1.12, 0, 1));
         giant.style.opacity = gp.toFixed(3);
+        /* rotateX: a palavra "deita" ao longe e levanta ao chegar —
+           profundidade real na revelação (perspective no .cine-foot) */
         giant.style.transform =
           "translateX(-50%) translateY(" + ((1 - gp) * 10).toFixed(2) + "vh) scale(" +
-          (0.8 + gp * 0.2).toFixed(3) + ")";
+          (0.8 + gp * 0.2).toFixed(3) + ") rotateX(" + ((1 - gp) * 24).toFixed(1) + "deg)";
       }
 
       const reveal = (el, delay) => {
@@ -787,6 +815,7 @@
     let comecou = false;
 
     const mostra = (i) => {
+      if (i < 0 || i >= perguntas.length) return; /* nunca fora da faixa */
       atual = i;
       perguntas.forEach((q, k) => { q.hidden = k !== i; });
       if (conta) conta.textContent = String(i + 1);
@@ -829,9 +858,9 @@
         '<div class="diag-frentes">' + frentes + "</div>" +
         '<p class="diag-prazo">' + vb.prazo + "</p>" +
         '<div class="diag-cta">' +
-        '<a class="btn btn-primary cursor-target" target="_blank" rel="noopener" href="https://wa.me/' +
+        '<a class="btn btn-primary" target="_blank" rel="noopener" href="https://wa.me/' +
         WA + "?text=" + encodeURIComponent(msg) + '" data-diag-wa>Quero aprofundar no WhatsApp</a>' +
-        '<a class="btn btn-ghost cursor-target" href="/contato/">Prefiro escrever pelo formulário</a>' +
+        '<a class="btn btn-ghost" href="/contato/">Prefiro escrever pelo formulário</a>' +
         '<button type="button" class="diag-refaz" data-diag-refaz>Responder de novo</button>' +
         "</div>";
 
@@ -874,11 +903,20 @@
       });
     };
 
+    /* Dois toques rápidos na mesma pergunta agendavam DOIS avanços:
+       o segundo relia `atual` já avançado e pulava uma pergunta — ou
+       chamava mostra(3), que não existe, e matava o quiz inteiro com
+       um TypeError. Agora: um timer de cada vez (o toque seguinte
+       cancela o pendente) e o destino é congelado no agendamento. */
+    let tAvanca = null;
+    let tMostra = null;
     const avanca = () => {
       if (atual < perguntas.length - 1) {
-        if (REDUCED) { mostra(atual + 1); return; }
+        const alvo = atual + 1; /* congela o destino AQUI, não na execução */
+        if (REDUCED) { mostra(alvo); return; }
         body.classList.add("diag-swap");
-        setTimeout(() => { mostra(atual + 1); body.classList.remove("diag-swap"); }, 200);
+        clearTimeout(tMostra);
+        tMostra = setTimeout(() => { mostra(alvo); body.classList.remove("diag-swap"); }, 200);
       } else {
         monta();
       }
@@ -898,7 +936,8 @@
             detail: { fim: false, passo: campo, resp: Object.assign({}, resp) }
           }));
         } catch (e) {}
-        setTimeout(avanca, REDUCED ? 0 : 130);
+        clearTimeout(tAvanca); /* trocar de resposta reagenda, não duplica */
+        tAvanca = setTimeout(avanca, REDUCED ? 0 : 130);
       });
     });
 
@@ -1040,7 +1079,7 @@
     const simples = (s) => (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
     const cartao = (p) => {
       const a = document.createElement("a");
-      a.className = "rel-card cursor-target";
+      a.className = "rel-card";
       a.href = p.url;
       const cat = document.createElement("span"); cat.className = "post-cat"; cat.textContent = p.cat;
       const h = document.createElement("b"); h.textContent = p.titulo;
@@ -1164,6 +1203,186 @@
     });
   });
 
+
+  /* ==========================================================
+     FASE 3 · O NOTEBOOK QUE ABRE COM O SCROLL (peça central)
+     Storyboard do DS em 3 quadros: (1) visto de CIMA, fechado,
+     com a marca na tampa e a dobradiça no lado de cima; (2) ainda
+     de cima, a tampa abre girando para TRÁS e revela o teclado
+     embaixo (perto de você); (3) a câmera desce para a vista
+     frontal com o relatório aceso. Em reduced-motion o CSS já
+     entrega tudo aberto e estático.
+     ========================================================== */
+  safe("notebook", () => {
+    const cena = document.querySelector("[data-notebook]");
+    if (!cena) return;
+    const laptop = cena.querySelector("[data-nb-laptop]");
+    const passos = Array.from(cena.querySelectorAll(".nb-passo"));
+    if (!laptop) return;
+
+    if (REDUCED) { passos.forEach((p) => p.classList.add("on")); return; }
+
+    /* Câmera (--nb-cam): -90° (a pino) → -18° (frontal), começa a
+       descer DEPOIS que a tampa já está abrindo. Tampa (--nb-open):
+       -90° (fechada por cima da base) → +10° (de pé). Como os dois
+       giros são no mesmo eixo, o ângulo efetivo da tampa na tela é
+       a soma — a tela só "acorda" quando essa soma vira para você. */
+    const MARCOS = [0, 0.3, 0.58, 0.82];
+    const outCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+    const mede = () => {
+      const vh = window.innerHeight || 1;
+      const r = cena.getBoundingClientRect();
+      if (r.bottom < -100 || r.top > vh + 100) return;
+      const total = Math.max(r.height - vh, 1);
+      const p = clamp(-r.top / total, 0, 1);
+      const abre = outCubic(clamp((p - 0.10) / 0.55, 0, 1));  /* tampa abre ainda de cima */
+      const desce = outCubic(clamp((p - 0.38) / 0.50, 0, 1)); /* câmera desce por último  */
+      const cam = -90 + desce * 72;
+      const open = -90 + abre * 100;
+      laptop.style.setProperty("--nb-cam", cam.toFixed(2) + "deg");
+      laptop.style.setProperty("--nb-open", open.toFixed(2) + "deg");
+      laptop.style.setProperty("--nb-wake", clamp((cam + open + 70) / 50, 0, 1).toFixed(3));
+      let ativo = 0;
+      for (let i = MARCOS.length - 1; i >= 0; i--) { if (p >= MARCOS[i]) { ativo = i; break; } }
+      passos.forEach((el, i) => el.classList.toggle("on", i === ativo));
+    };
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => { ticking = false; mede(); });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    mede();
+  });
+
+  /* ==========================================================
+     FASE 3 · CALCULADORA DE RETORNO
+     Faixas CONSERVADORAS (médias BR para PME): CPC R$1,50-2,50,
+     clique→conversa 3-6%, conversa→venda 20-35%. Nunca promessa:
+     o resultado convida para o diagnóstico. O CTA pré-preenche o
+     WhatsApp com a simulação e vira sinal server-side (zCap).
+     ========================================================== */
+  safe("calculadora", () => {
+    const raiz = document.querySelector("[data-calc]");
+    if (!raiz) return;
+    const WA = window.ZYVA_WA || "5598984337265";
+    const verba = raiz.querySelector("[data-calc-verba]");
+    const ticket = raiz.querySelector("[data-calc-ticket]");
+    const outs = {
+      verba: raiz.querySelector("[data-calc-verba-out]"),
+      ticket: raiz.querySelector("[data-calc-ticket-out]"),
+      cliques: raiz.querySelector("[data-calc-cliques]"),
+      conversas: raiz.querySelector("[data-calc-conversas]"),
+      vendas: raiz.querySelector("[data-calc-vendas]"),
+      retorno: raiz.querySelector("[data-calc-retorno]"),
+    };
+    const cta = raiz.querySelector("[data-calc-wa]");
+    if (!verba || !ticket) return;
+
+    const rs = (n) => "R$ " + Math.round(n).toLocaleString("pt-BR");
+    const faixa = (a, b) =>
+      Math.max(Math.round(a), 0).toLocaleString("pt-BR") + "–" + Math.round(b).toLocaleString("pt-BR");
+
+    const calcula = () => {
+      const v = Number(verba.value), t = Number(ticket.value);
+      outs.verba.textContent = rs(v);
+      outs.ticket.textContent = rs(t);
+      verba.style.setProperty("--fill", (((v - verba.min) / (verba.max - verba.min)) * 100).toFixed(1) + "%");
+      ticket.style.setProperty("--fill", (((t - ticket.min) / (ticket.max - ticket.min)) * 100).toFixed(1) + "%");
+      const cliMin = v / 2.5, cliMax = v / 1.5;          /* CPC 2,50 e 1,50 */
+      const convMin = cliMin * 0.03, convMax = cliMax * 0.06;
+      const vendMin = convMin * 0.2, vendMax = convMax * 0.35;
+      outs.cliques.textContent = faixa(cliMin, cliMax);
+      outs.conversas.textContent = faixa(convMin, convMax);
+      outs.vendas.textContent = faixa(vendMin, vendMax);
+      outs.retorno.textContent = "R$ " + faixa(vendMin * t, vendMax * t);
+      if (cta) {
+        const msg = "Olá, Zyva! Usei a calculadora do site: invisto R$ " + v +
+          " por mês e uma venda vale R$ " + t + " para mim. Deu " +
+          Math.max(Math.round(vendMin), 1) + "–" + Math.round(vendMax) +
+          " vendas estimadas. Quero o número exato do meu caso.";
+        cta.href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(msg);
+        cta.setAttribute("data-wa-msg", msg);
+      }
+    };
+    verba.addEventListener("input", calcula);
+    ticket.addEventListener("input", calcula);
+    calcula();
+
+    /* primeiro ajuste = interesse (evento GA, uma vez por página) */
+    let usou = false;
+    const marca = () => {
+      if (usou) return;
+      usou = true;
+      try { window.zt && window.zt("calc_uso", {}); } catch (e) {}
+    };
+    verba.addEventListener("input", marca);
+    ticket.addEventListener("input", marca);
+
+    /* clique no CTA = lead-sinal com os valores da simulação */
+    if (cta) cta.addEventListener("click", () => {
+      try { window.zCap && window.zCap.send("calc", { verba: verba.value, ticket: ticket.value }); } catch (e) {}
+    });
+  });
+
+  /* ==========================================================
+     FASE 3 · O CELULAR DO CONTATO SEGUE O PONTEIRO
+     Inclinação sutil com mola (lerp) em torno do repouso que o
+     CSS já define via --ry/--rx. Só ponteiro fino; nunca no
+     toque nem com movimento reduzido.
+     ========================================================== */
+  safe("phone-tilt", () => {
+    if (!FINE || REDUCED) return;
+    const cena = document.querySelector(".phone-scene");
+    const phone = cena && cena.querySelector(".phone");
+    if (!phone) return;
+    const BASE_RY = -9, BASE_RX = 3, AMP = 7;
+    let tRy = BASE_RY, tRx = BASE_RX, cRy = BASE_RY, cRx = BASE_RX, raf = null;
+    const anima = () => {
+      cRy += (tRy - cRy) * 0.08;
+      cRx += (tRx - cRx) * 0.08;
+      phone.style.setProperty("--ry", cRy.toFixed(2) + "deg");
+      phone.style.setProperty("--rx", cRx.toFixed(2) + "deg");
+      if (Math.abs(cRy - tRy) + Math.abs(cRx - tRx) > 0.05) raf = requestAnimationFrame(anima);
+      else raf = null;
+    };
+    const acorda = () => { if (!raf) raf = requestAnimationFrame(anima); };
+    cena.addEventListener("pointermove", (e) => {
+      const r = cena.getBoundingClientRect();
+      tRy = BASE_RY + ((e.clientX - r.left) / r.width - 0.5) * AMP * 2;
+      tRx = BASE_RX - ((e.clientY - r.top) / r.height - 0.5) * AMP;
+      acorda();
+    });
+    cena.addEventListener("pointerleave", () => { tRy = BASE_RY; tRx = BASE_RX; acorda(); });
+  });
+
+  /* ==========================================================
+     FASE 3 · BOTÕES MAGNÉTICOS
+     O CTA principal "atrai" o cursor alguns pixels e volta com
+     mola (retorno no CSS, classe .mag). Só ponteiro fino.
+     ========================================================== */
+  safe("magnetic", () => {
+    if (!FINE || REDUCED) return;
+    /* Só o CTA primário: no rodapé cinematográfico seria acessório
+       sobre acessório (a skill de design manda tirar um). */
+    document.querySelectorAll(".btn-primary").forEach((el) => {
+      el.classList.add("mag");
+      el.addEventListener("pointermove", (e) => {
+        const r = el.getBoundingClientRect();
+        el.classList.add("mag-live");
+        el.style.setProperty("--mag-x", (((e.clientX - (r.left + r.width / 2)) / (r.width / 2)) * 5).toFixed(1) + "px");
+        el.style.setProperty("--mag-y", (((e.clientY - (r.top + r.height / 2)) / (r.height / 2)) * 4).toFixed(1) + "px");
+      });
+      el.addEventListener("pointerleave", () => {
+        el.classList.remove("mag-live");
+        el.style.setProperty("--mag-x", "0px");
+        el.style.setProperty("--mag-y", "0px");
+      });
+    });
+  });
 
   /* Dispara a fila: a primeira fatia roda já, o resto entre quadros. */
   roda();

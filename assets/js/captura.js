@@ -1,5 +1,5 @@
 /* ================================================================
-   Zyva — captura.js v1 · o carteiro dos leads
+   Zyva — captura.js v2 · o carteiro dos leads
 
    Missão: nenhum dado de lead existe só dentro de um link wa.me.
    Tudo passa por aqui: valida → grava no servidor → confirma →
@@ -8,6 +8,11 @@
    Se o servidor falhar (ou ainda não estiver configurado), o lead
    entra numa fila local (localStorage) e é reenviado sozinho na
    próxima visita. Perder lead por falha técnica: proibido.
+
+   v2: TODO clique rumo ao wa.me (links [data-wa], chat simulado,
+   CTA do quiz) vira sinal "wa-clique" no servidor — o listener vive
+   no main.js (síncrono, sem janela de perda) e chama zCap.send;
+   aqui o wa-clique é tratado como sinal efêmero (sem fila).
 
    É carregado pelo main.js; expõe window.zCap.
    ================================================================ */
@@ -94,10 +99,14 @@
       meta(),
       extra || {}
     );
-    if (tipo !== "quiz-parcial") filaPoe({ cid, payload });
+    /* Sinais de comportamento (resposta parcial do quiz, clique no
+       WhatsApp) não entram na fila de reenvio: reenviar um clique de
+       ontem viraria dado falso. Lead com dados de contato entra. */
+    const efemero = tipo === "quiz-parcial" || tipo === "wa-clique";
+    if (!efemero) filaPoe({ cid, payload });
     const ok = await posta(payload);
     if (ok) { filaTira(cid); zt("captura_ok", { tipo }); }
-    else if (tipo !== "quiz-parcial") zt("captura_fila", { tipo });
+    else if (!efemero) zt("captura_fila", { tipo });
     return ok;
   };
 
@@ -111,6 +120,9 @@
     }
   };
   if (filaLe().length) setTimeout(drena, 4000);
+
+  /* (o clique de WhatsApp é observado pelo main.js — sincronamente,
+     sem janela de perda — que chama zCap.send("wa-clique", ...)) */
 
   /* ---------- quiz do herói: cada resposta é um sinal ---------- */
   document.addEventListener("zyva:diag", (e) => {

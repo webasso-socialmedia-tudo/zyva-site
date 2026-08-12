@@ -30,7 +30,7 @@ window.zt = zt;
    ================================================================ */
 (() => {
   const s = document.createElement("script");
-  s.src = "/assets/js/captura.js?v=1";
+  s.src = "/assets/js/captura.js?v=2";
   s.defer = true;
   document.head.appendChild(s);
 })();
@@ -63,7 +63,9 @@ window.zt = zt;
    WHATSAPP — o caminho da conversão não pode falhar em silêncio
    Cada link [data-wa] já nasce com o endereço real no HTML, então
    funciona mesmo se este arquivo não carregar. Aqui o JS só refina
-   a mensagem e conta o clique.
+   a mensagem. O rastreio do clique (GA) e o lead-sinal server-side
+   moram no captura.js, delegados no documento — assim cobrem também
+   links criados depois, como a barra mobile.
    ================================================================ */
 const waLink = (msg) =>
   "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(msg || WHATSAPP_DEFAULT_MSG);
@@ -73,13 +75,28 @@ document.querySelectorAll("[data-wa]").forEach((el) => {
   el.href = waLink(msg);
   el.target = "_blank";
   el.rel = "noopener";
-  el.addEventListener("click", () => {
-    zt("clique_whatsapp", {
-      origem: el.getAttribute("data-wa") || "link",
-      pagina: location.pathname,
-    });
-  });
 });
+
+/* Clique rumo ao WhatsApp — registrado AQUI, sincronamente, para não
+   existir janela sem rastreio (o dataLayer enfileira o evento mesmo
+   antes de o Analytics carregar). Delegado no documento: cobre também
+   links criados depois (barra mobile, resultado do quiz). O sinal
+   server-side vai via zCap quando o captura.js já estiver de pé.
+   Um envio por destino por página — clique repetido não duplica. */
+const waVistos = new Set();
+document.addEventListener("click", (ev) => {
+  const a = ev.target.closest("a[data-wa], a.wa-go, [data-wa-manual], [data-diag-wa]");
+  if (!a) return;
+  const origem = a.getAttribute("data-wa") ||
+    (a.classList.contains("wa-go") ? "chat-simulado" :
+     a.hasAttribute("data-diag-wa") ? "diagnostico" :
+     a.hasAttribute("data-wa-manual") ? "formulario-manual" : "link");
+  zt("clique_whatsapp", { origem, pagina: location.pathname });
+  const chave = origem + "|" + (a.getAttribute("href") || "");
+  if (waVistos.has(chave)) return;
+  waVistos.add(chave);
+  if (window.zCap) window.zCap.send("wa-clique", { origem, pagina: location.pathname });
+}, true);
 
 /* Menu mobile */
 const toggle = document.querySelector(".nav-toggle");
@@ -91,31 +108,9 @@ if (toggle && links) {
   );
 }
 
-/* ================================================================
-   Animação de entrada
-   O que já está na primeira tela aparece na hora, sem esperar o
-   observador. Esperar custava meio segundo do LCP na página de
-   Serviços: o parágrafo estava lá, mas em opacity 0 aguardando um
-   callback que só rodava depois de todo o resto.
-   ================================================================ */
-const observer = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((e) => {
-      if (e.isIntersecting) {
-        e.target.classList.add("visible");
-        observer.unobserve(e.target);
-      }
-    });
-  },
-  { threshold: 0.12 }
-);
-document.querySelectorAll(".reveal").forEach((el) => {
-  if (el.getBoundingClientRect().top < (window.innerHeight || 800) * 0.98) {
-    el.classList.add("visible", "reveal-now");
-    return;
-  }
-  observer.observe(el);
-});
+/* A animação de entrada (.reveal) agora mora no zyva-motion.js,
+   no MESMO observador dos [data-reveal]/.rise — um sistema só,
+   com a mesma isenção de primeira tela que protege o LCP. */
 
 /* ================================================================
    FORMULÁRIO DE CONTATO
@@ -180,8 +175,7 @@ if (form) {
         'Abrindo o WhatsApp com ela pronta — o Weba responde em até 1 dia útil.<br>' +
         'Não abriu? <a href="' + url + '" target="_blank" rel="noopener" data-wa-manual>Toque aqui para abrir</a> ' +
         'ou chame direto no <a href="tel:+' + WHATSAPP_NUMBER + '">(98) 98433-7265</a>.';
-      const manual = ok.querySelector("[data-wa-manual]");
-      if (manual) manual.addEventListener("click", () => zt("whatsapp_manual", { pagina: location.pathname }));
+      /* o clique no link manual é contado pelo captura.js (delegado) */
       ok.scrollIntoView({ block: "nearest", behavior: "smooth" });
     }
 
@@ -191,14 +185,12 @@ if (form) {
   });
 }
 
-/* Aviso simples sem alert() nativo */
+/* Aviso simples sem alert() nativo (estilo em style.css: #alert-box) */
 function alertBox(text) {
   let box = document.querySelector("#alert-box");
   if (!box) {
     box = document.createElement("div");
     box.id = "alert-box";
-    box.style.cssText =
-      "position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:#1E2235;color:#fff;padding:14px 22px;border-radius:12px;z-index:99;font-size:.95rem;box-shadow:0 10px 30px rgba(0,0,0,.3)";
     document.body.appendChild(box);
   }
   box.textContent = text;
@@ -211,59 +203,9 @@ document.querySelectorAll("[data-year]").forEach((el) => {
   el.textContent = new Date().getFullYear();
 });
 
-/* ================================================================
-   Rodapé revelado (estilo "cortina"): o conteúdo desliza por cima
-   do rodapé fixo, que aparece no fim da rolagem. Ativado só quando
-   o rodapé cabe na tela; no celular fica estático como sempre.
-   ================================================================ */
-(() => {
-  const footer = document.querySelector(".site-footer");
-  if (!footer) return;
-
-  /* A cortina do rodapé só faz sentido em página de FUNDO ESCURO: o
-     conteúdo escuro desliza revelando o rodapé escuro por baixo. Num
-     post de blog (fundo claro) ela virava uma cortina CLARA com cantos
-     arredondados por cima de um rodapé escuro — a emenda quebrada. Aqui
-     ela fica desligada, e o post ganha um rodapé estático normal. */
-  const fundoEscuro =
-    document.body.classList.contains("home") ||
-    document.body.classList.contains("dark-shell");
-  if (!fundoEscuro) return;
-
-  let wrap = null;
-  const build = () => {
-    if (wrap) return;
-    /* div, não main: a página já tem seu <main id="conteudo">.
-       Dois landmarks main deixam o leitor de tela sem referência. */
-    wrap = document.createElement("div");
-    wrap.className = "page-curtain";
-    const move = [...document.body.children].filter(
-      (el) =>
-        el !== footer &&
-        el.tagName !== "SCRIPT" &&
-        !el.classList.contains("wa-float") &&
-        !el.classList.contains("skip-link") &&
-        el.id !== "alert-box"
-    );
-    document.body.insertBefore(wrap, footer);
-    move.forEach((el) => wrap.appendChild(el));
-  };
-
-  const apply = () => {
-    const h = footer.offsetHeight;
-    const on = window.matchMedia("(min-width: 820px)").matches && h > 0 && h < window.innerHeight * 0.92;
-    if (on) build();
-    document.body.classList.toggle("curtain-on", on && !!wrap);
-    if (wrap) wrap.style.marginBottom = on ? h + "px" : "";
-  };
-
-  apply();
-  window.addEventListener("resize", apply);
-  window.addEventListener("load", () => {
-    apply();
-    setTimeout(apply, 600);
-  });
-})();
+/* (o módulo da "cortina" do rodapé antigo saiu: procurava um
+   .site-footer que não existe em nenhuma página — o rodapé do site
+   é o cinematográfico, cuidado pelo zyva-motion.js) */
 
 /* ================================================================
    Números dos compromissos: contagem animada ao entrar na tela
@@ -346,13 +288,15 @@ const lerLatest = () => {
    Categorias não mapeadas mantêm o estilo padrão (ciano do CSS).
    ================================================================ */
 (() => {
+  /* Tintas escurecidas para contraste AA (≥4,5:1) sobre os fundos
+     tingidos — verde e rosa antigos reprovavam em texto pequeno. */
   const CAT_COLORS = {
     "notícias": ["rgba(108,76,241,.16)", "#5B3DE0"],
-    "anúncios": ["rgba(236,72,153,.14)", "#DB2777"],
-    "seo local": ["rgba(16,185,129,.15)", "#059669"],
-    "whatsapp": ["rgba(37,211,102,.16)", "#1FA855"],
-    "sites": ["rgba(59,130,246,.14)", "#2563EB"],
-    "gestão": ["rgba(245,158,11,.16)", "#B45309"]
+    "anúncios": ["rgba(236,72,153,.14)", "#B01A5F"],
+    "seo local": ["rgba(16,185,129,.15)", "#046B4B"],
+    "whatsapp": ["rgba(37,211,102,.16)", "#0F7A3D"],
+    "sites": ["rgba(59,130,246,.14)", "#1D4FD7"],
+    "gestão": ["rgba(245,158,11,.16)", "#9A4A08"]
   };
   document.querySelectorAll(".post-cat").forEach((chip) => {
     const t = (chip.textContent || "").trim().toLowerCase();
@@ -566,8 +510,6 @@ const lerLatest = () => {
             const b = document.createElement("span");
             b.className = "zyva-badge";
             b.textContent = i.kind === "special" ? "ESPECIAL" : "NOVO";
-            b.style.cssText =
-              "display:inline-block;margin-left:8px;padding:2px 9px;border-radius:999px;font-size:.68rem;font-weight:700;letter-spacing:.5px;background:linear-gradient(90deg,#6C4CF1,#22D3EE);color:#fff;vertical-align:middle;";
             h3.appendChild(b);
           }
         }
@@ -576,10 +518,13 @@ const lerLatest = () => {
   } catch (e) {}
 })();
 
-/* Rede de segurança do rodapé: se o zyva-motion.js não carregar,
-   nada de rodapé invisível para sempre. */
+/* Rede de segurança: se o zyva-motion.js não carregar, nada de
+   rodapé invisível nem de conteúdo preso em opacity:0 para sempre. */
 setTimeout(() => {
   if (!document.documentElement.classList.contains("cine-on")) {
     document.documentElement.classList.add("cine-fallback");
+  }
+  if (!document.documentElement.classList.contains("rv-on")) {
+    document.documentElement.classList.add("rv-fallback");
   }
 }, 2500);
