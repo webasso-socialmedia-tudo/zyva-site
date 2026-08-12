@@ -22,8 +22,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
   <script>document.documentElement.className+=" js-on";</script>
-  <link rel="stylesheet" href="/assets/css/style.css?v=10" />
-  <link rel="stylesheet" href="/assets/css/motion.css?v=18" />
+  <link rel="stylesheet" href="/assets/css/style.css?v=14" />
+  <link rel="stylesheet" href="/assets/css/motion.css?v=19" />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -106,18 +106,18 @@
 
   <header class="site-header">
     <div class="container nav">
-      <a class="logo cursor-target" href="/" aria-label="Zyva — início">
+      <a class="logo" href="/" aria-label="Zyva — início">
         <svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6C4CF1"/><stop offset="1" stop-color="#22D3EE"/></linearGradient></defs><polygon points="10,10 54,10 54,20 38,31 46,31 30,44 54,44 54,54 10,54 10,44 26,33 18,33 34,20 10,20" fill="url(#lg)"/></svg>
         <span class="logo-word">zyva<span class="dot">.</span></span>
       </a>
       <button class="nav-toggle" aria-label="Abrir menu"><span></span></button>
       <nav class="nav-links">
-        <a href="/" class="cursor-target active">Início</a>
-        <a class="cursor-target" href="/servicos/">Serviços</a>
-        <a class="cursor-target" href="/cases/">Cases</a>
-        <a class="cursor-target" href="/sobre/">Sobre</a>
-        <a class="cursor-target" href="/blog/">Blog</a>
-        <a href="/contato/" class="btn btn-primary nav-cta cursor-target">Diagnóstico gratuito</a>
+        <a href="/" class="active">Início</a>
+        <a href="/servicos/">Serviços</a>
+        <a href="/cases/">Cases</a>
+        <a href="/sobre/">Sobre</a>
+        <a href="/blog/">Blog</a>
+        <a href="/contato/" class="btn btn-primary nav-cta">Diagnóstico gratuito</a>
       </nav>
     </div>
   </header>
@@ -131,8 +131,8 @@
         <h1>Sua empresa crescendo.<br />E você <em>vendo cada resultado</em>.</h1>
         <p class="lead">A Zyva cuida do seu marketing de ponta a ponta — SEO, redes sociais, anúncios e conteúdo — com relatórios claros do retorno sobre cada real investido.</p>
         <div class="hero-ctas">
-          <a href="/contato/" class="btn btn-primary cursor-target">Pedir diagnóstico gratuito</a>
-          <a href="https://wa.me/5598984337265?text=Ol%C3%A1%2C%20Zyva!%20Quero%20um%20diagn%C3%B3stico%20gratuito%20para%20minha%20empresa." target="_blank" rel="noopener" class="btn btn-ghost cursor-target" data-wa>Chamar no WhatsApp</a>
+          <a href="/contato/" class="btn btn-primary">Pedir diagnóstico gratuito</a>
+          <a href="https://wa.me/5598984337265?text=Ol%C3%A1%2C%20Zyva!%20Quero%20um%20diagn%C3%B3stico%20gratuito%20para%20minha%20empresa." target="_blank" rel="noopener" class="btn btn-ghost" data-wa>Chamar no WhatsApp</a>
         </div>
         <ul class="hero-points">
           <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Resposta em até 1 dia útil</li>
@@ -154,30 +154,30 @@
             <fieldset class="diag-q" data-q="negocio">
               <legend>Que tipo de negócio você tem?</legend>
               <div class="diag-opts">
-                <button type="button" class="diag-opt cursor-target" data-v="comercio">Loja ou comércio</button>
-                <button type="button" class="diag-opt cursor-target" data-v="servico">Serviço local <small>clínica, salão, oficina</small></button>
-                <button type="button" class="diag-opt cursor-target" data-v="profissional">Profissional ou consultoria</button>
-                <button type="button" class="diag-opt cursor-target" data-v="restaurante">Restaurante ou delivery</button>
+                <button type="button" class="diag-opt" data-v="comercio">Loja ou comércio</button>
+                <button type="button" class="diag-opt" data-v="servico">Serviço local <small>clínica, salão, oficina</small></button>
+                <button type="button" class="diag-opt" data-v="profissional">Profissional ou consultoria</button>
+                <button type="button" class="diag-opt" data-v="restaurante">Restaurante ou delivery</button>
               </div>
             </fieldset>
 
             <fieldset class="diag-q" data-q="trava" hidden>
               <legend>O que mais trava hoje?</legend>
               <div class="diag-opts">
-                <button type="button" class="diag-opt cursor-target" data-v="google">Ninguém me acha no Google</button>
-                <button type="button" class="diag-opt cursor-target" data-v="social">Tenho seguidor, mas não vira venda</button>
-                <button type="button" class="diag-opt cursor-target" data-v="anuncio">Gasto em anúncio e não sei o retorno</button>
-                <button type="button" class="diag-opt cursor-target" data-v="venda">Chega contato, mas eu perco a venda</button>
+                <button type="button" class="diag-opt" data-v="google">Ninguém me acha no Google</button>
+                <button type="button" class="diag-opt" data-v="social">Tenho seguidor, mas não vira venda</button>
+                <button type="button" class="diag-opt" data-v="anuncio">Gasto em anúncio e não sei o retorno</button>
+                <button type="button" class="diag-opt" data-v="venda">Chega contato, mas eu perco a venda</button>
               </div>
             </fieldset>
 
             <fieldset class="diag-q" data-q="verba" hidden>
               <legend>Quanto você investe por mês hoje?</legend>
               <div class="diag-opts">
-                <button type="button" class="diag-opt cursor-target" data-v="zero">Nada ainda</button>
-                <button type="button" class="diag-opt cursor-target" data-v="ate500">Até R$ 500</button>
-                <button type="button" class="diag-opt cursor-target" data-v="ate2k">De R$ 500 a R$ 2.000</button>
-                <button type="button" class="diag-opt cursor-target" data-v="acima">Mais de R$ 2.000</button>
+                <button type="button" class="diag-opt" data-v="zero">Nada ainda</button>
+                <button type="button" class="diag-opt" data-v="ate500">Até R$ 500</button>
+                <button type="button" class="diag-opt" data-v="ate2k">De R$ 500 a R$ 2.000</button>
+                <button type="button" class="diag-opt" data-v="acima">Mais de R$ 2.000</button>
               </div>
             </fieldset>
           </div>
@@ -199,6 +199,72 @@
     </div>
   </div>
 
+  <!-- ====== O RELATÓRIO VIVO: notebook que abre com o scroll ======
+       A promessa "você vê cada resultado" encenada. A rolagem abre a
+       tampa; a tela acende com o relatório. Sem bibliotecas: CSS 3D
+       (mesma técnica do celular do Contato) + um módulo de scroll. -->
+  <section class="nb-scene" data-notebook aria-label="O relatório que você recebe todo mês">
+    <div class="nb-sticky">
+      <div class="container nb-grid">
+        <div class="nb-copy">
+          <span class="kicker k-bar">Você vê funcionando</span>
+          <h2 data-reveal>O seu marketing, <em>aberto na sua frente</em></h2>
+          <div class="nb-passos" aria-live="polite">
+            <p class="nb-passo on" data-nb-passo="0">Todo mês, um relatório em português claro. Role e veja como ele chega.</p>
+            <p class="nb-passo" data-nb-passo="1">De onde veio cada cliente: Google, Instagram, WhatsApp — sem achismo.</p>
+            <p class="nb-passo" data-nb-passo="2">Quanto cada real investido trouxe de volta, rastreado até o pedido.</p>
+            <p class="nb-passo" data-nb-passo="3">E o que vamos ajustar no mês seguinte. Zero caixa-preta.</p>
+          </div>
+          <p class="nb-dica" aria-hidden="true">Role para abrir</p>
+        </div>
+        <div class="nb-stage">
+          <div class="nb-laptop" data-nb-laptop>
+            <div class="nb-lid" data-nb-lid>
+              <div class="nb-lid-back" aria-hidden="true">
+                <svg viewBox="0 0 64 64"><defs><linearGradient id="nblg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6C4CF1"/><stop offset="1" stop-color="#22D3EE"/></linearGradient></defs><polygon points="10,10 54,10 54,20 38,31 46,31 30,44 54,44 54,54 10,54 10,44 26,33 18,33 34,20 10,20" fill="url(#nblg)"/></svg>
+              </div>
+              <div class="nb-lid-edge" aria-hidden="true"></div>
+              <div class="nb-screen" aria-hidden="true">
+                <svg viewBox="0 0 460 280" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+                  <rect width="460" height="280" fill="#0b1220"/>
+                  <rect width="460" height="30" fill="#0e1628"/>
+                  <circle cx="16" cy="15" r="4" fill="#FF8A8A"/><circle cx="30" cy="15" r="4" fill="#2a3350"/><circle cx="44" cy="15" r="4" fill="#2a3350"/>
+                  <text x="62" y="19" font-family="Space Grotesk, sans-serif" font-size="11" fill="#8b93b0">Relatório do mês — exemplo ilustrativo</text>
+                  <text x="24" y="62" font-family="Space Grotesk, sans-serif" font-size="15" font-weight="700" fill="#ffffff">De onde vieram os clientes</text>
+                  <rect x="24" y="76" width="170" height="12" rx="6" fill="#22D3EE"/>
+                  <text x="202" y="86" font-family="Inter, sans-serif" font-size="10" fill="#9fb0c8">Google · 46%</text>
+                  <rect x="24" y="96" width="122" height="12" rx="6" fill="#6C4CF1"/>
+                  <text x="154" y="106" font-family="Inter, sans-serif" font-size="10" fill="#9fb0c8">Instagram · 33%</text>
+                  <rect x="24" y="116" width="78" height="12" rx="6" fill="#25D366"/>
+                  <text x="110" y="126" font-family="Inter, sans-serif" font-size="10" fill="#9fb0c8">Indicação · 21%</text>
+                  <text x="24" y="168" font-family="Space Grotesk, sans-serif" font-size="15" font-weight="700" fill="#ffffff">Contatos por semana</text>
+                  <polyline points="24,238 84,224 144,230 204,204 264,196 324,178 384,168 436,148" fill="none" stroke="#22D3EE" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  <g fill="#22D3EE"><circle cx="84" cy="224" r="3"/><circle cx="204" cy="204" r="3"/><circle cx="324" cy="178" r="3"/><circle cx="436" cy="148" r="3"/></g>
+                  <line x1="24" y1="252" x2="436" y2="252" stroke="#233052" stroke-width="1"/>
+                  <rect x="298" y="52" width="138" height="84" rx="10" fill="#0e1a2e" stroke="#1d3050"/>
+                  <text x="312" y="76" font-family="Inter, sans-serif" font-size="10" fill="#9fb0c8">Retorno rastreado</text>
+                  <text x="312" y="104" font-family="Space Grotesk, sans-serif" font-size="24" font-weight="700" fill="#22D3EE">R$ 4,8 mil</text>
+                  <text x="312" y="122" font-family="Inter, sans-serif" font-size="10" fill="#67d9a0">▲ de R$ 1,2 mil investidos</text>
+                </svg>
+              </div>
+            </div>
+            <div class="nb-base" aria-hidden="true">
+              <div class="nb-shadow"></div>
+              <div class="nb-base-top">
+                <div class="nb-keys"></div>
+                <div class="nb-trackpad"></div>
+              </div>
+              <div class="nb-base-front"></div>
+              <div class="nb-base-left"></div>
+              <div class="nb-base-right"></div>
+              <div class="nb-glow"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ====== FOLHA CLARA 1: serviços + comparativo ====== -->
   <div class="sheet sheet-pull">
 
@@ -211,58 +277,58 @@
         </div>
         <div class="grid grid-4">
           <div class="card reveal">
-            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
+            <div class="icon"><svg class="iso" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 14 40 23 24 32 8 23Z" fill="#A78BFA"/><path d="M40 23v9L24 41v-9Z" fill="#6C4CF1"/><path d="M8 23v9l16 9v-9Z" fill="#5638D6"/><ellipse cx="22" cy="9" rx="6.2" ry="5" fill="none" stroke="#22D3EE" stroke-width="2.6"/><path d="m27 13 5.4 4.2" stroke="#22D3EE" stroke-width="2.6" stroke-linecap="round"/></svg></div>
             <h3>SEO</h3>
             <p>Apareça no Google quando o cliente procura o que você vende.</p>
-            <a class="more cursor-target" href="/servicos/#seo">Saiba mais →</a>
+            <a class="more" href="/servicos/#seo">Saiba mais →</a>
           </div>
           <div class="card reveal">
-            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></div>
+            <div class="icon"><svg class="iso" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 14 40 23 24 32 8 23Z" fill="#A78BFA"/><path d="M40 23v9L24 41v-9Z" fill="#6C4CF1"/><path d="M8 23v9l16 9v-9Z" fill="#5638D6"/><path d="M24 17c-4.2-3.5-8.2-6-8.2-9.5 0-2.3 1.9-4 4.2-4 1.7 0 3.2.9 4 2.4.8-1.5 2.3-2.4 4-2.4 2.3 0 4.2 1.7 4.2 4 0 3.5-4 6-8.2 9.5Z" fill="#22D3EE"/></svg></div>
             <h3>Redes Sociais</h3>
             <p>Perfil ativo, público engajado e marca viva todos os dias.</p>
-            <a class="more cursor-target" href="/servicos/#redes-sociais">Saiba mais →</a>
+            <a class="more" href="/servicos/#redes-sociais">Saiba mais →</a>
           </div>
           <div class="card reveal">
-            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
+            <div class="icon"><svg class="iso" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 14 40 23 24 32 8 23Z" fill="#A78BFA"/><path d="M40 23v9L24 41v-9Z" fill="#6C4CF1"/><path d="M8 23v9l16 9v-9Z" fill="#5638D6"/><ellipse cx="24" cy="10" rx="8.4" ry="5.6" fill="none" stroke="#22D3EE" stroke-width="2.4"/><ellipse cx="24" cy="10" rx="4.2" ry="2.8" fill="none" stroke="#22D3EE" stroke-width="2"/><circle cx="24" cy="10" r="1.5" fill="#22D3EE"/></svg></div>
             <h3>Tráfego Pago</h3>
             <p>Anúncios no Google e no Instagram que trazem cliente, não só clique.</p>
-            <a class="more cursor-target" href="/servicos/#trafego-pago">Saiba mais →</a>
+            <a class="more" href="/servicos/#trafego-pago">Saiba mais →</a>
           </div>
           <div class="card reveal">
-            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+            <div class="icon"><svg class="iso" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 14 40 23 24 32 8 23Z" fill="#A78BFA"/><path d="M40 23v9L24 41v-9Z" fill="#6C4CF1"/><path d="M8 23v9l16 9v-9Z" fill="#5638D6"/><path d="m13 15 3.4-6.4L29 2.4l4.6 2.7-12.6 6.2Z" fill="#22D3EE"/><path d="m29 2.4 4.6 2.7 2-1.2-4.6-2.6Z" fill="#0E93AC"/><path d="m13 15 3.4-6.4 2.4 1.4Z" fill="#7EE7F7"/></svg></div>
             <h3>Conteúdo</h3>
             <p>Conteúdo que educa, gera confiança e vende pelo caminho.</p>
-            <a class="more cursor-target" href="/servicos/#conteudo">Saiba mais →</a>
+            <a class="more" href="/servicos/#marketing-de-conteudo">Saiba mais →</a>
           </div>
           <div class="card reveal">
-            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-4-1L3 21l2-5.5a8.5 8.5 0 1 1 16-4Z"/></svg></div>
+            <div class="icon"><svg class="iso" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 14 40 23 24 32 8 23Z" fill="#A78BFA"/><path d="M40 23v9L24 41v-9Z" fill="#6C4CF1"/><path d="M8 23v9l16 9v-9Z" fill="#5638D6"/><path d="M16 3h16a4 4 0 0 1 4 4v3a4 4 0 0 1-4 4h-7l-5.4 4.2.4-4.2H16a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4Z" fill="#22D3EE"/><g fill="#0b1220"><circle cx="19.5" cy="8.6" r="1.35"/><circle cx="24" cy="8.6" r="1.35"/><circle cx="28.5" cy="8.6" r="1.35"/></g></svg></div>
             <h3>WhatsApp Business</h3>
             <p>Transforme o canal que o brasileiro mais usa no seu melhor vendedor.</p>
-            <a class="more cursor-target" href="/servicos/#whatsapp">Saiba mais →</a>
+            <a class="more" href="/servicos/#whatsapp">Saiba mais →</a>
           </div>
           <div class="card reveal">
-            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg></div>
+            <div class="icon"><svg class="iso" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 14 40 23 24 32 8 23Z" fill="#A78BFA"/><path d="M40 23v9L24 41v-9Z" fill="#6C4CF1"/><path d="M8 23v9l16 9v-9Z" fill="#5638D6"/><rect x="12" y="2" width="24" height="15" rx="3" fill="none" stroke="#22D3EE" stroke-width="2.4"/><path d="M12 7h24" stroke="#22D3EE" stroke-width="2"/><circle cx="16" cy="4.6" r="0.95" fill="#22D3EE"/><circle cx="19.4" cy="4.6" r="0.95" fill="#22D3EE"/></svg></div>
             <h3>Criação de Sites</h3>
             <p>Sites rápidos, bonitos e feitos para transformar visita em contato.</p>
-            <a class="more cursor-target" href="/servicos/#sites">Saiba mais →</a>
+            <a class="more" href="/servicos/#sites">Saiba mais →</a>
           </div>
           <div class="card reveal">
-            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 3 7h7l-5.5 4.5L18 21l-6-4.5L6 21l1.5-7.5L2 9h7Z"/></svg></div>
+            <div class="icon"><svg class="iso" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 14 40 23 24 32 8 23Z" fill="#A78BFA"/><path d="M40 23v9L24 41v-9Z" fill="#6C4CF1"/><path d="M8 23v9l16 9v-9Z" fill="#5638D6"/><path d="m24 1 2.7 5.7 6.3.8-4.7 4.3 1.2 6.2L24 15l-5.5 3 1.2-6.2L15 7.5l6.3-.8Z" fill="#22D3EE"/></svg></div>
             <h3>Branding</h3>
             <p>Uma marca coerente, profissional e com cara de quem cresceu.</p>
-            <a class="more cursor-target" href="/servicos/#branding">Saiba mais →</a>
+            <a class="more" href="/servicos/#branding">Saiba mais →</a>
           </div>
           <div class="card reveal">
-            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M8 17V9m4 8V5m4 12v-6"/></svg></div>
+            <div class="icon"><svg class="iso" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 14 40 23 24 32 8 23Z" fill="#A78BFA"/><path d="M40 23v9L24 41v-9Z" fill="#6C4CF1"/><path d="M8 23v9l16 9v-9Z" fill="#5638D6"/><g><path d="M14 21v-6l4 2.3v6Z" fill="#22D3EE"/><path d="m14 15 3-1.7 4 2.3-3 1.7Z" fill="#7EE7F7"/><path d="M18 17.3v6l3-1.7v-6Z" fill="#0E93AC"/><path d="M21 19v-9l4 2.3v9Z" fill="#22D3EE"/><path d="m21 10 3-1.7 4 2.3-3 1.7Z" fill="#7EE7F7"/><path d="M25 12.3v9l3-1.7v-9Z" fill="#0E93AC"/><path d="M28 17v-12l4 2.3v12Z" fill="#22D3EE"/><path d="m28 5 3-1.7 4 2.3-3 1.7Z" fill="#7EE7F7"/><path d="M32 7.3v12l3-1.7v-12Z" fill="#0E93AC"/></g></svg></div>
             <h3>Relatórios e ROI</h3>
             <p>Você sabe exatamente o que está funcionando — e o que voltou.</p>
-            <a class="more cursor-target" href="/servicos/#relatorios">Saiba mais →</a>
+            <a class="more" href="/servicos/#relatorios">Saiba mais →</a>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="section" style="padding-top: 6px;">
+    <section class="section section-seq">
       <div class="container">
         <div class="section-head reveal">
           <span class="kicker k-bar">A diferença</span>
@@ -306,22 +372,22 @@
       </div>
       <div class="grid grid-4">
         <div class="pain-card reveal">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></div>
+          <div class="icon"><svg class="iso" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 14 40 23 24 32 8 23Z" fill="#A78BFA"/><path d="M40 23v9L24 41v-9Z" fill="#6C4CF1"/><path d="M8 23v9l16 9v-9Z" fill="#5638D6"/><path d="m12 4 7.5 4.4 4.3-2.6 8.6 5.4" fill="none" stroke="#F59E0B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="m32.6 6.6-.2 4.9-4.6-.7" fill="none" stroke="#F59E0B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <h3>Movimento sem venda</h3>
           <p>Curtida até tem. Mas o caixa não sente diferença nenhuma.</p>
         </div>
         <div class="pain-card reveal">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></div>
+          <div class="icon"><svg class="iso" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 14 40 23 24 32 8 23Z" fill="#A78BFA"/><path d="M40 23v9L24 41v-9Z" fill="#6C4CF1"/><path d="M8 23v9l16 9v-9Z" fill="#5638D6"/><path d="M19.6 6.6c0-2.6 2-4.4 4.5-4.4 2.6 0 4.4 1.7 4.4 4 0 3-3.7 3.2-3.7 5.6" fill="none" stroke="#F59E0B" stroke-width="2.6" stroke-linecap="round"/><circle cx="24.6" cy="15.4" r="1.7" fill="#F59E0B"/></svg></div>
           <h3>Anúncio no escuro</h3>
           <p>Você paga todo mês, mas ninguém sabe dizer o que voltou.</p>
         </div>
         <div class="pain-card reveal">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M8 11h6"/></svg></div>
+          <div class="icon"><svg class="iso" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 14 40 23 24 32 8 23Z" fill="#A78BFA"/><path d="M40 23v9L24 41v-9Z" fill="#6C4CF1"/><path d="M8 23v9l16 9v-9Z" fill="#5638D6"/><ellipse cx="22" cy="9" rx="6.2" ry="5" fill="none" stroke="#F59E0B" stroke-width="2.4" stroke-dasharray="4 3"/><path d="m27 13 5.4 4.2" stroke="#F59E0B" stroke-width="2.6" stroke-linecap="round"/></svg></div>
           <h3>Invisível no Google</h3>
           <p>Quem procura o seu serviço encontra o seu concorrente.</p>
         </div>
         <div class="pain-card reveal">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-4-1L3 21l2-5.5a8.5 8.5 0 1 1 16-4Z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/></svg></div>
+          <div class="icon"><svg class="iso" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 14 40 23 24 32 8 23Z" fill="#A78BFA"/><path d="M40 23v9L24 41v-9Z" fill="#6C4CF1"/><path d="M8 23v9l16 9v-9Z" fill="#5638D6"/><path d="M16 2.6h16a4 4 0 0 1 4 4v3a4 4 0 0 1-4 4h-7l-5.4 4.2.4-4.2H16a4 4 0 0 1-4-4v-3a4 4 0 0 1 4-4Z" fill="none" stroke="#F59E0B" stroke-width="2.3"/><g fill="#F59E0B"><circle cx="19.5" cy="8.1" r="1.35"/><circle cx="24" cy="8.1" r="1.35" opacity="0.55"/><circle cx="28.5" cy="8.1" r="1.35" opacity="0.22"/></g></svg></div>
           <h3>WhatsApp no vácuo</h3>
           <p>O cliente chama, a resposta demora e a venda esfria.</p>
         </div>
@@ -369,10 +435,46 @@
     </div>
   </section>
 
-  <!-- ====== FOLHA CLARA 2: diagnóstico + blog + FAQ ====== -->
+  <!-- ====== FOLHA CLARA 2: calculadora + diagnóstico + blog + FAQ ====== -->
   <div class="sheet">
 
+    <!-- Calculadora de retorno: números honestos que geram conversa.
+         As contas usam faixas CONSERVADORAS (constantes no zyva-motion.js);
+         o resultado nunca promete — convida para o diagnóstico. -->
     <section class="section">
+      <div class="container">
+        <div class="calc reveal" data-calc>
+          <span class="kicker k-bar">Faça as contas</span>
+          <h2 data-reveal>Quanto o seu investimento <em>pode</em> trazer de volta?</h2>
+          <p>Arraste e veja uma estimativa honesta — em faixas, não em promessa. O número exato do seu caso sai no diagnóstico gratuito.</p>
+          <div class="calc-grid">
+            <div>
+              <div class="calc-campo">
+                <label for="calc-verba">Investimento mensal em anúncio <output data-calc-verba-out>R$ 1.000</output></label>
+                <input type="range" id="calc-verba" data-calc-verba min="300" max="5000" step="50" value="1000" aria-describedby="calc-nota" />
+              </div>
+              <div class="calc-campo">
+                <label for="calc-ticket">Quanto vale uma venda para você <output data-calc-ticket-out>R$ 120</output></label>
+                <input type="range" id="calc-ticket" data-calc-ticket min="30" max="500" step="10" value="120" aria-describedby="calc-nota" />
+              </div>
+              <p class="calc-nota" id="calc-nota">Estimativa conservadora com médias brasileiras de custo por clique e conversão para pequenas empresas. Não é promessa: é ponto de partida para a conversa.</p>
+            </div>
+            <div class="calc-saida" role="status" aria-live="polite">
+              <div class="calc-linha"><span>Cliques no seu anúncio</span><b data-calc-cliques>400–667</b></div>
+              <div class="calc-linha"><span>Conversas iniciadas</span><b data-calc-conversas>12–40</b></div>
+              <div class="calc-linha"><span>Vendas estimadas</span><b data-calc-vendas>2–14</b></div>
+              <div class="calc-linha calc-destaque"><span>Retorno potencial</span><b data-calc-retorno>R$ 288–1.680</b></div>
+              <div class="calc-cta">
+                <a class="btn btn-primary" data-wa="calculadora" data-calc-wa href="https://wa.me/5598984337265" target="_blank" rel="noopener">Quero o número exato do meu caso</a>
+                <a class="btn btn-ghost" href="/contato/">Prefiro começar pelo diagnóstico</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-seq">
       <div class="container">
         <div class="diag reveal">
           <span class="kicker k-bar">Primeiro passo</span>
@@ -385,8 +487,8 @@
             <li>Lista de prioridades para os próximos 90 dias</li>
           </ul>
           <div class="hero-ctas">
-            <a href="/contato/" class="btn btn-primary cursor-target">Pedir meu diagnóstico</a>
-            <a href="https://wa.me/5598984337265?text=Ol%C3%A1%2C%20Zyva!%20Quero%20um%20diagn%C3%B3stico%20gratuito%20para%20minha%20empresa." target="_blank" rel="noopener" class="btn btn-ghost cursor-target" data-wa>Chamar no WhatsApp</a>
+            <a href="/contato/" class="btn btn-primary">Pedir meu diagnóstico</a>
+            <a href="https://wa.me/5598984337265?text=Ol%C3%A1%2C%20Zyva!%20Quero%20um%20diagn%C3%B3stico%20gratuito%20para%20minha%20empresa." target="_blank" rel="noopener" class="btn btn-ghost" data-wa>Chamar no WhatsApp</a>
           </div>
           <p class="diag-note">Sem compromisso: se não fizer sentido seguir, o diagnóstico fica com você do mesmo jeito.</p>
           <svg class="hero-z" viewBox="0 0 64 64" aria-hidden="true"><polygon points="10,10 54,10 54,20 38,31 46,31 30,44 54,44 54,54 10,54 10,44 26,33 18,33 34,20 10,20" fill="#fff"/></svg>
@@ -394,7 +496,7 @@
       </div>
     </section>
 
-    <section class="section" style="padding-top: 6px;">
+    <section class="section section-seq">
       <div class="container">
         <div class="section-head reveal">
           <span class="kicker k-bar">Blog da Zyva</span>
@@ -406,19 +508,19 @@
             <span class="post-cat">Estratégia</span>
             <h3>Marketing digital para pequenas empresas: por onde começar</h3>
             <p>O guia direto ao ponto para dar os primeiros passos sem desperdiçar dinheiro.</p>
-            <a class="more cursor-target" href="/blog/marketing-digital-pequenas-empresas-por-onde-comecar/">Ler artigo →</a>
+            <a class="more" href="/blog/marketing-digital-pequenas-empresas-por-onde-comecar/">Ler artigo →</a>
           </div>
           <div class="card post-card reveal">
             <span class="post-cat">Anúncios</span>
             <h3>Quanto custa anunciar no Google e no Instagram?</h3>
             <p>Guia de orçamento realista para PMEs planejarem tráfego pago.</p>
-            <a class="more cursor-target" href="/blog/quanto-custa-anunciar-google-instagram/">Ler artigo →</a>
+            <a class="more" href="/blog/quanto-custa-anunciar-google-instagram/">Ler artigo →</a>
           </div>
           <div class="card post-card reveal" data-latest-slot>
             <span class="post-cat">Notícias</span>
             <h3>O post do dia sai toda manhã no blog</h3>
             <p>Análise diária de uma notícia de marketing — e o que ela muda para a sua empresa.</p>
-            <a class="more cursor-target" href="/blog/">Ver o blog →</a>
+            <a class="more" href="/blog/">Ver o blog →</a>
           </div>
         </div>
       </div>
@@ -427,7 +529,7 @@
     <!-- Confiança antes do FAQ: agência nova não tem case — tem rosto,
          transparência do processo e CNPJ. É isso que responde o medo
          "vou virar alvo de vendedor?" antes de a pergunta ser feita. -->
-    <section class="section" style="padding-top: 6px;" aria-labelledby="qa-titulo">
+    <section class="section section-seq" aria-labelledby="qa-titulo">
       <div class="container">
         <div class="qa-grid reveal">
           <img src="/assets/img/weba-640.webp" width="640" height="640" alt="Weba, responsável pelo atendimento da Zyva" loading="lazy" decoding="async" />
@@ -446,7 +548,7 @@
       </div>
     </section>
 
-    <section class="section" style="padding-top: 6px;">
+    <section class="section section-seq">
       <div class="container">
         <div class="section-head reveal">
           <span class="kicker k-bar">Perguntas frequentes</span>
@@ -483,9 +585,9 @@
     <div class="container reveal">
       <h2>Pronto para crescer com método?</h2>
       <p>Peça seu diagnóstico gratuito. Em até 1 dia útil a gente te mostra onde estão as suas oportunidades.</p>
-      <div class="hero-ctas" style="justify-content: center;">
-        <a href="/contato/" class="btn btn-primary cursor-target">Pedir diagnóstico gratuito</a>
-        <a href="https://wa.me/5598984337265?text=Ol%C3%A1%2C%20Zyva!%20Quero%20um%20diagn%C3%B3stico%20gratuito%20para%20minha%20empresa." target="_blank" rel="noopener" class="btn btn-ghost cursor-target" data-wa>Chamar no WhatsApp</a>
+      <div class="hero-ctas">
+        <a href="/contato/" class="btn btn-primary">Pedir diagnóstico gratuito</a>
+        <a href="https://wa.me/5598984337265?text=Ol%C3%A1%2C%20Zyva!%20Quero%20um%20diagn%C3%B3stico%20gratuito%20para%20minha%20empresa." target="_blank" rel="noopener" class="btn btn-ghost" data-wa>Chamar no WhatsApp</a>
       </div>
     </div>
   </section>
@@ -520,20 +622,20 @@
         <h2 class="cine-title" data-cine-title>Vamos começar?</h2>
         <div class="cine-actions" data-cine-links>
           <div class="cine-row">
-            <a class="cine-pill cine-pill-primary magnetic cursor-target" href="/contato/">Pedir diagnóstico gratuito</a>
-            <a class="cine-pill magnetic cursor-target" href="https://wa.me/5598984337265?text=Ol%C3%A1%2C%20Zyva!%20Quero%20um%20diagn%C3%B3stico%20gratuito%20para%20minha%20empresa." target="_blank" rel="noopener" data-wa aria-label="Falar no WhatsApp">
+            <a class="cine-pill cine-pill-primary" href="/contato/">Pedir diagnóstico gratuito</a>
+            <a class="cine-pill" href="https://wa.me/5598984337265?text=Ol%C3%A1%2C%20Zyva!%20Quero%20um%20diagn%C3%B3stico%20gratuito%20para%20minha%20empresa." target="_blank" rel="noopener" data-wa aria-label="Falar no WhatsApp">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
               Chamar no WhatsApp
             </a>
           </div>
           <div class="cine-row cine-row-sec">
-            <a class="cine-pill cine-pill-sm cursor-target" href="/servicos/">Serviços</a>
-            <a class="cine-pill cine-pill-sm cursor-target" href="/cases/">Cases</a>
-            <a class="cine-pill cine-pill-sm cursor-target" href="/sobre/">Sobre</a>
-            <a class="cine-pill cine-pill-sm cursor-target" href="/blog/">Blog</a>
-            <a class="cine-pill cine-pill-sm cursor-target" href="https://instagram.com/agenciazyva" target="_blank" rel="noopener">Instagram</a>
-            <a class="cine-pill cine-pill-sm cursor-target" href="mailto:contato@agenciazyva.com.br">E-mail</a>
-            <a class="cine-pill cine-pill-sm cursor-target" href="/politica-de-privacidade/">Privacidade</a>
+            <a class="cine-pill cine-pill-sm" href="/servicos/">Serviços</a>
+            <a class="cine-pill cine-pill-sm" href="/cases/">Cases</a>
+            <a class="cine-pill cine-pill-sm" href="/sobre/">Sobre</a>
+            <a class="cine-pill cine-pill-sm" href="/blog/">Blog</a>
+            <a class="cine-pill cine-pill-sm" href="https://instagram.com/agenciazyva" target="_blank" rel="noopener">Instagram</a>
+            <a class="cine-pill cine-pill-sm" href="mailto:contato@agenciazyva.com.br">E-mail</a>
+            <a class="cine-pill cine-pill-sm" href="/politica-de-privacidade/">Privacidade</a>
           </div>
         </div>
       </div>
@@ -546,18 +648,18 @@
           <span>pela</span>
           <strong>Zyva</strong>
         </div>
-        <button class="cine-top magnetic cursor-target" type="button" data-cine-top aria-label="Voltar ao topo">
+        <button class="cine-top" type="button" data-cine-top aria-label="Voltar ao topo">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
         </button>
       </div>
     </footer>
   </div>
 
-  <a href="https://wa.me/5598984337265?text=Ol%C3%A1%2C%20Zyva!%20Quero%20um%20diagn%C3%B3stico%20gratuito%20para%20minha%20empresa." target="_blank" rel="noopener" class="wa-float cursor-target" data-wa aria-label="Falar no WhatsApp">
+  <a href="https://wa.me/5598984337265?text=Ol%C3%A1%2C%20Zyva!%20Quero%20um%20diagn%C3%B3stico%20gratuito%20para%20minha%20empresa." target="_blank" rel="noopener" class="wa-float" data-wa aria-label="Falar no WhatsApp">
     <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
   </a>
 
-  <script src="/assets/js/main.js?v=8"></script>
-  <script src="/assets/js/zyva-motion.js?v=17" defer></script>
+  <script src="/assets/js/main.js?v=9"></script>
+  <script src="/assets/js/zyva-motion.js?v=19" defer></script>
 </body>
 </html>
