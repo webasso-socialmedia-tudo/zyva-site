@@ -30,10 +30,14 @@ export async function onRequestPost({ request, env }) {
     return j({ ok: false, motivo: "json" }, 400);
   }
 
-  /* Honeypot e tempo mínimo: sucesso falso, sem pista para o robô. */
+  /* Honeypot e tempo mínimo: sucesso falso, sem pista para o robô.
+     Sinais de comportamento (resposta parcial do quiz, clique no
+     WhatsApp) ficam isentos do tempo mínimo: um humano decidido
+     clica no CTA em menos de 2,5s e o sinal é legítimo. */
   if (d.site) return j({ ok: true });
   const decorrido = Number(d.el) || 0;
-  if (d.tipo !== "quiz-parcial" && decorrido > 0 && decorrido < 2500) return j({ ok: true });
+  const sinalRapido = d.tipo === "quiz-parcial" || d.tipo === "wa-clique";
+  if (!sinalRapido && decorrido > 0 && decorrido < 2500) return j({ ok: true });
 
   if (!env.LEADS) return j({ ok: false, motivo: "nao-configurado" }, 503);
 
