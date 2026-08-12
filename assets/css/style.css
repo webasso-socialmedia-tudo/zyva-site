@@ -10,7 +10,9 @@
   --violet: #6C4CF1;
   --violet-dark: #5638d6;
   --cyan: #22D3EE;
-  --cyan-ink: #0E93AC;
+  /* escurecido de #0E93AC → passa de 3,6:1 para ≥4,6:1 em texto
+     pequeno sobre fundo claro (chips, h4s) — contraste AA */
+  --cyan-ink: #0A6E80;
   --night: #0B0E1A;
   --night-2: #12162a;
   --bg: #F5F6FB;
@@ -22,11 +24,30 @@
   --wa: #25D366;
   --grad: linear-gradient(100deg, #6C4CF1 0%, #22D3EE 100%);
   --radius: 16px;
+  --radius-sm: 12px;
+  --radius-pill: 999px;
   --radius-sheet: 44px;
   --shadow: 0 8px 30px rgba(20, 24, 55, 0.08);
   --shadow-lg: 0 16px 50px rgba(20, 24, 55, 0.14);
   --font-head: "Space Grotesk", system-ui, sans-serif;
   --font-body: "Inter", system-ui, sans-serif;
+
+  /* ---- Motion: a curva assinatura da marca + durações ----
+     Uma curva só (saída rápida, assentamento suave) para o site
+     inteiro parecer "uma coisa só". Os nomes antigos (--ease-out-*)
+     continuam valendo — motion.css e paginas.css dependem deles. */
+  --ease-zyva: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-expo: var(--ease-zyva);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-micro: 0.18s;   /* micro-interação: hover, foco */
+  --dur-state: 0.28s;   /* troca de estado: abrir, marcar */
+  --dur-scene: 0.52s;   /* coreografia de seção */
+
+  /* ---- Cores do WhatsApp (cena do celular) — antes em motion.css ---- */
+  --wa-green: #25D366;
+  --wa-panel: #0d1418;
+  --wa-bubble-in: #1f2c33;
+  --wa-bubble-out: #005c4b;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -66,27 +87,20 @@ ul { list-style: none; }
   margin-bottom: 14px;
 }
 .on-dark .kicker, .band .kicker { color: var(--cyan); }
-.kicker-pill {
-  padding: 7px 15px;
-  border-radius: 100px;
-  background: rgba(108, 76, 241, 0.09);
-  border: 1px solid rgba(108, 76, 241, 0.28);
-}
-.on-dark .kicker-pill, .band .kicker-pill {
-  background: rgba(34, 211, 238, 0.08);
-  border-color: rgba(34, 211, 238, 0.28);
-}
 
 .section-head { max-width: 680px; margin-bottom: 38px; }
 .section-head p { margin-top: 12px; font-size: 1.02rem; }
 .center { text-align: center; margin-inline: auto; }
 
-.grad-text {
-  background: var(--grad);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
+/* Seção que continua a anterior: respiro mínimo, decidido no CSS
+   (substitui os style="padding-top: 6px" espalhados pelo HTML). */
+.section-seq { padding-top: 6px; }
+.section-flush-t { padding-top: 0; }
+.section-flush-b { padding-bottom: 0; }
+
+/* O destaque de palavra-chave (.grad-text e os <em> de título) é
+   estilizado pela "onda de sinal" em motion.css — o texto-degradê
+   com background-clip saiu de vez do site. */
 
 /* ---------- Botões ---------- */
 .btn {
@@ -100,7 +114,7 @@ ul { list-style: none; }
   border-radius: 12px;
   border: 0;
   cursor: pointer;
-  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+  transition: transform var(--dur-micro) var(--ease-zyva), box-shadow var(--dur-micro) ease, background var(--dur-micro) ease;
 }
 .btn:hover { transform: translateY(-2px); }
 .btn-primary {
@@ -129,8 +143,8 @@ ul { list-style: none; }
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(11, 14, 26, 0.92);
-  backdrop-filter: blur(12px);
+  /* Superfície sólida com profundidade real — sem vidro/blur. */
+  background: rgba(11, 14, 26, 0.96);
   border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 .nav {
@@ -199,7 +213,7 @@ ul { list-style: none; }
   align-items: center;
 }
 .hero h1 { color: #fff; max-width: 720px; }
-.hero h1 em { font-style: normal; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero h1 em { font-style: normal; }
 .hero p.lead {
   color: rgba(255,255,255,0.75);
   font-size: 1.12rem;
@@ -220,62 +234,8 @@ ul { list-style: none; }
   pointer-events: none;
 }
 
-/* Painel ilustrativo do hero (mini relatório) */
+/* O visual do herói é o quiz de diagnóstico (.dquiz, em motion.css). */
 .hero-visual { position: relative; min-height: 360px; }
-.mock {
-  position: absolute;
-  background: #fff;
-  color: var(--ink);
-  border-radius: 18px;
-  box-shadow: 0 24px 60px rgba(3, 5, 15, 0.5);
-}
-.mock-report {
-  inset: 8% 6% auto auto;
-  width: min(400px, 92%);
-  padding: 22px 24px 20px;
-  transform: rotate(-1.6deg);
-}
-.mock-top { display: flex; align-items: center; gap: 6px; margin-bottom: 14px; }
-.mock-top .m-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--line); }
-.mock-top .m-dot:first-child { background: #FF8A8A; }
-.mock-top em {
-  margin-left: 8px; font-style: normal; font-size: 0.74rem;
-  color: var(--muted); font-family: var(--font-head);
-}
-.m-title { display: block; font-family: var(--font-head); font-size: 0.98rem; margin-bottom: 12px; }
-.m-chart { width: 100%; height: auto; }
-.m-row { display: flex; justify-content: space-between; margin-top: 10px; }
-.m-row span { font-size: 0.72rem; color: var(--muted); }
-.mock-chat {
-  left: 0; bottom: 6%;
-  display: flex; align-items: center; gap: 12px;
-  padding: 14px 20px 14px 14px;
-  border-radius: 100px;
-  animation: mock-float 5.5s ease-in-out infinite;
-}
-.mock-chat b { display: block; font-size: 0.86rem; font-family: var(--font-head); }
-.mock-chat small { font-size: 0.74rem; color: var(--muted); }
-.m-wa {
-  width: 38px; height: 38px; border-radius: 50%; flex: none;
-  background: var(--wa) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23fff'%3E%3Cpath d='M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z'/%3E%3C/svg%3E") no-repeat center / 20px;
-}
-.mock-roi {
-  top: -4%; left: 4%;
-  padding: 10px 18px;
-  border-radius: 100px;
-  background: var(--night-2);
-  border: 1px solid rgba(255,255,255,0.14);
-  color: #fff;
-  font-family: var(--font-head);
-  font-weight: 600;
-  font-size: 0.88rem;
-  box-shadow: 0 14px 40px rgba(3,5,15,0.5);
-}
-@keyframes mock-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-9px); }
-}
-
 /* Page hero (páginas internas) */
 .page-hero {
   background:
@@ -332,7 +292,7 @@ body.home .trust { padding-bottom: 58px; }
 }
 .band + .sheet { margin-top: -34px; }
 .band h2 { color: #fff; }
-.band h2 em { font-style: normal; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.band h2 em { font-style: normal; }
 .band .section-head p { color: rgba(255,255,255,0.66); }
 .band-gap { height: 64px; }
 
@@ -342,7 +302,7 @@ body.home .trust { padding-bottom: 58px; }
   border: 1px solid rgba(255,255,255,0.09);
   border-radius: var(--radius);
   padding: 26px 24px;
-  transition: transform .2s ease, border-color .2s ease;
+  transition: transform .2s var(--ease-zyva), border-color .2s ease;
 }
 .pain-card:hover { transform: translateY(-5px); border-color: rgba(108,76,241,0.55); }
 .pain-card .icon {
@@ -403,10 +363,10 @@ body.home .trust { padding-bottom: 58px; }
   font-family: var(--font-head);
   font-weight: 700;
   font-size: clamp(2.2rem, 4vw, 3rem);
-  background: var(--grad);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  /* Número é dado: cor chapada com intenção + algarismos tabulares
+     (a contagem animada não "dança" de largura). */
+  color: #fff;
+  font-variant-numeric: tabular-nums;
   line-height: 1.1;
 }
 .stat span { font-size: 0.9rem; color: rgba(255,255,255,0.66); }
@@ -414,7 +374,7 @@ body.home .trust { padding-bottom: 58px; }
   text-align: center;
   margin-top: 26px;
   font-size: 0.84rem;
-  color: rgba(255,255,255,0.45);
+  color: rgba(255,255,255,0.62);
 }
 
 /* ---------- Cards ---------- */
@@ -429,7 +389,7 @@ body.home .trust { padding-bottom: 58px; }
   border-radius: var(--radius);
   padding: 26px 24px;
   box-shadow: var(--shadow);
-  transition: transform .2s ease, box-shadow .2s ease;
+  transition: transform .2s var(--ease-zyva), box-shadow .2s ease;
   position: relative;
 }
 .card::after {
@@ -476,10 +436,8 @@ body.home .trust { padding-bottom: 58px; }
   font-family: var(--font-head);
   font-weight: 700;
   font-size: 2.4rem;
-  background: var(--grad);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--violet);
+  font-variant-numeric: tabular-nums;
   margin-bottom: 8px;
 }
 .step h3 { margin-bottom: 8px; }
@@ -559,7 +517,7 @@ body.home .trust { padding-bottom: 58px; }
   width: 18px; height: 18px;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2322D3EE' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") no-repeat center / contain;
 }
-.diag-note { font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-top: 18px; }
+.diag-note { font-size: 0.85rem; color: rgba(255,255,255,0.64); margin-top: 18px; }
 .diag .btn-ghost { color: #fff; border-color: rgba(255,255,255,0.28); }
 .diag .btn-ghost:hover { border-color: var(--cyan); color: var(--cyan); }
 .diag .hero-z { right: -150px; bottom: -190px; width: 460px; opacity: 0.045; }
@@ -743,43 +701,38 @@ body.home .trust { padding-bottom: 58px; }
 body.home .cta-final, body.dark-shell .cta-final { padding-top: 118px; }
 .cta-final h2 { color: #fff; font-size: clamp(1.8rem, 3.6vw, 2.5rem); max-width: 620px; margin: 0 auto 14px; }
 .cta-final p { color: rgba(255,255,255,0.72); max-width: 520px; margin: 0 auto 34px; }
+/* Os CTAs do bloco final são sempre centralizados (antes era inline no HTML). */
+.cta-final .hero-ctas { justify-content: center; }
 
-/* ---------- Footer + rodapé revelado ---------- */
-.site-footer {
-  background: #070912;
-  color: rgba(255,255,255,0.65);
-  padding: 54px 0 28px;
-  border-top: 1px solid rgba(255,255,255,0.06);
-  font-size: 0.93rem;
-}
-.footer-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 36px; margin-bottom: 38px; }
-.site-footer h4 { color: #fff; font-size: 0.95rem; margin-bottom: 16px; }
-.site-footer li { margin-bottom: 9px; }
-.site-footer a { color: rgba(255,255,255,0.65); transition: color .15s; }
-.site-footer a:hover { color: var(--cyan); }
-.footer-bottom {
-  border-top: 1px solid rgba(255,255,255,0.08);
-  padding-top: 24px;
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-  font-size: 0.85rem;
-}
+/* (o rodapé antigo .site-footer e a "cortina" .page-curtain saíram:
+   nenhum HTML os usa — o rodapé do site é o cinematográfico, em motion.css) */
 
-.page-curtain { background: var(--bg); }
-body.home .page-curtain, body.dark-shell .page-curtain { background: var(--night); }
-body.curtain-on .site-footer {
+/* ---------- Aviso simples (alertBox do main.js) ---------- */
+#alert-box {
   position: fixed;
-  left: 0; right: 0; bottom: 0;
-  z-index: 1;
+  left: 50%; bottom: 96px;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: #fff;
+  padding: 14px 22px;
+  border-radius: var(--radius-sm);
+  z-index: 99;
+  font-size: 0.95rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
-body.curtain-on .page-curtain {
-  position: relative;
-  z-index: 2;
-  box-shadow: 0 40px 80px rgba(2, 4, 12, 0.65);
-  border-radius: 0 0 38px 38px;
-  overflow: clip;
+
+/* ---------- Selo NOVO/ESPECIAL nos cards do blog (main.js) ---------- */
+.zyva-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 9px;
+  border-radius: var(--radius-pill);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  background: var(--grad);
+  color: #fff;
+  vertical-align: middle;
 }
 
 /* ---------- Aviso de post novo (notificação flutuante) ---------- */
@@ -914,7 +867,6 @@ html.js-on .reveal.visible, .reveal.visible { opacity: 1; transform: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
-  .mock-chat { animation: none; }
   html { scroll-behavior: auto; }
 }
 
@@ -925,7 +877,6 @@ html.js-on .reveal.visible, .reveal.visible { opacity: 1; transform: none; }
   .hero p.lead { font-size: 1.06rem; margin: 16px 0 26px; }
   .hero-points { margin-top: 22px; }
   .hero-visual { min-height: 315px; }
-  .mock-report { width: min(370px, 92%); }
   h1 { font-size: clamp(2rem, 3.9vw, 2.8rem); }
   h2 { font-size: clamp(1.45rem, 2.6vw, 1.9rem); }
   .section-head { margin-bottom: 30px; }
@@ -941,7 +892,6 @@ html.js-on .reveal.visible, .reveal.visible { opacity: 1; transform: none; }
   .grid-4 { grid-template-columns: repeat(2, 1fr); }
   .grid-3 { grid-template-columns: repeat(2, 1fr); }
   .trust-grid { grid-template-columns: repeat(2, 1fr); }
-  .footer-grid { grid-template-columns: 1fr 1fr; }
   .contact-grid { grid-template-columns: 1fr; }
   .service-cols { grid-template-columns: 1fr; }
   .hero-grid { grid-template-columns: 1fr; gap: 40px; }
@@ -982,6 +932,454 @@ html.js-on .reveal.visible, .reveal.visible { opacity: 1; transform: none; }
   .service-block { padding: 28px 22px; }
   .form-card { padding: 26px 20px; }
 }
+
+/* ============================================================
+   FASE 3 — O NOTEBOOK QUE ABRE COM O SCROLL (peça central)
+   A promessa "você vê cada resultado" encenada: um laptop da
+   Zyva abre conforme a rolagem e a tela acende com o relatório
+   vivo. CSS 3D puro (mesma técnica do celular do Contato).
+   ============================================================ */
+.nb-scene {
+  /* pista de rolagem: a cena fica "presa" enquanto o notebook abre */
+  height: 240vh;
+  position: relative;
+  background:
+    radial-gradient(820px 420px at 80% 10%, rgba(108,76,241,0.25), transparent 60%),
+    radial-gradient(600px 380px at 5% 90%, rgba(34,211,238,0.10), transparent 60%),
+    var(--night);
+  color: #fff;
+}
+.nb-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+.nb-grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 40px;
+  align-items: center;
+}
+.nb-copy h2 { color: #fff; max-width: 420px; }
+.nb-copy h2 em { font-style: normal; }
+.nb-passos { position: relative; margin-top: 18px; min-height: 86px; }
+.nb-passo {
+  position: absolute;
+  inset: 0 auto auto 0;
+  max-width: 400px;
+  color: rgba(255,255,255,0.72);
+  font-size: 1.05rem;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .35s ease, transform .45s var(--ease-zyva);
+  pointer-events: none;
+}
+.nb-passo.on { opacity: 1; transform: none; }
+.nb-dica {
+  margin-top: 110px;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.58);
+  font-family: var(--font-head);
+}
+
+/* ---- o aparelho: BLOCOS SÓLIDOS ----
+   Rig físico (storyboard do DS): a DOBRADIÇA fica no lado de cima
+   (longe de você); a BASE/teclado se estende da dobradiça PARA PERTO;
+   a TAMPA fecha por cima da base com a marca para cima. A câmera
+   (--nb-cam) começa a pino (-90° = visto de cima) e desce para a
+   frontal (-18°); a tampa (--nb-open) abre girando para TRÁS
+   (-90° fechada → +10° de pé). Rotações no mesmo eixo X somam:
+   fechada de cima = -180° (costas/marca), aberta de frente = -8°.
+   VOLUME: a base é um bloco de 16px de espessura (tampo elevado +
+   saia frontal + saias laterais + sombra no chão) e a tampa uma
+   placa de 12px (tela na frente, marca atrás, borda na ponta),
+   articulada 20px acima do chão — no topo do bloco da base. */
+.nb-stage {
+  perspective: 1800px; /* lente mais "longa": menos distorção de perto */
+  perspective-origin: 50% 46%;
+  display: grid;
+  place-items: center;
+  min-height: 620px;
+}
+.nb-laptop {
+  position: relative;
+  width: min(460px, 88%);
+  height: 280px; /* zona da tampa; MESMA profundidade da base */
+  transform-style: preserve-3d;
+  transform:
+    rotateX(var(--nb-cam, -90deg))
+    rotateY(var(--nb-yaw, 0deg));
+  will-change: transform;
+}
+/* base: carcaça 3D — este elemento é só o "chassi" invisível no
+   plano do chão; as faces do bloco são os filhos */
+.nb-base {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 280px;
+  transform-origin: top center;
+  transform: rotateX(90deg);
+  transform-style: preserve-3d;
+}
+/* sombra no chão: ancora o bloco na mesa */
+.nb-shadow {
+  position: absolute;
+  inset: -4% -3%;
+  transform: translateZ(-1px);
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 42%, rgba(0,0,0,0.5), transparent 66%);
+  filter: blur(18px);
+}
+/* tampo do teclado: 16px acima da mesa */
+.nb-base-top {
+  position: absolute;
+  inset: 0;
+  transform: translateZ(16px);
+  /* cantos de trás também arredondados: nada de quina reta
+     vazando por trás do recorte da tampa fechada */
+  border-radius: 14px 14px 28px 28px;
+  background: linear-gradient(180deg, #262b47 0%, #171b2e 55%, #10131f 100%);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.13) inset;
+}
+/* barra da dobradiça no fundo do tampo: é o que aparece atrás da
+   tampa fechada (paralaxe de objeto com espessura) — veste a fresta */
+.nb-base-top::before {
+  content: "";
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 6px;
+  height: 18px;
+  border-radius: 9px;
+  background: linear-gradient(180deg, #0a0d18, #1a1f34);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.06);
+}
+.nb-keys {
+  position: absolute;
+  inset: 34px 22px 80px;
+  border-radius: 10px;
+  background:
+    repeating-linear-gradient(to right, rgba(255,255,255,0.07) 0 24px, transparent 24px 29px),
+    repeating-linear-gradient(to bottom, rgba(255,255,255,0.055) 0 15px, transparent 15px 20px),
+    #0a0d18;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.45) inset;
+}
+/* trackpad na borda LIVRE da base (o lado perto de você) */
+.nb-trackpad {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  width: 140px;
+  height: 48px;
+  transform: translateX(-50%);
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.035));
+  border: 1px solid rgba(255,255,255,0.09);
+}
+/* faces do bloco: saia frontal (a espessura que você vê de frente)
+   e saias laterais — alumínio escuro usinado */
+.nb-base-front {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 16px;
+  transform-origin: bottom center;
+  transform: rotateX(-90deg);
+  border-radius: 0 0 12px 12px;
+  background: linear-gradient(180deg, #2a2f4d 0%, #131727 70%, #0b0e19 100%);
+}
+.nb-base-left,
+.nb-base-right {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 16px;
+  background: linear-gradient(180deg, #20253e 0%, #0d101c 100%);
+}
+.nb-base-left { left: 0; transform-origin: left center; transform: rotateY(-90deg); }
+.nb-base-right { right: 0; transform-origin: right center; transform: rotateY(90deg); }
+/* brilho que a tela acesa projeta sobre o teclado (1px acima do tampo) */
+.nb-glow {
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  top: 3%;
+  height: 58%;
+  transform: translateZ(17px);
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(34,211,238,0.28), transparent 70%);
+  filter: blur(16px);
+  opacity: var(--nb-wake, 0);
+  pointer-events: none;
+}
+/* tampa: placa de 12px articulada no TOPO do bloco da base
+   (dobradiça 20px acima da mesa — o translateZ vem ANTES do giro,
+   então o eixo sobe junto e o sinal não depende do ângulo);
+   fechada = -90° (deitada por cima da base, marca para cima);
+   aberta = +10° (de pé, levemente reclinada para trás) */
+.nb-lid {
+  position: absolute;
+  inset: 0;
+  transform-origin: bottom center;
+  /* o eixo da dobradiça sobe 20px da mesa = -Y no plano do laptop
+     (o translate vem ANTES do giro na leitura, fora dele na matriz:
+     gira na dobradiça, depois ergue o conjunto — sinal fixo) */
+  transform: translateY(-20px) rotateX(var(--nb-open, -90deg));
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+/* costas da tampa = a MARCA (é o que se vê de cima, fechado);
+   fica 12px "acima" da face da tela = a espessura da placa */
+.nb-lid-back {
+  position: absolute;
+  inset: 0;
+  border-radius: 28px;
+  background:
+    radial-gradient(120% 90% at 30% 20%, rgba(255,255,255,0.08), transparent 55%),
+    linear-gradient(200deg, #2b3050 0%, #171b30 55%, #10131f 100%);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.09);
+  transform: rotateY(180deg) translateZ(12px);
+  backface-visibility: hidden;
+  display: grid;
+  place-items: center;
+}
+/* visto de cima (câmera -90° + tampa -90° = -180°), o conteúdo da
+   face de trás aparece girado 180° no plano — o rotate compensa
+   para a marca ler em pé, com a dobradiça no lado de cima */
+.nb-lid-back svg {
+  width: 92px;
+  transform: rotate(180deg);
+  filter: drop-shadow(0 4px 18px rgba(34,211,238,0.35));
+}
+/* a tela (face da frente): aparece quando a tampa fica de pé */
+.nb-screen {
+  position: absolute;
+  inset: 0;
+  border-radius: 28px 28px 12px 12px;
+  background: #0b1220;
+  border: 9px solid #0a0c16;
+  border-bottom-width: 15px;
+  backface-visibility: hidden;
+  overflow: hidden;
+  filter: brightness(calc(0.25 + var(--nb-wake, 0) * 0.75));
+}
+.nb-screen svg { width: 100%; height: 100%; display: block; }
+/* reflexo de vidro, bem contido */
+.nb-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, rgba(255,255,255,0.06) 0%, transparent 34%);
+  pointer-events: none;
+}
+/* a espessura na ponta livre da tampa */
+.nb-lid-edge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 12px;
+  transform-origin: top center;
+  transform: rotateX(-90deg);
+  border-radius: 10px 10px 0 0;
+  background: linear-gradient(180deg, #232842, #0b0e19);
+}
+
+@media (max-width: 1000px) {
+  .nb-scene { height: 200vh; }
+  .nb-grid { grid-template-columns: 1fr; gap: 18px; }
+  .nb-copy { text-align: center; }
+  .nb-copy h2, .nb-passo { max-width: none; }
+  .nb-passos { min-height: 100px; }
+  .nb-dica { margin-top: 8px; }
+  .nb-stage { min-height: 460px; }
+  .nb-laptop { width: min(340px, 92%); height: 208px; }
+  .nb-base { height: 208px; }
+  .nb-keys { inset: 28px 16px 64px; }
+  .nb-trackpad { width: 112px; height: 38px; bottom: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* alternativa estática REAL: notebook aberto na vista frontal,
+     relatório aceso, todos os passos visíveis como texto corrido */
+  .nb-scene { height: auto; }
+  .nb-sticky { position: static; height: auto; padding: 78px 0; overflow: visible; }
+  .nb-laptop { transform: rotateX(-18deg); }
+  .nb-lid { transform: translateY(-20px) rotateX(10deg); }
+  .nb-screen { filter: none; }
+  .nb-glow { opacity: 1; }
+  .nb-passos { min-height: 0; }
+  .nb-passo { position: static; opacity: 1; transform: none; margin-bottom: 10px; }
+  .nb-dica { display: none; }
+}
+
+/* ============================================================
+   FASE 3 — CALCULADORA DE RETORNO (beleza que gera lead)
+   Números honestos: faixas conservadoras, nunca promessa.
+   ============================================================ */
+.calc {
+  background:
+    radial-gradient(640px 300px at 12% -20%, rgba(34,211,238,0.14), transparent 60%),
+    radial-gradient(520px 300px at 95% 120%, rgba(108,76,241,0.35), transparent 62%),
+    var(--night);
+  border-radius: 30px;
+  color: #fff;
+  padding: clamp(40px, 5vw, 62px);
+  position: relative;
+  overflow: hidden;
+}
+.calc h2 { color: #fff; max-width: 520px; }
+.calc > p { color: rgba(255,255,255,0.7); margin: 12px 0 30px; max-width: 560px; }
+.calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 34px 44px; align-items: start; }
+.calc-campo { margin-bottom: 26px; }
+.calc-campo label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 0.98rem;
+  margin-bottom: 12px;
+}
+.calc-campo output {
+  font-variant-numeric: tabular-nums;
+  color: var(--cyan);
+  font-size: 1.15rem;
+}
+.calc input[type="range"] {
+  width: 100%;
+  height: 30px;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+.calc input[type="range"]::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, var(--violet), var(--cyan)) no-repeat rgba(255,255,255,0.12);
+  background-size: var(--fill, 50%) 100%;
+}
+.calc input[type="range"]::-moz-range-track {
+  height: 6px; border-radius: 3px; background: rgba(255,255,255,0.12);
+}
+.calc input[type="range"]::-moz-range-progress {
+  height: 6px; border-radius: 3px; background: linear-gradient(to right, var(--violet), var(--cyan));
+}
+.calc input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--cyan);
+  margin-top: -8px;
+  box-shadow: 0 4px 14px rgba(34,211,238,0.45);
+}
+.calc input[type="range"]::-moz-range-thumb {
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #fff; border: 3px solid var(--cyan);
+  box-shadow: 0 4px 14px rgba(34,211,238,0.45);
+}
+.calc input[type="range"]:focus-visible { outline: 3px solid rgba(34,211,238,0.6); outline-offset: 4px; border-radius: 6px; }
+.calc-saida {
+  background: rgba(255,255,255,0.045);
+  border: 1px solid rgba(255,255,255,0.11);
+  border-radius: 18px;
+  padding: 24px 26px;
+}
+.calc-linha {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 14px;
+  padding: 9px 0;
+  border-bottom: 1px dashed rgba(255,255,255,0.12);
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.75);
+}
+.calc-linha:last-of-type { border-bottom: 0; }
+.calc-linha b {
+  font-family: var(--font-head);
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  font-size: 1.06rem;
+  white-space: nowrap;
+}
+.calc-linha.calc-destaque b { color: var(--cyan); font-size: 1.35rem; }
+.calc-nota { font-size: 0.8rem; color: rgba(255,255,255,0.62); margin-top: 14px; line-height: 1.5; }
+.calc-cta { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+.calc-cta .btn { justify-content: center; }
+/* o painel é escuro: o botão fantasma precisa de texto claro
+   (sem isto herdava tinta #1E2235 — invisível, razão 1,2:1) */
+.calc .btn-ghost { color: #fff; border-color: rgba(255,255,255,0.28); }
+.calc .btn-ghost:hover { border-color: var(--cyan); color: var(--cyan); }
+@media (max-width: 900px) {
+  .calc-grid { grid-template-columns: 1fr; gap: 10px; }
+}
+
+/* ============================================================
+   FASE 3 — ÍCONES ISOMÉTRICOS
+   Cada frente é um bloco da máquina Zyva: mesmo bloco, mesma
+   câmera, mesma luz — e um símbolo próprio em ciano por cima.
+   Micro-inclinação no hover/toque (com equivalente de teclado).
+   ============================================================ */
+.icon { perspective: 320px; }
+.icon .iso {
+  width: 34px;
+  height: 34px;
+  transition: transform .3s var(--ease-zyva);
+  will-change: transform;
+}
+.card:hover .iso,
+.pain-card:hover .iso,
+.card:focus-within .iso,
+.service-block h2:hover .iso {
+  transform: rotateX(10deg) rotateY(-12deg) scale(1.08);
+}
+.card:active .iso, .pain-card:active .iso { transform: rotateX(10deg) rotateY(-12deg) scale(1.02); }
+/* Nos títulos de /servicos/: anula o stroke violeta e o tamanho 30px
+   da regra antiga (.service-block h2 svg) — o bloco isométrico traz
+   as próprias cores por atributo. */
+.service-block h2 .iso { width: 36px; height: 36px; stroke: none; }
+@media (prefers-reduced-motion: reduce) {
+  .icon .iso { transition: none; }
+  .card:hover .iso, .pain-card:hover .iso { transform: none; }
+}
+
+/* ============================================================
+   FASE 3 — TRANSIÇÕES PERSISTENTES ENTRE PÁGINAS
+   O logotipo e o CTA principal "atravessam" a navegação sem
+   piscar (View Transitions por elemento — a base já existia).
+   ============================================================ */
+.logo { view-transition-name: zyva-logo; }
+.nav-cta { view-transition-name: zyva-cta; }
+::view-transition-group(zyva-logo),
+::view-transition-group(zyva-cta) {
+  animation-duration: 0.32s;
+  animation-timing-function: var(--ease-zyva);
+}
+
+/* ============================================================
+   FASE 3 — BOTÕES MAGNÉTICOS (só ponteiro fino, nunca no toque)
+   O deslocamento vem do JS via --mag-x/--mag-y; aqui só o retorno
+   suave quando o ponteiro sai.
+   ============================================================ */
+.mag {
+  transform: translate(var(--mag-x, 0px), var(--mag-y, 0px));
+  transition: transform .35s var(--ease-zyva);
+}
+/* precisa vencer o translateY(-2px) do .btn:hover — mesma especificidade,
+   mas declarado depois; o levantamento entra na conta do magnético */
+.mag:hover { transform: translate(var(--mag-x, 0px), calc(var(--mag-y, 0px) - 2px)); }
+.mag.mag-live { transition: transform .06s linear; }
 
 /* ============================================================
    ACESSIBILIDADE — base
@@ -1039,9 +1437,6 @@ html.js-on .reveal.visible, .reveal.visible { opacity: 1; transform: none; }
 
   .card a.more,
   .post-card a.more,
-  .footer-grid a,
-  .footer-bottom a,
-  .footer-links a,
   .hint a,
   .article a {
     display: inline-flex;

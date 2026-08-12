@@ -49,13 +49,7 @@
   max-width: 15ch;
 }
 
-.phone-copy h2 em {
-  font-style: normal;
-  background: var(--grad);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
+.phone-copy h2 em { font-style: normal; }
 
 .phone-copy > p {
   color: rgba(255, 255, 255, 0.68);
@@ -465,71 +459,19 @@
 
 .wa-go:hover { transform: scale(1.1); }
 
-.phone-hint {
-  position: absolute;
-  left: 50%;
-  bottom: 26px;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 0.76rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  font-family: var(--font-head);
-  color: rgba(255, 255, 255, 0.4);
-  transition: opacity 0.4s ease;
-  pointer-events: none;
+/* (a dica "Role para abrir" e o trilho lateral saíram do HTML —
+   as regras .phone-hint/.scene-rail foram removidas junto) */
+
+@media (max-width: 1000px) {.phone-track { height: auto; }.phone { width: 250px; height: 510px; }.phone-holder { order: -1; }.topic-list { max-width: none; }
 }
 
-.phone-hint i {
-  width: 20px; height: 32px;
-  border: 1.5px solid rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
-  position: relative;
-}
-
-.phone-hint i::after {
-  content: "";
-  position: absolute;
-  left: 50%; top: 6px;
-  width: 3px; height: 6px;
-  margin-left: -1.5px;
-  border-radius: 2px;
-  background: var(--cyan);
-  animation: hint-scroll 1.7s ease-in-out infinite;
-}
-
-.scene-rail {
-  position: absolute;
-  right: 26px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 2px;
-  height: 190px;
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.scene-rail i {
-  position: absolute;
-  inset: 0 0 auto;
-  height: 0%;
-  background: var(--grad);
-  border-radius: 2px;
-}
-
-@media (max-width: 1000px) {.phone-track { height: auto; }.phone { width: 250px; height: 510px; }.phone-holder { order: -1; }.scene-rail { display: none; }.topic-list { max-width: none; }
-}
-
-@media (max-width: 640px) {.phone-track { height: auto; }.phone-sticky { padding: 48px 0; }.phone { width: 170px; height: 346px; }.phone-body { border-radius: 30px; padding: 7px; }.phone-screen { border-radius: 24px; }.phone-notch { width: 66px; height: 19px; top: 7px; }.wa-status { padding: 9px 13px 5px; font-size: 0.6rem; }.wa-head { padding: 5px 9px 7px; gap: 8px; }.wa-avatar { width: 28px; height: 28px; }.wa-head-t b { font-size: 0.68rem; }.wa-head-t span { font-size: 0.6rem; }.wa-head-act { gap: 10px; }.wa-head-act svg { width: 13px; height: 13px; }.wa-chat { padding: 9px 8px; gap: 6px; }.wa-b { font-size: 0.66rem; padding: 6px 8px 5px; }.wa-day { font-size: 0.55rem; }.wa-send { padding: 6px 7px 9px; }.wa-input { font-size: 0.63rem; padding: 7px 10px; }.wa-go { width: 30px; height: 30px; }.wa-go svg { width: 15px; height: 15px; }.phone-copy > p, .live-status { display: none; }.phone-copy h2 { font-size: 1.3rem; margin-bottom: 12px; max-width: none; }.topic { padding: 8px 11px; gap: 10px; border-radius: 12px; font-size: 0.88rem; }.topic-ico { width: 28px; height: 28px; border-radius: 8px; }.topic-ico svg { width: 15px; height: 15px; }.topic-txt b { font-size: 0.85rem; }.topic-txt > span { display: none; }.topic-list { gap: 6px; }.phone-hint { display: none; }.spin-badge { width: 104px; height: 104px; }
+@media (max-width: 640px) {.phone-track { height: auto; }.phone-sticky { padding: 48px 0; }.phone { width: 170px; height: 346px; }.phone-body { border-radius: 30px; padding: 7px; }.phone-screen { border-radius: 24px; }.phone-notch { width: 66px; height: 19px; top: 7px; }.wa-status { padding: 9px 13px 5px; font-size: 0.6rem; }.wa-head { padding: 5px 9px 7px; gap: 8px; }.wa-avatar { width: 28px; height: 28px; }.wa-head-t b { font-size: 0.68rem; }.wa-head-t span { font-size: 0.6rem; }.wa-head-act { gap: 10px; }.wa-head-act svg { width: 13px; height: 13px; }.wa-chat { padding: 9px 8px; gap: 6px; }.wa-b { font-size: 0.66rem; padding: 6px 8px 5px; }.wa-day { font-size: 0.55rem; }.wa-send { padding: 6px 7px 9px; }.wa-input { font-size: 0.63rem; padding: 7px 10px; }.wa-go { width: 30px; height: 30px; }.wa-go svg { width: 15px; height: 15px; }.phone-copy > p, .live-status { display: none; }.phone-copy h2 { font-size: 1.3rem; margin-bottom: 12px; max-width: none; }.topic { padding: 8px 11px; gap: 10px; border-radius: 12px; font-size: 0.88rem; }.topic-ico { width: 28px; height: 28px; border-radius: 8px; }.topic-ico svg { width: 15px; height: 15px; }.topic-txt b { font-size: 0.85rem; }.topic-txt > span { display: none; }.topic-list { gap: 6px; }
 }
 
 @media (min-width: 1000px) and (max-height: 820px) {.phone { width: 268px; height: 546px; }.phone-copy h2 { font-size: clamp(1.6rem, 2.6vw, 2.2rem); }.phone-copy > p { font-size: 0.97rem; margin-bottom: 20px; }.live-status { margin-bottom: 16px; }.topic { padding: 10px 13px; }
 }
 
-@media (prefers-reduced-motion: reduce) {.spin-badge svg { animation: none; }.phone { transform: none !important; }.topic { opacity: 1 !important; transform: none !important; }.wa-head, .wa-send { opacity: 1 !important; transform: none !important; }.phone-track { height: auto; }.phone-sticky { position: static; height: auto; padding: 60px 0; }
+@media (prefers-reduced-motion: reduce) {.phone { transform: none !important; }.topic { opacity: 1 !important; transform: none !important; }.wa-head, .wa-send { opacity: 1 !important; transform: none !important; }.phone-track { height: auto; }.phone-sticky { position: static; height: auto; padding: 60px 0; }
 }
 
 .pipeline {
@@ -546,13 +488,7 @@
 
 .pipeline h2 { color: #fff; max-width: 18ch; }
 
-.pipeline h2 em {
-  font-style: normal;
-  background: var(--grad);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
+.pipeline h2 em { font-style: normal; }
 
 .pipeline > p { color: rgba(255, 255, 255, 0.66); max-width: 54ch; margin: 12px 0 34px; }
 
@@ -761,23 +697,13 @@
   0%, 60%, 100% { transform: translateY(0); opacity: 0.45; }
   30% { transform: translateY(-4px); opacity: 1; }
 }
-@keyframes hint-scroll {
-  0%, 100% { transform: translateY(0); opacity: 1; }
-  50% { transform: translateY(9px); opacity: 0.3; }
-}
 @keyframes m3-up { from { transform: translateY(-90px); } to { transform: translateY(90px); } }
 @keyframes m3-down { from { transform: translateY(90px); } to { transform: translateY(-90px); } }
 @keyframes pipe-energy { to { stroke-dashoffset: -66; } }
 
-/* A cena do celular deixou de ser dirigida por rolagem, então a dica
-   "Role para abrir" e o trilho de progresso lateral não fazem mais
-   sentido — saem de cena. O balão de saudação aparece via .show (JS). */
-.phone-hint, .scene-rail { display: none !important; }
-
-/* Sub-nav dos Serviços (N2) — só esta página carrega. */
 /* ---------- Sub-nav dos Serviços com scroll-spy (N2) ---------- */
 .svc-nav { position: sticky; top: 64px; z-index: 40;
-  background: rgba(11,14,26,0.92); backdrop-filter: blur(12px);
+  background: rgba(11,14,26,0.96);
   border-bottom: 1px solid rgba(255,255,255,0.08); }
 .svc-nav-in { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none;
   padding: 10px 24px; scroll-behavior: smooth; }
