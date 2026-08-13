@@ -20,11 +20,11 @@
   <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
-  <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" /></noscript>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" /></noscript>
   <script>document.documentElement.className+=" js-on";</script>
-  <link rel="stylesheet" href="/assets/css/style.css?v=14" />
-  <link rel="stylesheet" href="/assets/css/motion.css?v=19" />
+  <link rel="stylesheet" href="/assets/css/style.css?v=19" />
+  <link rel="stylesheet" href="/assets/css/motion.css?v=23" />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -82,10 +82,18 @@
       },
       {
         "@type": "Question",
+        "name": "O que é o Relatório Vivo?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "É o relatório mensal da Zyva, em português claro: de onde veio cada cliente, quanto cada real investido trouxe de volta e o que vamos ajustar no mês seguinte. Um exemplo aparece no notebook da página inicial."
+        }
+      },
+      {
+        "@type": "Question",
         "name": "Como eu acompanho o trabalho?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Todo mês você recebe um relatório em português claro — o que foi feito, o que aconteceu e o que vem agora — e uma reunião de ajuste de rota. No dia a dia, o canal é o WhatsApp direto com o time."
+          "text": "Todo mês você recebe o Relatório Vivo — o que foi feito, o que aconteceu e o que vem agora — e uma reunião de ajuste de rota. No dia a dia, o canal é o WhatsApp direto com o time."
         }
       },
       {
@@ -208,10 +216,10 @@
     <div class="nb-sticky">
       <div class="container nb-grid">
         <div class="nb-copy">
-          <span class="kicker k-bar">Você vê funcionando</span>
+          <span class="kicker k-bar">O Relatório Vivo</span>
           <h2 data-reveal>O seu marketing, <em>aberto na sua frente</em></h2>
           <div class="nb-passos" aria-live="polite">
-            <p class="nb-passo on" data-nb-passo="0">Todo mês, um relatório em português claro. Role e veja como ele chega.</p>
+            <p class="nb-passo on" data-nb-passo="0">Todo mês, o Relatório Vivo chega em português claro. Role e veja.</p>
             <p class="nb-passo" data-nb-passo="1">De onde veio cada cliente: Google, Instagram, WhatsApp — sem achismo.</p>
             <p class="nb-passo" data-nb-passo="2">Quanto cada real investido trouxe de volta, rastreado até o pedido.</p>
             <p class="nb-passo" data-nb-passo="3">E o que vamos ajustar no mês seguinte. Zero caixa-preta.</p>
@@ -226,26 +234,43 @@
               </div>
               <div class="nb-lid-edge" aria-hidden="true"></div>
               <div class="nb-screen" aria-hidden="true">
+                <!-- A tela conta a história em capítulos: cada camada
+                     .nb-tela acende com o passo correspondente
+                     (data-passo no .nb-laptop, módulo "notebook"). -->
                 <svg viewBox="0 0 460 280" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
                   <rect width="460" height="280" fill="#0b1220"/>
                   <rect width="460" height="30" fill="#0e1628"/>
                   <circle cx="16" cy="15" r="4" fill="#FF8A8A"/><circle cx="30" cy="15" r="4" fill="#2a3350"/><circle cx="44" cy="15" r="4" fill="#2a3350"/>
-                  <text x="62" y="19" font-family="Space Grotesk, sans-serif" font-size="11" fill="#8b93b0">Relatório do mês — exemplo ilustrativo</text>
-                  <text x="24" y="62" font-family="Space Grotesk, sans-serif" font-size="15" font-weight="700" fill="#ffffff">De onde vieram os clientes</text>
-                  <rect x="24" y="76" width="170" height="12" rx="6" fill="#22D3EE"/>
-                  <text x="202" y="86" font-family="Inter, sans-serif" font-size="10" fill="#9fb0c8">Google · 46%</text>
-                  <rect x="24" y="96" width="122" height="12" rx="6" fill="#6C4CF1"/>
-                  <text x="154" y="106" font-family="Inter, sans-serif" font-size="10" fill="#9fb0c8">Instagram · 33%</text>
-                  <rect x="24" y="116" width="78" height="12" rx="6" fill="#25D366"/>
-                  <text x="110" y="126" font-family="Inter, sans-serif" font-size="10" fill="#9fb0c8">Indicação · 21%</text>
-                  <text x="24" y="168" font-family="Space Grotesk, sans-serif" font-size="15" font-weight="700" fill="#ffffff">Contatos por semana</text>
-                  <polyline points="24,238 84,224 144,230 204,204 264,196 324,178 384,168 436,148" fill="none" stroke="#22D3EE" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
-                  <g fill="#22D3EE"><circle cx="84" cy="224" r="3"/><circle cx="204" cy="204" r="3"/><circle cx="324" cy="178" r="3"/><circle cx="436" cy="148" r="3"/></g>
-                  <line x1="24" y1="252" x2="436" y2="252" stroke="#233052" stroke-width="1"/>
-                  <rect x="298" y="52" width="138" height="84" rx="10" fill="#0e1a2e" stroke="#1d3050"/>
-                  <text x="312" y="76" font-family="Inter, sans-serif" font-size="10" fill="#9fb0c8">Retorno rastreado</text>
-                  <text x="312" y="104" font-family="Space Grotesk, sans-serif" font-size="24" font-weight="700" fill="#22D3EE">R$ 4,8 mil</text>
-                  <text x="312" y="122" font-family="Inter, sans-serif" font-size="10" fill="#67d9a0">▲ de R$ 1,2 mil investidos</text>
+                  <text x="62" y="19" font-family="Space Grotesk, sans-serif" font-size="11" fill="#8b93b0">Relatório Vivo — agosto (exemplo)</text>
+                  <g class="nb-tela nb-tela-chega">
+                    <rect x="140" y="96" width="180" height="88" rx="12" fill="#0e1a2e" stroke="#1d3050"/>
+                    <circle cx="230" cy="122" r="13" fill="#6C4CF1"/>
+                    <text x="230" y="127" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="13" font-weight="700" fill="#ffffff">Z</text>
+                    <text x="230" y="152" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="13" font-weight="700" fill="#ffffff">Relatório Vivo — agosto</text>
+                    <text x="230" y="169" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#9fb0c8">acabou de chegar</text>
+                  </g>
+                  <g class="nb-tela nb-tela-origem">
+                    <text x="24" y="62" font-family="Space Grotesk, sans-serif" font-size="15" font-weight="700" fill="#ffffff">De onde vieram os clientes</text>
+                    <rect x="24" y="76" width="170" height="12" rx="6" fill="#22D3EE"/>
+                    <text x="202" y="86" font-family="Inter, sans-serif" font-size="10" fill="#9fb0c8">Google · 46%</text>
+                    <rect x="24" y="96" width="122" height="12" rx="6" fill="#6C4CF1"/>
+                    <text x="154" y="106" font-family="Inter, sans-serif" font-size="10" fill="#9fb0c8">Instagram · 33%</text>
+                    <rect x="24" y="116" width="78" height="12" rx="6" fill="#25D366"/>
+                    <text x="110" y="126" font-family="Inter, sans-serif" font-size="10" fill="#9fb0c8">Indicação · 21%</text>
+                  </g>
+                  <g class="nb-tela nb-tela-retorno">
+                    <text x="24" y="168" font-family="Space Grotesk, sans-serif" font-size="15" font-weight="700" fill="#ffffff">Contatos por semana</text>
+                    <polyline points="24,238 84,224 144,230 204,204 264,196 324,178 384,168 436,148" fill="none" stroke="#22D3EE" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+                    <g fill="#22D3EE"><circle cx="84" cy="224" r="3"/><circle cx="204" cy="204" r="3"/><circle cx="324" cy="178" r="3"/><circle cx="436" cy="148" r="3"/></g>
+                    <line x1="24" y1="252" x2="436" y2="252" stroke="#233052" stroke-width="1"/>
+                    <rect x="298" y="52" width="138" height="84" rx="10" fill="#0e1a2e" stroke="#1d3050"/>
+                    <text x="312" y="76" font-family="Inter, sans-serif" font-size="10" fill="#9fb0c8">Retorno rastreado</text>
+                    <text x="312" y="104" font-family="Space Grotesk, sans-serif" font-size="24" font-weight="700" fill="#22D3EE">R$ 4,8 mil</text>
+                    <text x="312" y="122" font-family="Inter, sans-serif" font-size="10" fill="#67d9a0">▲ de R$ 1,2 mil investidos</text>
+                  </g>
+                  <g class="nb-tela nb-tela-plano">
+                    <text x="24" y="273" font-family="Inter, sans-serif" font-size="10.5" fill="#F59E0B">▸ Próximo mês: reforçar Google Ads e testar novo criativo no Instagram</text>
+                  </g>
                 </svg>
               </div>
             </div>
@@ -266,7 +291,86 @@
     </div>
   </section>
 
-  <!-- ====== FOLHA CLARA 1: serviços + comparativo ====== -->
+  <!-- ====== FAIXA ESCURA: a dor ANTES da oferta (problema → método
+       → serviços) — cada cartão fecha o próprio argumento com o
+       "de → para" que antes era uma seção inteira de comparativo. -->
+  <section class="band">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="kicker k-bar">Se identifica?</span>
+        <h2 data-reveal>Sinais de que o digital está te <em>custando cliente</em></h2>
+        <p>São os quatro problemas que mais encontramos no primeiro diagnóstico — e, em cada cartão, o que muda quando entra método.</p>
+      </div>
+      <div class="grid grid-4">
+        <div class="pain-card reveal">
+          <div class="icon"><svg class="iso" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 14 40 23 24 32 8 23Z" fill="#A78BFA"/><path d="M40 23v9L24 41v-9Z" fill="#6C4CF1"/><path d="M8 23v9l16 9v-9Z" fill="#5638D6"/><path d="m12 4 7.5 4.4 4.3-2.6 8.6 5.4" fill="none" stroke="#F59E0B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="m32.6 6.6-.2 4.9-4.6-.7" fill="none" stroke="#F59E0B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3>Movimento sem venda</h3>
+          <p>Curtida até tem. Mas o caixa não sente diferença nenhuma.</p>
+          <p class="pain-cura"><b>Com método:</b> calendário de conteúdo com objetivo de venda definido.</p>
+        </div>
+        <div class="pain-card reveal">
+          <div class="icon"><svg class="iso" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 14 40 23 24 32 8 23Z" fill="#A78BFA"/><path d="M40 23v9L24 41v-9Z" fill="#6C4CF1"/><path d="M8 23v9l16 9v-9Z" fill="#5638D6"/><path d="M19.6 6.6c0-2.6 2-4.4 4.5-4.4 2.6 0 4.4 1.7 4.4 4 0 3-3.7 3.2-3.7 5.6" fill="none" stroke="#F59E0B" stroke-width="2.6" stroke-linecap="round"/><circle cx="24.6" cy="15.4" r="1.7" fill="#F59E0B"/></svg></div>
+          <h3>Anúncio no escuro</h3>
+          <p>Você paga todo mês, mas ninguém sabe dizer o que voltou.</p>
+          <p class="pain-cura"><b>Com método:</b> cada real de anúncio rastreado até o pedido.</p>
+        </div>
+        <div class="pain-card reveal">
+          <div class="icon"><svg class="iso" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 14 40 23 24 32 8 23Z" fill="#A78BFA"/><path d="M40 23v9L24 41v-9Z" fill="#6C4CF1"/><path d="M8 23v9l16 9v-9Z" fill="#5638D6"/><ellipse cx="22" cy="9" rx="6.2" ry="5" fill="none" stroke="#F59E0B" stroke-width="2.4" stroke-dasharray="4 3"/><path d="m27 13 5.4 4.2" stroke="#F59E0B" stroke-width="2.6" stroke-linecap="round"/></svg></div>
+          <h3>Invisível no Google</h3>
+          <p>Quem procura o seu serviço encontra o seu concorrente.</p>
+          <p class="pain-cura"><b>Com método:</b> SEO pensado desde a estrutura do site.</p>
+        </div>
+        <div class="pain-card reveal">
+          <div class="icon"><svg class="iso" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 14 40 23 24 32 8 23Z" fill="#A78BFA"/><path d="M40 23v9L24 41v-9Z" fill="#6C4CF1"/><path d="M8 23v9l16 9v-9Z" fill="#5638D6"/><path d="M16 2.6h16a4 4 0 0 1 4 4v3a4 4 0 0 1-4 4h-7l-5.4 4.2.4-4.2H16a4 4 0 0 1-4-4v-3a4 4 0 0 1 4-4Z" fill="none" stroke="#F59E0B" stroke-width="2.3"/><g fill="#F59E0B"><circle cx="19.5" cy="8.1" r="1.35"/><circle cx="24" cy="8.1" r="1.35" opacity="0.55"/><circle cx="28.5" cy="8.1" r="1.35" opacity="0.22"/></g></svg></div>
+          <h3>WhatsApp no vácuo</h3>
+          <p>O cliente chama, a resposta demora e a venda esfria.</p>
+          <p class="pain-cura"><b>Com método:</b> WhatsApp configurado para responder e vender rápido.</p>
+        </div>
+      </div>
+
+      <div class="band-gap"></div>
+
+      <div class="section-head reveal">
+        <span class="kicker k-bar">Como trabalhamos</span>
+        <h2 data-reveal>Método simples, resultado <em>visível</em></h2>
+        <p>Sem caixa-preta: você sabe o que está sendo feito, por que está sendo feito e o que está voltando.</p>
+      </div>
+      <div class="grid grid-4 timeline">
+        <div class="tl-step reveal">
+          <div class="num">1</div>
+          <h3>Diagnóstico</h3>
+          <p>Analisamos seu negócio, sua concorrência e sua presença digital. De graça.</p>
+        </div>
+        <div class="tl-step reveal">
+          <div class="num">2</div>
+          <h3>Plano</h3>
+          <p>Montamos a estratégia e o pacote certo para o seu momento e orçamento.</p>
+        </div>
+        <div class="tl-step reveal">
+          <div class="num">3</div>
+          <h3>Execução</h3>
+          <p>Nosso time coloca tudo para rodar: conteúdo, anúncios, site, WhatsApp.</p>
+        </div>
+        <div class="tl-step reveal">
+          <div class="num">4</div>
+          <h3>Resultado</h3>
+          <p>Relatório mensal em linguagem simples + reunião de ajuste de rota.</p>
+        </div>
+      </div>
+
+      <div class="stats reveal">
+        <!-- Números reais no HTML desde o primeiro byte: sem JS (ou para
+             o Google) o site mostra o valor certo; o JS só anima a partir dele. -->
+        <div class="stat"><b data-count="8">8</b><span>frentes de trabalho integradas</span></div>
+        <div class="stat"><b data-count="1">1</b><span>dia útil para responder você</span></div>
+        <div class="stat"><b data-count="12">12</b><span>relatórios de resultado por ano</span></div>
+        <div class="stat"><b>0</b><span>caixa-preta no seu investimento</span></div>
+      </div>
+      <p class="stats-note">Compromissos de trabalho, não promessa de vitrine — é assim que operamos com todo cliente.</p>
+    </div>
+  </section>
+
+  <!-- ====== FOLHA CLARA 1: serviços ====== -->
   <div class="sheet sheet-pull">
 
     <section class="section">
@@ -329,120 +433,14 @@
       </div>
     </section>
 
-    <section class="section section-seq">
-      <div class="container">
-        <div class="section-head reveal">
-          <span class="kicker k-bar">A diferença</span>
-          <h2 data-reveal>Marketing no improviso × marketing com <span class="grad-text">método</span></h2>
-          <p>O problema quase nunca é falta de esforço — é falta de sistema. Veja de que lado sua empresa está hoje.</p>
-        </div>
-        <div class="compare">
-          <div class="compare-col compare-bad reveal">
-            <h3>Como costuma ser <span class="compare-tag">improviso</span></h3>
-            <ul>
-              <li>Posta quando dá tempo, sem estratégia por trás</li>
-              <li>Anúncio ligado sem saber quanto voltou de venda</li>
-              <li>Site bonito que o Google não encontra</li>
-              <li>Relatório cheio de termo técnico — ou nenhum relatório</li>
-              <li>Cliente chama no WhatsApp e espera horas por resposta</li>
-            </ul>
-          </div>
-          <div class="compare-col compare-good reveal">
-            <h3>Como é com a Zyva <span class="compare-tag">método</span></h3>
-            <ul>
-              <li>Calendário de conteúdo com objetivo de venda definido</li>
-              <li>Cada real de anúncio rastreado até o pedido</li>
-              <li>SEO pensado desde a estrutura do site</li>
-              <li>Relatório mensal em português claro, sem jargão</li>
-              <li>WhatsApp configurado para responder e vender rápido</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section>
-
-  </div>
-
-  <!-- ====== FAIXA ESCURA: dores + método + compromissos ====== -->
-  <section class="band">
-    <div class="container">
-      <div class="section-head reveal">
-        <span class="kicker k-bar">Se identifica?</span>
-        <h2 data-reveal>Sinais de que o digital está te <em>custando cliente</em></h2>
-        <p>São os quatro problemas que mais encontramos quando fazemos o primeiro diagnóstico de uma empresa.</p>
-      </div>
-      <div class="grid grid-4">
-        <div class="pain-card reveal">
-          <div class="icon"><svg class="iso" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 14 40 23 24 32 8 23Z" fill="#A78BFA"/><path d="M40 23v9L24 41v-9Z" fill="#6C4CF1"/><path d="M8 23v9l16 9v-9Z" fill="#5638D6"/><path d="m12 4 7.5 4.4 4.3-2.6 8.6 5.4" fill="none" stroke="#F59E0B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="m32.6 6.6-.2 4.9-4.6-.7" fill="none" stroke="#F59E0B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <h3>Movimento sem venda</h3>
-          <p>Curtida até tem. Mas o caixa não sente diferença nenhuma.</p>
-        </div>
-        <div class="pain-card reveal">
-          <div class="icon"><svg class="iso" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 14 40 23 24 32 8 23Z" fill="#A78BFA"/><path d="M40 23v9L24 41v-9Z" fill="#6C4CF1"/><path d="M8 23v9l16 9v-9Z" fill="#5638D6"/><path d="M19.6 6.6c0-2.6 2-4.4 4.5-4.4 2.6 0 4.4 1.7 4.4 4 0 3-3.7 3.2-3.7 5.6" fill="none" stroke="#F59E0B" stroke-width="2.6" stroke-linecap="round"/><circle cx="24.6" cy="15.4" r="1.7" fill="#F59E0B"/></svg></div>
-          <h3>Anúncio no escuro</h3>
-          <p>Você paga todo mês, mas ninguém sabe dizer o que voltou.</p>
-        </div>
-        <div class="pain-card reveal">
-          <div class="icon"><svg class="iso" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 14 40 23 24 32 8 23Z" fill="#A78BFA"/><path d="M40 23v9L24 41v-9Z" fill="#6C4CF1"/><path d="M8 23v9l16 9v-9Z" fill="#5638D6"/><ellipse cx="22" cy="9" rx="6.2" ry="5" fill="none" stroke="#F59E0B" stroke-width="2.4" stroke-dasharray="4 3"/><path d="m27 13 5.4 4.2" stroke="#F59E0B" stroke-width="2.6" stroke-linecap="round"/></svg></div>
-          <h3>Invisível no Google</h3>
-          <p>Quem procura o seu serviço encontra o seu concorrente.</p>
-        </div>
-        <div class="pain-card reveal">
-          <div class="icon"><svg class="iso" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 14 40 23 24 32 8 23Z" fill="#A78BFA"/><path d="M40 23v9L24 41v-9Z" fill="#6C4CF1"/><path d="M8 23v9l16 9v-9Z" fill="#5638D6"/><path d="M16 2.6h16a4 4 0 0 1 4 4v3a4 4 0 0 1-4 4h-7l-5.4 4.2.4-4.2H16a4 4 0 0 1-4-4v-3a4 4 0 0 1 4-4Z" fill="none" stroke="#F59E0B" stroke-width="2.3"/><g fill="#F59E0B"><circle cx="19.5" cy="8.1" r="1.35"/><circle cx="24" cy="8.1" r="1.35" opacity="0.55"/><circle cx="28.5" cy="8.1" r="1.35" opacity="0.22"/></g></svg></div>
-          <h3>WhatsApp no vácuo</h3>
-          <p>O cliente chama, a resposta demora e a venda esfria.</p>
-        </div>
-      </div>
-
-      <div class="band-gap"></div>
-
-      <div class="section-head reveal">
-        <span class="kicker k-bar">Como trabalhamos</span>
-        <h2 data-reveal>Método simples, resultado <em>visível</em></h2>
-        <p>Sem caixa-preta: você sabe o que está sendo feito, por que está sendo feito e o que está voltando.</p>
-      </div>
-      <div class="grid grid-4 timeline">
-        <div class="tl-step reveal">
-          <div class="num">1</div>
-          <h3>Diagnóstico</h3>
-          <p>Analisamos seu negócio, sua concorrência e sua presença digital. De graça.</p>
-        </div>
-        <div class="tl-step reveal">
-          <div class="num">2</div>
-          <h3>Plano</h3>
-          <p>Montamos a estratégia e o pacote certo para o seu momento e orçamento.</p>
-        </div>
-        <div class="tl-step reveal">
-          <div class="num">3</div>
-          <h3>Execução</h3>
-          <p>Nosso time coloca tudo para rodar: conteúdo, anúncios, site, WhatsApp.</p>
-        </div>
-        <div class="tl-step reveal">
-          <div class="num">4</div>
-          <h3>Resultado</h3>
-          <p>Relatório mensal em linguagem simples + reunião de ajuste de rota.</p>
-        </div>
-      </div>
-
-      <div class="stats reveal">
-        <!-- Números reais no HTML desde o primeiro byte: sem JS (ou para
-             o Google) o site mostra o valor certo; o JS só anima a partir dele. -->
-        <div class="stat"><b data-count="8">8</b><span>frentes de trabalho integradas</span></div>
-        <div class="stat"><b data-count="1">1</b><span>dia útil para responder você</span></div>
-        <div class="stat"><b data-count="12">12</b><span>relatórios de resultado por ano</span></div>
-        <div class="stat"><b>0</b><span>caixa-preta no seu investimento</span></div>
-      </div>
-      <p class="stats-note">Compromissos de trabalho, não promessa de vitrine — é assim que operamos com todo cliente.</p>
-    </div>
-  </section>
-
-  <!-- ====== FOLHA CLARA 2: calculadora + diagnóstico + blog + FAQ ====== -->
-  <div class="sheet">
+  <!-- (folha ÚNICA e contínua até o FAQ: duas folhas coladas criavam
+       uma "quebra de página" falsa — recortes escuros no meio de um
+       trecho claro, sem nenhuma seção escura entre elas) -->
 
     <!-- Calculadora de retorno: números honestos que geram conversa.
          As contas usam faixas CONSERVADORAS (constantes no zyva-motion.js);
          o resultado nunca promete — convida para o diagnóstico. -->
-    <section class="section">
+    <section class="section section-seq">
       <div class="container">
         <div class="calc reveal" data-calc>
           <span class="kicker k-bar">Faça as contas</span>
@@ -459,6 +457,7 @@
                 <input type="range" id="calc-ticket" data-calc-ticket min="30" max="500" step="10" value="120" aria-describedby="calc-nota" />
               </div>
               <p class="calc-nota" id="calc-nota">Estimativa conservadora com médias brasileiras de custo por clique e conversão para pequenas empresas. Não é promessa: é ponto de partida para a conversa.</p>
+              <p class="calc-nota calc-fonte" data-calc-fonte hidden>Já começamos do valor que você marcou no diagnóstico ali em cima — sem achismo até aqui.</p>
             </div>
             <div class="calc-saida" role="status" aria-live="polite">
               <div class="calc-linha"><span>Cliques no seu anúncio</span><b data-calc-cliques>400–667</b></div>
@@ -569,8 +568,12 @@
             <p>Não. Se você ainda não tem, a gente cria do zero; se já tem, aproveitamos o que funciona e arrumamos o que trava resultado. O diagnóstico indica o caminho mais econômico.</p>
           </details>
           <details>
+            <summary>O que é o Relatório Vivo?</summary>
+            <p>É o relatório mensal da Zyva, em português claro: de onde veio cada cliente, quanto cada real investido trouxe de volta e o que vamos ajustar no mês seguinte. Você vê um exemplo dele abrindo no notebook, no topo desta página.</p>
+          </details>
+          <details>
             <summary>Como eu acompanho o trabalho?</summary>
-            <p>Todo mês você recebe um relatório em português claro — o que foi feito, o que aconteceu e o que vem agora — e uma reunião de ajuste de rota. No dia a dia, o canal é o WhatsApp direto com o time.</p>
+            <p>Todo mês você recebe o Relatório Vivo — o que foi feito, o que aconteceu e o que vem agora — e uma reunião de ajuste de rota. No dia a dia, o canal é o WhatsApp direto com o time.</p>
           </details>
           <details>
             <summary>Vocês atendem a minha cidade?</summary>
@@ -645,7 +648,7 @@
         <div class="cine-copy">© <span data-year></span> Zyva · CNPJ 65.963.470/0001-04 · São Luís (MA) — atendemos todo o Brasil.</div>
         <div class="cine-badge">
           <span>Feito com</span>
-          <span class="cine-heart">&#10084;</span>
+          <strong>m&#233;todo</strong>
           <span>pela</span>
           <strong>Zyva</strong>
         </div>
@@ -661,6 +664,6 @@
   </a>
 
   <script src="/assets/js/main.js?v=9"></script>
-  <script src="/assets/js/zyva-motion.js?v=19" defer></script>
+  <script src="/assets/js/zyva-motion.js?v=21" defer></script>
 </body>
 </html>
