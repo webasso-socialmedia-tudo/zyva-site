@@ -327,7 +327,7 @@
 .wa-avatar {
   width: 38px; height: 38px;
   border-radius: 50%;
-  background: var(--grad);
+  background: var(--violet);
   display: grid; place-items: center;
   flex: none;
 }
@@ -621,7 +621,7 @@
 
 .m3-col:nth-child(even) { animation: m3-down 28s ease-in-out infinite alternate; }
 
-.m3-a { background: var(--grad); }
+.m3-a { background: var(--violet); }
 
 .m3-b { background: linear-gradient(140deg, #0B0E1A, #35307a); }
 
@@ -666,7 +666,7 @@
 
 .steps::before {
   content: ""; position: absolute; top: -16px; left: 2px; right: 2px; height: 3px;
-  border-radius: 3px; background: var(--grad); opacity: .6;
+  border-radius: 3px; background: var(--violet); opacity: .7;
   transform-origin: left center;
 }
 

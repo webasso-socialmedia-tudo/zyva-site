@@ -330,7 +330,7 @@ html.js-on .rise.rv-in, .rise.rv-in { opacity: 1; transform: none; }
 
 .bl-letter.on {
   transform: translateY(-10px);
-  background: linear-gradient(var(--white), var(--white)) padding-box, var(--grad) border-box;
+  background: linear-gradient(var(--white), var(--white)) padding-box, var(--violet) border-box;
   border: 2px solid transparent;
   color: transparent;
   background-clip: padding-box, border-box;
@@ -401,7 +401,7 @@ html.js-on .rise.rv-in, .rise.rv-in { opacity: 1; transform: none; }
 .read-bar i {
   display: block;
   height: 100%;
-  background: var(--grad);
+  background: var(--cyan);
   transform: scaleX(0);
   transform-origin: 0 50%;
   will-change: transform;
@@ -460,6 +460,7 @@ html.js-on .rise.rv-in, .rise.rv-in { opacity: 1; transform: none; }
 .cine-reveal {
   position: relative;
   height: 100vh;
+  height: 100dvh; /* celular: sem pulo da barra de endereço */
   width: 100%;
   clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
   background: var(--night);
@@ -468,6 +469,7 @@ html.js-on .rise.rv-in, .rise.rv-in { opacity: 1; transform: none; }
   position: fixed;
   bottom: 0; left: 0;
   height: 100vh; width: 100%;
+  height: 100dvh;
   display: flex; flex-direction: column; justify-content: space-between;
   overflow: hidden;
   background: var(--night);
@@ -584,15 +586,15 @@ html.js-on .rise.rv-in, .rise.rv-in { opacity: 1; transform: none; }
 }
 .cine-pill svg { width: 22px; height: 22px; fill: currentColor; flex: none; }
 .cine-pill-primary {
-  /* Gradiente com sobra de 240% centralizado: as pontas arredondadas
-     nascem em tons do meio da transição, sem cor sólida na extremidade. */
-  background-image: linear-gradient(to right, #6C4CF1, #22D3EE);
-  background-size: 240% 100%;
-  background-position: center;
+  /* sólido: mesma regra do .btn-primary — degradê só em fio e marca */
+  background: var(--violet);
   border-color: transparent;
   box-shadow: 0 14px 36px rgba(108,76,241,0.42);
 }
-.cine-pill-primary:hover { box-shadow: 0 18px 48px rgba(108,76,241,0.58); }
+.cine-pill-primary:hover {
+  background: var(--violet-deep, #5B3BE0);
+  box-shadow: 0 18px 48px rgba(108,76,241,0.58);
+}
 .cine-pill-sm { padding: 11px 22px; font-size: .82rem; font-weight: 600; color: rgba(255,255,255,0.7); }
 .cine-pill-sm:hover { color: #fff; }
 
@@ -612,12 +614,7 @@ html.js-on .rise.rv-in, .rise.rv-in { opacity: 1; transform: none; }
   color: rgba(255,255,255,0.6); font-size: .68rem; text-transform: uppercase; letter-spacing: .14em; font-weight: 700;
 }
 .cine-badge strong { color: #fff; font-family: var(--font-head); letter-spacing: normal; font-size: .82rem; }
-.cine-heart { color: #ff5a76; display: inline-block; animation: cine-heartbeat 2s cubic-bezier(.25,1,.5,1) infinite; }
-@keyframes cine-heartbeat {
-  0%,100% { transform: scale(1); }
-  15%,45% { transform: scale(1.25); }
-  30%     { transform: scale(1); }
-}
+/* (o coração do rodapé virou "método" — quinto matiz aposentado) */
 .cine-top {
   width: 48px; height: 48px; border-radius: 999px;
   display: inline-flex; align-items: center; justify-content: center;
@@ -649,7 +646,7 @@ html.js-on .rise.rv-in, .rise.rv-in { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) {
   .cine-reveal { height: auto; clip-path: none; }
   .cine-foot { position: relative; height: auto; min-height: 82vh; }
-  .cine-aurora, .cine-marquee-track, .cine-heart { animation: none; }
+  .cine-aurora, .cine-marquee-track { animation: none; }
 
 }
 
@@ -750,18 +747,18 @@ html.js-on .rise.rv-in, .rise.rv-in { opacity: 1; transform: none; }
 /* ---------- Modo A: TAG (tópico da página, no topo) ---------- */
 .kicker.k-tag {
   padding: 9px 17px 9px 14px; border-radius: 100px;
-  background: linear-gradient(#fff, #fff) padding-box, var(--grad) border-box;
+  background: linear-gradient(#fff, #fff) padding-box, var(--violet) border-box;
   border: 1.5px solid transparent; color: var(--ink);
   box-shadow: 0 8px 22px rgba(108,76,241,0.16);
 }
 /* no escuro: preenchimento OPACO (vidro escuro) — só a borda mostra o gradiente */
 .on-dark .kicker.k-tag, .band .kicker.k-tag {
-  background: linear-gradient(#171b30, #12162a) padding-box, var(--grad) border-box;
+  background: linear-gradient(#171b30, #12162a) padding-box, rgba(34,211,238,0.6) border-box;
   color: #fff; box-shadow: 0 10px 30px rgba(34,211,238,0.16);
 }
 .kicker.k-tag::before {
   content: ""; width: 8px; height: 8px; border-radius: 50%;
-  background: var(--grad); flex: none;
+  background: var(--cyan); flex: none;
   animation: k-ping 2.1s ease-out infinite;
 }
 @keyframes k-ping {
@@ -772,7 +769,13 @@ html.js-on .rise.rv-in, .rise.rv-in { opacity: 1; transform: none; }
 /* ---------- Modo B: BAR (cabeçalho de seção) ---------- */
 .kicker.k-bar::before {
   content: ""; width: 28px; height: 3px; border-radius: 3px;
-  background: var(--grad); flex: none; transform-origin: left center;
+  background: var(--violet); flex: none; transform-origin: left center;
+}
+/* no escuro o traço é ciano — mesma lógica de contexto do grifo */
+.on-dark .kicker.k-bar::before, .band .kicker.k-bar::before,
+.pipeline .kicker.k-bar::before, .diag .kicker.k-bar::before,
+.calc .kicker.k-bar::before, .nb-scene .kicker.k-bar::before {
+  background: var(--cyan);
 }
 
 /* ---------- Modo C: INDEX (enumeração) ---------- */
@@ -843,7 +846,7 @@ html.js-on .steps.mk-in .step:nth-child(4) .num { opacity:1; transform:none; tra
 }
 .hero .kicker.k-tag::before {
   content: ""; width: 24px; height: 24px; border-radius: 8px;
-  background: var(--grad); animation: none;
+  background: var(--violet); animation: none;
   box-shadow: 0 6px 18px rgba(108,76,241,0.45);
 }
 
@@ -893,23 +896,41 @@ html.js-on .steps.mk-in .step:nth-child(4) .num { opacity:1; transform:none; tra
 }
 
 /* ============================================================
-   20. DESTAQUE "ONDA DE SINAL" — no lugar do texto-degradê
-   Palavra-chave em cor sólida com uma onda correndo por baixo.
+   20. DESTAQUE "GRIFO DO RELATÓRIO" — no lugar do texto-degradê
+   A metáfora é humana e é a da marca: quem lê um relatório passa
+   marca-texto no que importa. Cor chapada translúcida, cortes
+   levemente inclinados como um traço de caneta, sem animação.
+   Violeta nas folhas claras, ciano nos palcos escuros.
    ============================================================ */
-.grad-text, .hero h1 em, .band h2 em, .pipeline h2 em, .phone-copy h2 em {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 7' preserveAspectRatio='none'%3E%3Cpath d='M0 3.5C3.5 .9 5 .9 8.5 3.5S13.5 6.1 17 3.5 22 .9 25.5 3.5 30.5 6.1 34 3.5' fill='none' stroke='%2322D3EE' stroke-width='1.7' stroke-linecap='round'/%3E%3C/svg%3E") !important;
+.grad-text, .hero h1 em, .band h2 em, .pipeline h2 em, .phone-copy h2 em,
+.nb-copy h2 em, .calc h2 em {
+  --grifo: rgba(108, 76, 241, 0.18);
+  background-image: linear-gradient(100deg,
+    transparent 1.5%, var(--grifo) 4%,
+    var(--grifo) 96%, transparent 98.5%) !important;
   -webkit-background-clip: border-box !important;
   background-clip: border-box !important;
   -webkit-text-fill-color: currentColor !important;
   color: inherit !important;
   font-style: normal;
-  background-repeat: repeat-x !important;
-  background-size: 1.05em 0.22em !important;
-  background-position: 0 100% !important;
-  padding-bottom: 0.16em;
-  animation: sig-wave-flow 7s linear infinite;
+  background-repeat: no-repeat !important;
+  background-size: 100% 0.68em !important;
+  background-position: 0 82% !important;
+  padding: 0 0.1em;
+  margin: 0 -0.02em;
+  border-radius: 0.2em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
-@keyframes sig-wave-flow { to { background-position: 1.05em 100%; } }
+/* nos palcos escuros o grifo é ciano — a cor do dado */
+.hero h1 em, .band h2 em, .nb-copy h2 em, .calc h2 em,
+.pipeline h2 em, .phone-copy h2 em,
+.on-dark .grad-text, .diag .grad-text {
+  --grifo: rgba(34, 211, 238, 0.24);
+}
+/* Space Grotesk não tem itálico: nenhum em de título cai no
+   oblíquo sintético do navegador (a cara de default de IA) */
+h1 em, h2 em, h3 em { font-style: normal; }
 
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
@@ -917,7 +938,7 @@ html.js-on .steps.mk-in .step:nth-child(4) .num { opacity:1; transform:none; tra
   
   .post-card, .post-card:hover { transform: none; }
   .post-card:hover .post-cat { animation: none; }
-  .grad-text, .hero h1 em, .band h2 em, .pipeline h2 em, .phone-copy h2 em { animation: none; }
+  /* (o grifo é estático — nada a desligar aqui) */
 
 }
 
@@ -951,6 +972,20 @@ html.rv-fallback .bl-value.on {
   opacity: 1 !important;
   transform: none !important;
 }
+/* A peça central também tem rede: sem o motor de movimento, o
+   notebook aparece ABERTO e os passos viram texto corrido — nada
+   de 240vh de laptop fechado com legendas invisíveis. */
+html.rv-fallback .nb-passo {
+  position: static;
+  opacity: 1;
+  transform: none;
+  margin-bottom: 10px;
+}
+html.rv-fallback .nb-laptop { transform: rotateX(-18deg); }
+html.rv-fallback .nb-lid { transform: translateY(-20px) rotateX(10deg); }
+html.rv-fallback .nb-screen { filter: none; }
+html.rv-fallback .nb-glow { opacity: 1; }
+html.rv-fallback .nb-dica { display: none; }
 
 /* ============================================================
    21. DIAGNÓSTICO NO HERÓI (home)
@@ -984,7 +1019,7 @@ html.rv-fallback .bl-value.on {
 }
 .diag-bar i {
   display: block; height: 100%; width: 33.33%;
-  background: var(--grad); border-radius: 3px;
+  background: var(--cyan); border-radius: 3px;
   transition: width 0.45s var(--ease-out-expo);
 }
 
@@ -1055,7 +1090,7 @@ html.rv-fallback .bl-value.on {
   font-family: var(--font-head); font-weight: 700; font-size: 0.8rem;
   width: 26px; height: 26px; border-radius: 8px;
   display: grid; place-items: center;
-  background: var(--grad); color: #fff;
+  background: var(--violet); color: #fff;
 }
 .diag-frente b { display: block; font-family: var(--font-head); font-size: 0.94rem; color: #fff; }
 .diag-frente span { display: block; font-size: 0.83rem; color: rgba(255, 255, 255, 0.6); margin-top: 2px; line-height: 1.45; }
