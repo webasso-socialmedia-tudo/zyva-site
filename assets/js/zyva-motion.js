@@ -127,10 +127,25 @@
       items.forEach(entra);
       return;
     }
+    /* Cadência de grade: irmãos do mesmo .grid entram escalonados
+       (60ms cada, teto 360ms) — sistema vivo, não bloco que pisca.
+       O atraso é LIMPO depois da entrada para não atrasar hovers. */
+    const escalona = (el) => {
+      const pai = el.parentElement;
+      if (!pai || !pai.classList.contains("grid")) return 0;
+      const irmaos = Array.from(pai.children).filter((c) =>
+        c.classList.contains("reveal") || c.classList.contains("rise") || c.hasAttribute("data-reveal"));
+      return Math.min(Math.max(irmaos.indexOf(el), 0) * 60, 360);
+    };
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           if (!e.isIntersecting) return;
+          const d = escalona(e.target);
+          if (d) {
+            e.target.style.transitionDelay = d + "ms";
+            setTimeout(() => { e.target.style.transitionDelay = ""; }, d + 800);
+          }
           entra(e.target);
           io.unobserve(e.target);
         });
@@ -195,10 +210,21 @@
 
       render(true);
       if (list.length > 1) {
-        setInterval(() => {
-          idx = (idx + 1) % list.length;
-          render(false);
-        }, interval);
+        /* O giro PARA quando o herói sai da tela ou a aba fica em
+           segundo plano: movimento invisível não gasta bateria. */
+        let timer = null;
+        let naTela = true;
+        const gira = () => { idx = (idx + 1) % list.length; render(false); };
+        const liga = () => { if (!timer && naTela && !document.hidden) timer = setInterval(gira, interval); };
+        const desliga = () => { if (timer) { clearInterval(timer); timer = null; } };
+        document.addEventListener("visibilitychange", () => (document.hidden ? desliga() : liga()));
+        if ("IntersectionObserver" in window) {
+          new IntersectionObserver((es) => {
+            naTela = es.some((e) => e.isIntersecting);
+            naTela ? liga() : desliga();
+          }, { threshold: 0 }).observe(host);
+        }
+        liga();
       }
     });
   });
@@ -916,7 +942,12 @@
         if (REDUCED) { mostra(alvo); return; }
         body.classList.add("diag-swap");
         clearTimeout(tMostra);
-        tMostra = setTimeout(() => { mostra(alvo); body.classList.remove("diag-swap"); }, 200);
+        tMostra = setTimeout(() => {
+          mostra(alvo);
+          /* dois quadros: o navegador precisa PINTAR a pergunta nova
+             ainda em .diag-swap para a transição de entrada rodar */
+          requestAnimationFrame(() => requestAnimationFrame(() => body.classList.remove("diag-swap")));
+        }, 200);
       } else {
         monta();
       }
@@ -1227,7 +1258,11 @@
        -90° (fechada por cima da base) → +10° (de pé). Como os dois
        giros são no mesmo eixo, o ângulo efetivo da tampa na tela é
        a soma — a tela só "acorda" quando essa soma vira para você. */
-    const MARCOS = [0, 0.3, 0.58, 0.82];
+    /* Os marcos moram DEPOIS de a tela virar para o espectador
+       (~p 0.5): cada passo acende um capítulo do relatório na tela
+       (data-passo → .nb-tela no CSS). Antes disso o passo 0 narra
+       a abertura. */
+    const MARCOS = [0, 0.52, 0.68, 0.84];
     const outCubic = (t) => 1 - Math.pow(1 - t, 3);
 
     const mede = () => {
@@ -1236,8 +1271,8 @@
       if (r.bottom < -100 || r.top > vh + 100) return;
       const total = Math.max(r.height - vh, 1);
       const p = clamp(-r.top / total, 0, 1);
-      const abre = outCubic(clamp((p - 0.10) / 0.55, 0, 1));  /* tampa abre ainda de cima */
-      const desce = outCubic(clamp((p - 0.38) / 0.50, 0, 1)); /* câmera desce por último  */
+      const abre = outCubic(clamp((p - 0.04) / 0.55, 0, 1));  /* tampa abre ainda de cima */
+      const desce = outCubic(clamp((p - 0.36) / 0.56, 0, 1)); /* câmera desce por último  */
       const cam = -90 + desce * 72;
       const open = -90 + abre * 100;
       laptop.style.setProperty("--nb-cam", cam.toFixed(2) + "deg");
@@ -1246,6 +1281,7 @@
       let ativo = 0;
       for (let i = MARCOS.length - 1; i >= 0; i--) { if (p >= MARCOS[i]) { ativo = i; break; } }
       passos.forEach((el, i) => el.classList.toggle("on", i === ativo));
+      laptop.dataset.passo = String(ativo);
     };
     let ticking = false;
     const onScroll = () => {
@@ -1286,6 +1322,33 @@
     const faixa = (a, b) =>
       Math.max(Math.round(a), 0).toLocaleString("pt-BR") + "–" + Math.round(b).toLocaleString("pt-BR");
 
+    /* Os números CORREM até o valor (~240ms) em vez de trocar secos:
+       o painel parece computar — e computar é a tese da seção.
+       Estado atual mostrado × alvo; um rAF só para as 4 linhas. */
+    const mostrado = { cliMin: 400, cliMax: 667, convMin: 12, convMax: 40, vendMin: 2.4, vendMax: 14, retMin: 288, retMax: 1680 };
+    let animRaf = null;
+    const pinta = (m) => {
+      outs.cliques.textContent = faixa(m.cliMin, m.cliMax);
+      outs.conversas.textContent = faixa(m.convMin, m.convMax);
+      outs.vendas.textContent = faixa(m.vendMin, m.vendMax);
+      outs.retorno.textContent = "R$ " + faixa(m.retMin, m.retMax);
+    };
+    const corre = (alvo) => {
+      if (animRaf) cancelAnimationFrame(animRaf);
+      /* aba oculta: rAF congela e o valor ficaria velho — pinta direto */
+      if (REDUCED || document.hidden) { Object.assign(mostrado, alvo); pinta(mostrado); return; }
+      const de = Object.assign({}, mostrado);
+      const ini = performance.now();
+      const passo = (agora) => {
+        const t = Math.min((agora - ini) / 240, 1);
+        const e = 1 - Math.pow(1 - t, 3);
+        for (const k in alvo) mostrado[k] = de[k] + (alvo[k] - de[k]) * e;
+        pinta(mostrado);
+        animRaf = t < 1 ? requestAnimationFrame(passo) : null;
+      };
+      animRaf = requestAnimationFrame(passo);
+    };
+
     const calcula = () => {
       const v = Number(verba.value), t = Number(ticket.value);
       outs.verba.textContent = rs(v);
@@ -1295,10 +1358,8 @@
       const cliMin = v / 2.5, cliMax = v / 1.5;          /* CPC 2,50 e 1,50 */
       const convMin = cliMin * 0.03, convMax = cliMax * 0.06;
       const vendMin = convMin * 0.2, vendMax = convMax * 0.35;
-      outs.cliques.textContent = faixa(cliMin, cliMax);
-      outs.conversas.textContent = faixa(convMin, convMax);
-      outs.vendas.textContent = faixa(vendMin, vendMax);
-      outs.retorno.textContent = "R$ " + faixa(vendMin * t, vendMax * t);
+      corre({ cliMin, cliMax, convMin, convMax, vendMin, vendMax,
+              retMin: vendMin * t, retMax: vendMax * t });
       if (cta) {
         const msg = "Olá, Zyva! Usei a calculadora do site: invisto R$ " + v +
           " por mês e uma venda vale R$ " + t + " para mim. Deu " +
@@ -1311,6 +1372,29 @@
     verba.addEventListener("input", calcula);
     ticket.addEventListener("input", calcula);
     calcula();
+
+    /* O quiz do herói alimenta a calculadora: quem já contou a
+       verba não recomeça do padrão — "sem achismo" vale dentro do
+       próprio site. A resposta nunca atropela quem mexeu no slider. */
+    let mexeu = false;
+    verba.addEventListener("input", () => { mexeu = true; }, { once: true });
+    const VERBA_QUIZ = { zero: 500, ate500: 500, ate2k: 1500, acima: 3000 };
+    const fonte = raiz.querySelector("[data-calc-fonte]");
+    const aplicaVerba = (chave) => {
+      const v = VERBA_QUIZ[chave];
+      if (!v || mexeu || Number(verba.value) === v) return;
+      verba.value = String(v);
+      if (fonte) fonte.hidden = false;
+      calcula();
+    };
+    try {
+      const guardado = sessionStorage.getItem("zyva_diag");
+      if (guardado) aplicaVerba(((JSON.parse(guardado) || {}).resp || {}).verba);
+    } catch (e) {}
+    document.addEventListener("zyva:diag", (e) => {
+      const d = (e && e.detail) || {};
+      if (d.resp && d.resp.verba) aplicaVerba(d.resp.verba);
+    });
 
     /* primeiro ajuste = interesse (evento GA, uma vez por página) */
     let usou = false;
@@ -1373,8 +1457,10 @@
       el.addEventListener("pointermove", (e) => {
         const r = el.getBoundingClientRect();
         el.classList.add("mag-live");
-        el.style.setProperty("--mag-x", (((e.clientX - (r.left + r.width / 2)) / (r.width / 2)) * 5).toFixed(1) + "px");
-        el.style.setProperty("--mag-y", (((e.clientY - (r.top + r.height / 2)) / (r.height / 2)) * 4).toFixed(1) + "px");
+        /* 8/6px: efeito assumido (5/4 era imperceptível — ou o
+           acessório se nota, ou não paga o pointermove que custa) */
+        el.style.setProperty("--mag-x", (((e.clientX - (r.left + r.width / 2)) / (r.width / 2)) * 8).toFixed(1) + "px");
+        el.style.setProperty("--mag-y", (((e.clientY - (r.top + r.height / 2)) / (r.height / 2)) * 6).toFixed(1) + "px");
       });
       el.addEventListener("pointerleave", () => {
         el.classList.remove("mag-live");
