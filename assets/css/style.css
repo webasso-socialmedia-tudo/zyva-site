@@ -148,7 +148,7 @@ ul { list-style: none; }
   top: 0;
   z-index: 50;
   /* Superfície sólida com profundidade real — sem vidro/blur. */
-  background: rgba(11, 14, 26, 0.96);
+  background: #0B0E1A; /* 100% opaco: nada vaza atras do cabecalho */
   border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 .nav {
@@ -1899,3 +1899,23 @@ h1, h2, .section-head p { text-wrap: balance; }
   margin-bottom: 10px;
 }
 .opera p { color: var(--muted); font-size: 0.97rem; margin: 0; }
+/* ---- ENQUADRAMENTO MOBILE (correcao do print do DS) ----
+   1) Nenhum navegador de celular infla o texto por conta propria;
+   2) A pagina NUNCA rola de lado: qualquer estouro e cortado
+      (clip nao cria conteiner de rolagem - sticky continua vivo);
+   3) A calculadora encolhe de verdade: itens de grid podem
+      afinar (min-width 0), linhas de resultado quebram e o
+      painel usa padding de celular. */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+html, body { overflow-x: clip; }
+.calc-grid > * { min-width: 0; }
+.calc-linha { flex-wrap: wrap; }
+@media (max-width: 640px) {
+  .calc { padding: 28px 18px; border-radius: 22px; }
+  .calc-saida { padding: 18px 16px; }
+  .calc-campo label { flex-wrap: wrap; gap: 4px 10px; }
+  .calc-destaque b { font-size: 1.45rem; }
+}
