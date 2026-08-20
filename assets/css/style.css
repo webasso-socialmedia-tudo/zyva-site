@@ -790,15 +790,13 @@ body.home .cta-final, body.dark-shell .cta-final { padding-top: 118px; }
   font-weight: 600;
   font-size: 0.87rem;
   color: #fff;
-  background-image: linear-gradient(to right, #6C4CF1, #22D3EE);
-  background-size: 240% 100%;
-  background-position: center;
+  background: var(--violet);
   padding: 8px 14px;
   border-radius: 9px;
   text-decoration: none;
-  transition: filter .15s ease, transform .15s ease;
+  transition: background .15s ease, transform .15s ease;
 }
-.zt-link:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.zt-link:hover { background: var(--violet-deep, #5B3BE0); transform: translateY(-1px); }
 .zt-close {
   position: absolute;
   top: 8px; right: 10px;
@@ -1688,6 +1686,54 @@ html.rv-fallback .nb-tela {
 .nb-laptop:not([data-passo]) .nb-tela-chega,
 html.rv-fallback .nb-tela-chega { opacity: 0; }
 
+/* ---- BOOT da tela: o relatório NASCE, não aparece ----
+   Quando o capítulo acende, as barras crescem da esquerda, a linha
+   do gráfico se desenha e os pontos pipocam no fim do traço. */
+.nb-tela-origem rect {
+  transform: scaleX(0);
+  transform-box: fill-box;
+  transform-origin: left center;
+  transition: transform 0.55s var(--ease-zyva);
+}
+.nb-tela-origem rect:nth-of-type(1) { transition-delay: 0.10s; }
+.nb-tela-origem rect:nth-of-type(2) { transition-delay: 0.24s; }
+.nb-tela-origem rect:nth-of-type(3) { transition-delay: 0.38s; }
+.nb-laptop[data-passo="1"] .nb-tela-origem rect,
+.nb-laptop[data-passo="2"] .nb-tela-origem rect,
+.nb-laptop[data-passo="3"] .nb-tela-origem rect { transform: scaleX(1); }
+
+.nb-tela-retorno polyline {
+  stroke-dasharray: 520;
+  stroke-dashoffset: 520;
+  transition: stroke-dashoffset 0.9s ease 0.15s;
+}
+.nb-tela-retorno g circle {
+  opacity: 0;
+  transition: opacity 0.3s ease 0.85s;
+}
+.nb-laptop[data-passo="2"] .nb-tela-retorno polyline,
+.nb-laptop[data-passo="3"] .nb-tela-retorno polyline { stroke-dashoffset: 0; }
+.nb-laptop[data-passo="2"] .nb-tela-retorno g circle,
+.nb-laptop[data-passo="3"] .nb-tela-retorno g circle { opacity: 1; }
+
+/* sem JS / fallback: relatório completo, sem estados a meio caminho */
+.nb-laptop:not([data-passo]) .nb-tela-origem rect,
+html.rv-fallback .nb-tela-origem rect { transform: scaleX(1); transition: none; }
+.nb-laptop:not([data-passo]) .nb-tela-retorno polyline,
+html.rv-fallback .nb-tela-retorno polyline { stroke-dashoffset: 0; transition: none; }
+.nb-laptop:not([data-passo]) .nb-tela-retorno g circle,
+html.rv-fallback .nb-tela-retorno g circle { opacity: 1; transition: none; }
+
+/* ---- Continuidade entre páginas (View Transitions) ----
+   O chrome fica IMÓVEL na navegação: cabeçalho, WhatsApp flutuante
+   e barra mobile não piscam mais a cada troca de página. */
+.site-header { view-transition-name: site-header; }
+.wa-float { view-transition-name: wa-float; }
+.barra-mobile { view-transition-name: barra-mobile; }
+/* o título do artigo é destino do morph que nasce no card do blog
+   (o card clicado recebe o mesmo nome via JS na saída da página) */
+.article h1 { view-transition-name: post-title; }
+
 /* Títulos equilibrados: sem última linha órfã (progressivo — quem
    não suporta text-wrap ignora) */
 h1, h2, .section-head p { text-wrap: balance; }
@@ -1721,3 +1767,135 @@ h1, h2, .section-head p { text-wrap: balance; }
 @media (max-width: 640px) {
   .trust-grid { grid-template-columns: 1fr; gap: 12px; }
 }
+
+/* ================================================================
+   COMPARADOR ANTES/DEPOIS (Cases) — simulação honesta
+   Dois estados sobre o material "tela"; a camada ANTES é recortada
+   pelo divisor (--cmp). O input range invisível dá arraste, toque,
+   teclado e leitor de tela. Sem case inventado: é meta rotulada.
+   ================================================================ */
+.cmp { max-width: 860px; margin-inline: auto; }
+.cmp-tabs { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+.cmp-tab {
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 0.82rem;
+  padding: 8px 16px;
+  min-height: 38px;
+  border-radius: 100px;
+  border: 1.5px solid var(--line);
+  background: var(--white);
+  color: var(--muted);
+  cursor: pointer;
+  transition: background var(--dur-micro) ease, color var(--dur-micro) ease, border-color var(--dur-micro) ease;
+}
+.cmp-tab:hover { border-color: var(--violet); color: var(--violet); }
+.cmp-tab[aria-pressed="true"] { background: var(--violet); border-color: var(--violet); color: #fff; }
+.cmp-tab:focus-visible { outline: 3px solid rgba(108, 76, 241, 0.5); outline-offset: 2px; }
+.cmp-area {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  min-height: 300px;
+  --cmp: 50%;
+  background:
+    radial-gradient(560px 300px at 88% -10%, rgba(108, 76, 241, 0.30), transparent 62%),
+    var(--night-2);
+}
+.cmp-lado {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  padding: 34px;
+  color: #fff;
+}
+.cmp-depois { align-items: flex-end; text-align: right; padding-right: 7%; }
+.cmp-antes {
+  align-items: flex-start;
+  text-align: left;
+  padding-left: 7%;
+  background: #10131f; /* o antes é opaco e mais apagado — cobre o depois */
+  clip-path: inset(0 calc(100% - var(--cmp)) 0 0);
+}
+.cmp-tag {
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 100px;
+}
+.cmp-tag-antes { background: rgba(245, 158, 11, 0.16); color: var(--amber); }
+.cmp-tag-depois { background: rgba(52, 211, 153, 0.15); color: #67d9a0; }
+.cmp-metrica b {
+  display: block;
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: clamp(2.2rem, 5vw, 3.1rem);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.cmp-antes .cmp-metrica b { color: rgba(255, 255, 255, 0.55); }
+.cmp-depois .cmp-metrica b { color: var(--cyan); }
+.cmp-metrica span { display: block; font-size: 0.9rem; color: rgba(255, 255, 255, 0.62); margin-top: 6px; }
+.cmp-sec { font-size: 0.92rem; }
+.cmp-antes .cmp-sec { color: var(--amber); }
+.cmp-depois .cmp-sec { color: #67d9a0; }
+/* divisor + alça (guiados pela mesma variável) */
+.cmp-area::before {
+  content: "";
+  position: absolute; top: 0; bottom: 0; left: var(--cmp);
+  width: 3px; transform: translateX(-50%);
+  background: #fff; z-index: 2; pointer-events: none;
+  box-shadow: 0 0 14px rgba(0, 0, 0, 0.45);
+}
+.cmp-area::after {
+  content: "\25C4 \25BA";
+  position: absolute; top: 50%; left: var(--cmp);
+  transform: translate(-50%, -50%);
+  width: 46px; height: 46px; border-radius: 50%;
+  background: #fff; color: var(--violet);
+  font-family: var(--font-head); font-size: 11px; letter-spacing: 1px;
+  display: grid; place-items: center;
+  z-index: 3; pointer-events: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+.cmp-range {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  opacity: 0; margin: 0;
+  cursor: ew-resize; z-index: 4;
+}
+.cmp-area:has(.cmp-range:focus-visible) { outline: 3px solid rgba(108, 76, 241, 0.55); outline-offset: 3px; }
+.cmp-nota { margin-top: 14px; font-size: 0.88rem; color: var(--muted); text-align: center; }
+.cmp-nota a { font-weight: 600; }
+@media (max-width: 640px) {
+  .cmp-area { min-height: 340px; }
+  .cmp-lado { padding: 24px; }
+  .cmp-depois { padding-right: 5%; }
+  .cmp-antes { padding-left: 5%; }
+}
+
+/* ================================================================
+   O RESUMO DA ÓPERA — a voz do blog fecha as páginas de venda:
+   3 linhas do que a página disse, antes do rodapé pedir a ação.
+   ================================================================ */
+.opera {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 26px 30px;
+  border-radius: 18px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--violet);
+  box-shadow: var(--shadow);
+}
+.opera h2 {
+  font-size: 1.05rem;
+  margin-bottom: 10px;
+}
+.opera p { color: var(--muted); font-size: 0.97rem; margin: 0; }

@@ -1470,6 +1470,94 @@
     });
   });
 
+  /* ==========================================================
+     COMPARADOR ANTES/DEPOIS (Cases) — simulação honesta
+     O range invisível move o divisor (--cmp); as abas trocam o
+     cenário; ao entrar na tela, o divisor desliza do "antes"
+     para o meio UMA vez (nunca com movimento reduzido).
+     ========================================================== */
+  safe("comparador", () => {
+    const raiz = document.querySelector("[data-cmp]");
+    if (!raiz) return;
+    const area = raiz.querySelector(".cmp-area");
+    const range = raiz.querySelector("[data-cmp-range]");
+    if (!area || !range) return;
+
+    const CENARIOS = {
+      clinica: { av: "12", au: "agendamentos/mês", as: "invisível no Google",
+                 dv: "40–60", du: "agendamentos/mês", ds: "Top 3 nas buscas da cidade" },
+      loja:    { av: "R$ 800", au: "por mês em vendas no site", as: "anúncio no escuro",
+                 dv: "R$ 6–12 mil", du: "por mês em vendas no site", ds: "cada real rastreado" },
+      servico: { av: "3", au: "orçamentos/mês", as: "WhatsApp no vácuo",
+                 dv: "25–40", du: "orçamentos/mês", ds: "resposta em minutos" }
+    };
+    const campos = {};
+    ["av", "au", "as", "dv", "du", "ds"].forEach((k) => {
+      campos[k] = raiz.querySelector("[data-cmp-" + k + "]");
+    });
+
+    const aplica = () => {
+      const v = Number(range.value);
+      area.style.setProperty("--cmp", v + "%");
+      range.setAttribute("aria-valuetext",
+        v <= 35 ? "mostrando principalmente o depois" :
+        v >= 65 ? "mostrando principalmente o antes" :
+        "metade antes, metade depois");
+    };
+    range.addEventListener("input", aplica);
+    aplica();
+
+    raiz.querySelectorAll("[data-cmp-tab]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const c = CENARIOS[btn.getAttribute("data-cmp-tab")];
+        if (!c) return;
+        raiz.querySelectorAll("[data-cmp-tab]").forEach((o) =>
+          o.setAttribute("aria-pressed", String(o === btn)));
+        for (const k in campos) { if (campos[k]) campos[k].textContent = c[k]; }
+        try { window.zt && window.zt("cmp_segmento", { seg: btn.getAttribute("data-cmp-tab") }); } catch (e) {}
+      });
+    });
+
+    /* provocação única: nasce mostrando a dor (82%) e desliza ao meio */
+    if (!REDUCED && "IntersectionObserver" in window) {
+      const io = new IntersectionObserver((es) => {
+        if (!es.some((e) => e.isIntersecting)) return;
+        io.disconnect();
+        range.value = "82";
+        aplica();
+        const ini = performance.now();
+        const anda = (agora) => {
+          const t = Math.min((agora - ini) / 900, 1);
+          range.value = String(82 - 32 * (1 - Math.pow(1 - t, 3)));
+          aplica();
+          if (t < 1) requestAnimationFrame(anda);
+        };
+        requestAnimationFrame(anda);
+      }, { threshold: 0.5 });
+      io.observe(area);
+    }
+  });
+
+  /* ==========================================================
+     CONTINUIDADE · morph card → artigo (View Transitions MPA)
+     O h1 do artigo já tem view-transition-name: post-title no
+     CSS. Aqui, o título do card CLICADO recebe o mesmo nome um
+     instante antes de a navegação começar — o navegador casa os
+     dois e o título "viaja" do card para o topo do artigo.
+     Navegadores sem a API ignoram sem efeito colateral.
+     ========================================================== */
+  safe("vt-morph", () => {
+    document.querySelectorAll(".post-card").forEach((card) => {
+      const titulo = card.querySelector("h3");
+      if (!titulo) return;
+      card.querySelectorAll("a[href]").forEach((a) => {
+        a.addEventListener("click", () => {
+          titulo.style.viewTransitionName = "post-title";
+        });
+      });
+    });
+  });
+
   /* Dispara a fila: a primeira fatia roda já, o resto entre quadros. */
   roda();
 

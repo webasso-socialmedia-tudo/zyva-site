@@ -18,14 +18,16 @@
   <meta name="twitter:description" content="Conheça o padrão de trabalho da Zyva: desafio, estratégia, execução e resultado documentado. E a condição especial para os nossos primeiros clientes." />
   <meta name="twitter:image" content="https://agenciazyva.com.br/assets/img/og-image.png" />
   <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg" />
+  <!-- @zyva:fontes -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
   <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" /></noscript>
+  <!-- /@zyva:fontes -->
   <script>document.documentElement.className+=" js-on";</script>
-  <link rel="stylesheet" href="/assets/css/style.css?v=19" />
-  <link rel="stylesheet" href="/assets/css/motion.css?v=23" />
-  <link rel="stylesheet" href="/assets/css/paginas.css?v=6" />
+  <link rel="stylesheet" href="/assets/css/style.css?v=f8c49963" />
+  <link rel="stylesheet" href="/assets/css/motion.css?v=79e88157" />
+  <link rel="stylesheet" href="/assets/css/paginas.css?v=fd9cf0bd" />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -50,6 +52,7 @@
 
   <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
 
+  <!-- @zyva:cabecalho -->
   <header class="site-header">
     <div class="container nav">
       <a class="logo" href="/" aria-label="Zyva — início">
@@ -67,6 +70,7 @@
       </nav>
     </div>
   </header>
+  <!-- /@zyva:cabecalho -->
 
   <main id="conteudo">
 
@@ -209,6 +213,41 @@
     </div>
   </section>
 
+  <!-- Comparador antes/depois: SIMULAÇÃO honesta por segmento.
+       Sem case inventado — números típicos, rotulados como cenário
+       ilustrativo. A prova real chega com os primeiros clientes. -->
+  <section class="section section-seq" aria-labelledby="cmp-titulo">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="kicker k-bar">Simulação honesta</span>
+        <h2 id="cmp-titulo" data-reveal>O antes e depois que a gente <em>persegue</em></h2>
+        <p>Números típicos de 90 dias de método, por segmento — cenário ilustrativo, não promessa. O seu número exato nasce no diagnóstico.</p>
+      </div>
+      <div class="cmp reveal" data-cmp>
+        <div class="cmp-tabs" aria-label="Escolha um segmento">
+          <button type="button" class="cmp-tab" data-cmp-tab="clinica" aria-pressed="true">Clínica</button>
+          <button type="button" class="cmp-tab" data-cmp-tab="loja" aria-pressed="false">Loja</button>
+          <button type="button" class="cmp-tab" data-cmp-tab="servico" aria-pressed="false">Serviço local</button>
+        </div>
+        <div class="cmp-area">
+          <div class="cmp-lado cmp-depois" aria-hidden="true">
+            <span class="cmp-tag cmp-tag-depois">Depois · meta de 90 dias</span>
+            <div class="cmp-metrica"><b data-cmp-dv>40–60</b><span data-cmp-du>agendamentos/mês</span></div>
+            <p class="cmp-sec" data-cmp-ds>Top 3 nas buscas da cidade</p>
+          </div>
+          <div class="cmp-lado cmp-antes" aria-hidden="true">
+            <span class="cmp-tag cmp-tag-antes">Antes</span>
+            <div class="cmp-metrica"><b data-cmp-av>12</b><span data-cmp-au>agendamentos/mês</span></div>
+            <p class="cmp-sec" data-cmp-as>invisível no Google</p>
+          </div>
+          <input type="range" class="cmp-range" data-cmp-range min="0" max="100" value="50" step="1" aria-label="Comparar antes e depois: arraste ou use as setas" />
+        </div>
+        <p class="cmp-nota">Arraste a linha para comparar. <a href="/#calculadora">Prefere fazer as contas com os seus números?</a></p>
+        <p class="sr-only">Comparação ilustrativa por segmento, não é promessa. Clínica: antes, 12 agendamentos por mês, invisível no Google; depois de 90 dias de método, meta de 40 a 60 agendamentos por mês, Top 3 nas buscas da cidade. Loja: antes, R$ 800 por mês em vendas pelo site, com anúncio no escuro; depois, meta de R$ 6 a 12 mil por mês, com cada real rastreado. Serviço local: antes, 3 orçamentos por mês, WhatsApp no vácuo; depois, meta de 25 a 40 orçamentos por mês, com resposta em minutos.</p>
+      </div>
+    </div>
+  </section>
+
   <section class="section section-flush-t">
     <div class="container">
       <div class="section-head reveal">
@@ -224,8 +263,16 @@
     </div>
   </section>
 
-  </div>
+  <section class="section section-seq">
+    <div class="container">
+      <div class="opera reveal">
+        <h2>O resumo da ópera</h2>
+        <p>Ainda não penduramos logotipo na parede — penduramos método. Projetos demonstrativos honestos, metas simuladas com números típicos e o compromisso de documentar cada case real com antes, depois e depoimento. O primeiro pode ser o seu.</p>
+      </div>
+    </div>
+  </section>
 
+  </div>
   <section class="cta-final on-dark">
     <div class="container reveal">
       <h2>Quer ser nosso próximo case?</h2>
@@ -240,6 +287,7 @@
   </main>
 
   <!-- Rodapé cinematográfico (revelação em cortina) -->
+  <!-- @zyva:rodape -->
   <div class="cine-reveal" data-cine-reveal>
         <footer class="cine-foot" role="contentinfo">
       <div class="cine-aurora" aria-hidden="true"></div>
@@ -299,12 +347,13 @@
       </div>
     </footer>
   </div>
+  <!-- /@zyva:rodape -->
 
   <a href="https://wa.me/5598984337265?text=Ol%C3%A1%2C%20Zyva!%20Quero%20um%20diagn%C3%B3stico%20gratuito%20para%20minha%20empresa." target="_blank" rel="noopener" class="wa-float" data-wa aria-label="Falar no WhatsApp">
     <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
   </a>
 
-  <script src="/assets/js/main.js?v=9"></script>
-  <script src="/assets/js/zyva-motion.js?v=21" defer></script>
+  <script src="/assets/js/main.js?v=8b865bbc"></script>
+  <script src="/assets/js/zyva-motion.js?v=e7153572" defer></script>
 </body>
 </html>

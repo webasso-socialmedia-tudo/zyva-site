@@ -432,14 +432,12 @@ html.js-on .rise.rv-in, .rise.rv-in { opacity: 1; transform: none; }
 }
 .chip-filter:hover { transform: translateY(-2px); border-color: var(--violet); color: var(--violet); }
 .chip-filter[aria-pressed="true"] {
-  /* O gradiente "sobra" bem para fora (background-size 240% centralizado):
-     as pontas arredondadas nascem em tons já no MEIO da transição — nenhuma
-     extremidade mostra cor sólida destoando. */
-  background-image: linear-gradient(to right, #6C4CF1, #22D3EE);
-  background-size: 240% 100%;
-  background-position: center;
-  border-color: transparent;
+  /* SELEÇÃO = violeta sólido da marca (regra do site: degradê só no
+     logo e no Z do notebook; escolha se marca com UMA cor) */
+  background: var(--violet);
+  border-color: var(--violet);
   color: #fff;
+  box-shadow: 0 6px 16px rgba(108, 76, 241, 0.28);
   /* Luz suave e uniforme (azul entre o violeta e o ciano), sem blocos de cor. */
   box-shadow: 0 8px 22px rgba(76, 132, 232, .34);
 }
@@ -1054,7 +1052,9 @@ html.rv-fallback .nb-dica { display: none; }
   margin-top: 2px;
 }
 .diag-opt:hover { background: rgba(108, 76, 241, 0.2); border-color: rgba(108, 76, 241, 0.6); transform: translateX(3px); }
-.diag-opt[aria-pressed="true"] { background: rgba(34, 211, 238, 0.13); border-color: var(--cyan); }
+/* seleção = violeta (uma cor marca a escolha em todo o site;
+   ciano fica reservado para DADO) */
+.diag-opt[aria-pressed="true"] { background: rgba(108, 76, 241, 0.30); border-color: var(--violet); }
 
 /* troca de pergunta */
 .diag-q[hidden] { display: none; }

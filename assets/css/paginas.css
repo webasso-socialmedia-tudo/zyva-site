@@ -116,8 +116,9 @@
 .topic:hover { background: rgba(108, 76, 241, 0.16); border-color: rgba(108, 76, 241, 0.5); }
 
 .topic[aria-pressed="true"] {
-  background: rgba(34, 211, 238, 0.1);
-  border-color: var(--cyan);
+  /* selecao = violeta, como no resto do site */
+  background: rgba(108, 76, 241, 0.28);
+  border-color: var(--violet);
 }
 
 .topic-ico {
