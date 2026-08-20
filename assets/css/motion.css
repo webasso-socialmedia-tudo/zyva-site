@@ -640,6 +640,29 @@ html.js-on .rise.rv-in, .rise.rv-in { opacity: 1; transform: none; }
 
 }
 
+/* Celular de verdade: o rodapé inteiro precisa CABER em uma tela.
+   O letreiro sai (decorativo e era o que atravessava o título),
+   o título encolhe, as pílulas compactam e o miolo ganha respiro
+   do cabeçalho fixo. */
+@media (max-width: 640px) {
+  .cine-foot { padding-top: 72px; }
+  .cine-marquee { display: none; }
+  .cine-title {
+    font-size: clamp(2rem, 9.5vw, 2.6rem);
+    margin-bottom: 22px;
+  }
+  .cine-center { margin-top: 0; padding: 0 18px; }
+  .cine-actions { gap: 14px; }
+  .cine-row { gap: 8px; }
+  .cine-pill { padding: 13px 24px; font-size: .88rem; gap: 9px; }
+  .cine-pill svg { width: 17px; height: 17px; }
+  .cine-pill-sm { padding: 9px 15px; font-size: .76rem; }
+  .cine-bottom { gap: 10px; padding-bottom: 16px; }
+  .cine-copy { font-size: .6rem; letter-spacing: .1em; line-height: 1.7; }
+  .cine-badge { font-size: .68rem; }
+  .cine-top { width: 42px; height: 42px; }
+}
+
 /* Sem movimento: vira um rodapé estático, sem cortina nem parallax */
 @media (prefers-reduced-motion: reduce) {
   .cine-reveal { height: auto; clip-path: none; }
