@@ -216,6 +216,9 @@
     radial-gradient(720px 340px at 82% -10%, rgba(108, 76, 241, 0.28), transparent 65%),
     var(--night, #0B0E1A);
 }
+/* palco escuro: o título herda a tinta das folhas claras se não
+   forçarmos — branco puro, como nos outros palcos escuros do site */
+.weba-prova h2 { color: #fff; }
 .weba-prova .section-head p { color: rgba(255, 255, 255, 0.72); }
 .weba-prova-grid {
   display: grid;
