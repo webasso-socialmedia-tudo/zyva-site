@@ -102,9 +102,14 @@ document.addEventListener("click", (ev) => {
 const toggle = document.querySelector(".nav-toggle");
 const links = document.querySelector(".nav-links");
 if (toggle && links) {
-  toggle.addEventListener("click", () => links.classList.toggle("open"));
+  const sinalizaMenu = (aberto) => {
+    toggle.setAttribute("aria-expanded", aberto ? "true" : "false");
+    toggle.setAttribute("aria-label", aberto ? "Fechar menu" : "Abrir menu");
+  };
+  sinalizaMenu(false);
+  toggle.addEventListener("click", () => sinalizaMenu(links.classList.toggle("open")));
   links.querySelectorAll("a").forEach((a) =>
-    a.addEventListener("click", () => links.classList.remove("open"))
+    a.addEventListener("click", () => { links.classList.remove("open"); sinalizaMenu(false); })
   );
 }
 

@@ -1,0 +1,271 @@
+/* ============================================================
+   WEBA.CSS — página /weba/ (quem faz a Zyva)
+   Fala a língua do site: Space Grotesk + Inter, cores sólidas
+   (violeta = marca, ciano = dado), grifo nos destaques e o
+   retrato com moldura de visor de câmera, o ofício do dono.
+   Carregada SÓ nesta página.
+   ============================================================ */
+
+/* ---------- HERO ---------- */
+.weba-hero .crumbs { margin-bottom: 6px; }
+.weba-hero-grid {
+  display: grid;
+  grid-template-columns: 1.12fr 0.88fr;
+  gap: clamp(32px, 5vw, 64px);
+  align-items: center;
+}
+.weba-nome {
+  font-size: clamp(4.2rem, 10.5vw, 8.2rem);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  margin: 10px 0 6px;
+  color: #fff;
+}
+.weba-nome .dot-cyan { color: var(--cyan); }
+.weba-funcao {
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: clamp(1.25rem, 2.6vw, 1.75rem);
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 14px;
+  min-height: 1.5em;
+}
+.weba-funcao .rot-text { color: var(--cyan); }
+.weba-lead {
+  max-width: 480px;
+  font-size: 1.06rem;
+  color: rgba(255, 255, 255, 0.78);
+  margin-bottom: 28px;
+}
+
+/* Retrato: duotone violeta sólido + visor de câmera.
+   O tom entra por cima do P&B com mix-blend-mode: color —
+   uma cor só, nada de degradê (regra da casa). */
+.weba-retrato {
+  position: relative;
+  margin: 0;
+  padding: 16px 16px 12px;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+}
+.weba-tinta { position: relative; display: block; border-radius: 14px; overflow: hidden; }
+.weba-tinta img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: grayscale(1) contrast(1.06) brightness(0.97);
+}
+.weba-tinta::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(108, 76, 241, 0.34);
+  mix-blend-mode: color;
+  pointer-events: none;
+}
+.weba-canto {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--cyan);
+  opacity: 0.85;
+  pointer-events: none;
+  z-index: 2;
+}
+.weba-canto.c1 { top: 8px;    left: 8px;   border-right: 0; border-bottom: 0; border-radius: 6px 0 0 0; }
+.weba-canto.c2 { top: 8px;    right: 8px;  border-left: 0;  border-bottom: 0; border-radius: 0 6px 0 0; }
+.weba-canto.c3 { bottom: 8px; left: 8px;   border-right: 0; border-top: 0;    border-radius: 0 0 0 6px; }
+.weba-canto.c4 { bottom: 8px; right: 8px;  border-left: 0;  border-top: 0;    border-radius: 0 0 6px 0; }
+.weba-rec {
+  position: absolute;
+  top: 26px;
+  right: 28px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-head);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: #fff;
+  background: rgba(11, 14, 26, 0.62);
+  padding: 5px 11px;
+  border-radius: 999px;
+}
+.weba-rec i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--danger);
+  animation: weba-rec-pisca 1.6s ease-in-out infinite;
+}
+@keyframes weba-rec-pisca { 50% { opacity: 0.25; } }
+.weba-legenda {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* ---------- FATOS (cards na folha clara) ---------- */
+.weba-fatos .card h3 { margin: 10px 0 8px; }
+
+/* ---------- OFÍCIOS ---------- */
+.weba-skills {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+.weba-skills li {
+  min-width: 0;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px 18px 18px;
+}
+.weba-skill-ico {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(108, 76, 241, 0.1);
+  margin-bottom: 12px;
+}
+.weba-skills li:nth-child(even) .weba-skill-ico { background: rgba(34, 211, 238, 0.12); }
+.weba-skill-ico svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: var(--violet-deep, #5B3BE0);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.weba-skills li:nth-child(even) .weba-skill-ico svg { stroke: var(--cyan-ink, #0A6E80); }
+.weba-skills b {
+  display: block;
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 1.02rem;
+  margin-bottom: 4px;
+}
+.weba-skills li > span:last-child {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.55;
+}
+.weba-skills-nota { margin-top: 22px; font-size: 0.98rem; }
+.weba-skills-nota a { font-weight: 600; }
+
+/* ---------- TRAJETÓRIA ---------- */
+.weba-linha {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0 4px 26px;
+  position: relative;
+  max-width: 640px;
+}
+.weba-linha::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 10px;
+  bottom: 10px;
+  width: 2px;
+  background: rgba(108, 76, 241, 0.22);
+  border-radius: 2px;
+}
+.weba-linha li { position: relative; padding-bottom: 26px; }
+.weba-linha li:last-child { padding-bottom: 0; }
+.weba-linha li::before {
+  content: "";
+  position: absolute;
+  left: -26px;
+  top: 7px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--violet);
+  box-shadow: 0 0 0 4px rgba(108, 76, 241, 0.14);
+}
+.weba-linha-hoje::before {
+  background: var(--cyan) !important;
+  box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.16) !important;
+}
+.weba-linha b {
+  display: block;
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 1.05rem;
+  margin-bottom: 4px;
+}
+.weba-linha p { margin: 0; font-size: 0.95rem; color: var(--muted); }
+
+/* ---------- PROVA DE TRABALHO (palco escuro) ---------- */
+.weba-prova {
+  background:
+    radial-gradient(720px 340px at 82% -10%, rgba(108, 76, 241, 0.28), transparent 65%),
+    var(--night, #0B0E1A);
+}
+.weba-prova .section-head p { color: rgba(255, 255, 255, 0.72); }
+.weba-prova-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+.weba-prova-card {
+  display: block;
+  min-width: 0;
+  padding: 24px 22px;
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  text-decoration: none;
+  transition: transform 0.35s var(--ease-out-expo, ease), border-color 0.25s ease, background 0.25s ease;
+}
+.weba-prova-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(108, 76, 241, 0.6);
+  background: rgba(108, 76, 241, 0.12);
+}
+.weba-prova-card h3 { color: #fff; margin: 10px 0 8px; }
+.weba-prova-card p { margin: 0; font-size: 0.94rem; color: rgba(255, 255, 255, 0.68); }
+.weba-prova-card .k-index { color: rgba(255, 255, 255, 0.62); }
+/* no palco escuro o número da enumeração vira ciano, a cor do dado */
+.weba-prova .kicker.k-index::before { color: var(--cyan); }
+.weba-arroba { color: var(--cyan); font-weight: 600; }
+.weba-prova-vaga { border-style: dashed; border-color: rgba(108, 76, 241, 0.5); }
+.weba-prova-vaga:hover { border-style: solid; }
+
+/* ---------- CELULAR (prioridade da casa: provar a 412px) ---------- */
+@media (max-width: 900px) {
+  .weba-hero-grid { grid-template-columns: 1fr; gap: 30px; }
+  .weba-retrato { max-width: 420px; margin: 0 auto; width: 100%; }
+  .weba-skills { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .weba-nome { font-size: clamp(3.4rem, 17vw, 4.6rem); }
+  .weba-lead { font-size: 1rem; }
+  .weba-hero-grid { gap: 24px; }
+  .weba-retrato { padding: 12px 12px 10px; }
+  .weba-rec { top: 20px; right: 22px; }
+  .weba-skills { gap: 10px; }
+  .weba-skills li { padding: 16px 14px 14px; }
+  .weba-prova-grid { grid-template-columns: 1fr; }
+}
+
+/* ---------- MOVIMENTO REDUZIDO ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .weba-rec i { animation: none; }
+  .weba-prova-card, .weba-prova-card:hover { transform: none; }
+}

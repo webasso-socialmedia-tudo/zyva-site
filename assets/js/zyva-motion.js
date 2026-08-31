@@ -164,7 +164,14 @@
 
       const interval = parseInt(host.getAttribute("data-rotate-interval"), 10) || 2600;
       host.classList.add("rot-text");
-      host.setAttribute("aria-live", "polite");
+      /* leitor de tela: o giro visual fica escondido (aria-hidden) e um
+         irmão estático .sr-only lê a lista inteira UMA vez — aria-live
+         aqui viraria anúncio em loop infinito (WCAG 2.2.2 / 4.1.3) */
+      host.setAttribute("aria-hidden", "true");
+      const srLista = document.createElement("span");
+      srLista.className = "sr-only";
+      srLista.textContent = list.join(", ");
+      host.parentNode.insertBefore(srLista, host);
       /* limpa o texto que veio no HTML (fallback para quem está sem JS),
          senão ele fica somado ao texto animado */
       host.textContent = "";
