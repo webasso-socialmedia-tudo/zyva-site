@@ -12,7 +12,7 @@
 /* ============================================================
    1. Revelação de texto (palavra a palavra, com máscara)
    ============================================================ */
-.rv-line { display: block; overflow: hidden; }
+/* (.rv-line saiu na faxina: o JS só cria .rv-word, nunca .rv-line) */
 
 /* Só esconde se o JS estiver de pé. Sem isso, uma falha de rede
    deixaria o site inteiro em branco — texto invisível esperando
@@ -50,7 +50,7 @@ html.js-on .rise.rv-in, .rise.rv-in { opacity: 1; transform: none; }
 }
 
 /* ============================================================
-   5. Texto rotativo (port do RotatingText — JS puro)
+   2. Texto rotativo (port do RotatingText — JS puro)
    ============================================================ */
 
 /* Cor sólida: um gradiente recortado por caractere ficaria ruidoso,
@@ -72,7 +72,7 @@ html.js-on .rise.rv-in, .rise.rv-in { opacity: 1; transform: none; }
 @keyframes rot-out { to { transform: translateY(-115%); opacity: 0; } }
 
 /* ============================================================
-   6. Cena do celular 3D (Contato)
+   3. Cena do celular 3D (Contato)
    ============================================================ */
 
 /* Sem trilho de 380vh: a página de conversão não pede 4 telas de rolagem
@@ -219,7 +219,7 @@ html.js-on .rise.rv-in, .rise.rv-in { opacity: 1; transform: none; }
 
 
 /* ============================================================
-   8. Responsivo
+   4. Responsivo
    ============================================================ */
 @media (max-width: 1000px) {
   .phone-sticky > .container { grid-template-columns: 1fr; gap: 26px; }
@@ -272,7 +272,7 @@ html.js-on .rise.rv-in, .rise.rv-in { opacity: 1; transform: none; }
 
 
 /* ============================================================
-   9. Acessibilidade — respeitar quem pediu menos movimento
+   5. Acessibilidade — respeitar quem pediu menos movimento
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
   .rv-word, .rise { opacity: 1 !important; transform: none !important; transition: none !important; }
@@ -288,7 +288,7 @@ html.js-on .rise.rv-in, .rise.rv-in { opacity: 1; transform: none; }
 }
 
 /* ============================================================
-   11. Máquina de marketing (Serviços)
+   6. Máquina de marketing (Serviços)
    ============================================================ */
 
 
@@ -323,7 +323,7 @@ html.js-on .rise.rv-in, .rise.rv-in { opacity: 1; transform: none; }
 
 
 /* ============================================================
-   12. ZYVA — quatro letras, quatro valores (Sobre)
+   7. ZYVA — quatro letras, quatro valores (Sobre)
    ============================================================ */
 
 
@@ -348,7 +348,7 @@ html.js-on .rise.rv-in, .rise.rv-in { opacity: 1; transform: none; }
 
 
 /* ============================================================
-   13. Vitrine 3D dos projetos (Cases)
+   8. Vitrine 3D dos projetos (Cases)
    ============================================================ */
 
 
@@ -388,7 +388,7 @@ html.js-on .rise.rv-in, .rise.rv-in { opacity: 1; transform: none; }
 
 
 /* ============================================================
-   14. Barra de progresso de leitura (artigos)
+   9. Barra de progresso de leitura (artigos)
    ============================================================ */
 .read-bar {
   position: fixed;
@@ -408,7 +408,7 @@ html.js-on .rise.rv-in, .rise.rv-in { opacity: 1; transform: none; }
 }
 
 /* ============================================================
-   15. Responsivo dos módulos novos
+   10. Responsivo dos módulos novos
    ============================================================ */
 
 
@@ -448,7 +448,7 @@ html.js-on .rise.rv-in, .rise.rv-in { opacity: 1; transform: none; }
 [data-blog-grid] > [hidden] { display: none !important; }
 
 /* ============================================================
-   15. Rodapé cinematográfico — revelação em cortina
+   11. Rodapé cinematográfico — revelação em cortina
        (port em JS puro do CinematicFooter React/GSAP)
    ============================================================ */
 
@@ -672,7 +672,7 @@ html.js-on .rise.rv-in, .rise.rv-in { opacity: 1; transform: none; }
 }
 
 /* ============================================================
-   17. Notificação do blog: gestos, dicas e Ilha Dinâmica
+   12. Notificação do blog: gestos, dicas e Ilha Dinâmica
    ============================================================ */
 .zyva-toast { touch-action: none; will-change: transform; }
 .zyva-toast.zt-dragging { transition: none; cursor: grabbing; }
@@ -742,7 +742,7 @@ html.js-on .rise.rv-in, .rise.rv-in { opacity: 1; transform: none; }
 }
 
 /* ============================================================
-   18. Sistema de MARCADORES de seção (kickers) + steppers
+   13. Sistema de MARCADORES de seção (kickers) + steppers
        3 modos por papel: k-tag (tópico da página), k-bar
        (cabeçalho de seção) e k-index (enumeração). Revelam ao
        entrar na tela. Sem JS (html sem .js-on) ficam visíveis.
@@ -825,14 +825,7 @@ html.js-on .kicker.k-index.mk-in { opacity: 1; transform: none; }
    Steppers: os blocos numerados viram uma progressão conectada
    ============================================================ */
 
-/* Home — "Método" (.timeline): a linha se desenha e os números surgem */
-html.js-on .timeline::before { transform: scaleX(0); transform-origin: left center; transition: transform 1.15s var(--ease-out-expo); opacity: .55; }
-html.js-on .timeline.mk-in::before { transform: scaleX(1); }
-html.js-on .timeline .tl-step .num { opacity: 0; transform: scale(.55); transition: opacity .4s ease, transform .55s var(--ease-out-expo); }
-html.js-on .timeline.mk-in .tl-step:nth-child(1) .num { opacity:1; transform:none; transition-delay:.15s; }
-html.js-on .timeline.mk-in .tl-step:nth-child(2) .num { opacity:1; transform:none; transition-delay:.32s; }
-html.js-on .timeline.mk-in .tl-step:nth-child(3) .num { opacity:1; transform:none; transition-delay:.49s; }
-html.js-on .timeline.mk-in .tl-step:nth-child(4) .num { opacity:1; transform:none; transition-delay:.66s; }
+/* (a animação da timeline da home saiu junto com a timeline — Palco Limpo) */
 
 /* Cases — "Padrão de case" (.steps): trilho de progresso + números escalonados */
 
@@ -848,7 +841,6 @@ html.js-on .steps.mk-in .step:nth-child(4) .num { opacity:1; transform:none; tra
 
 @media (prefers-reduced-motion: reduce) {
   html.js-on .kicker, html.js-on .kicker::before,
-  html.js-on .timeline::before, html.js-on .timeline .tl-step .num,
   html.js-on .steps::before, html.js-on .steps .step .num {
     opacity: 1 !important; transform: none !important; transition: none !important;
   }
@@ -872,7 +864,7 @@ html.js-on .steps.mk-in .step:nth-child(4) .num { opacity:1; transform:none; tra
 }
 
 /* ============================================================
-   19. Sobreviventes da camada de experiência
+   14. Sobreviventes da camada de experiência
    (o que passou no filtro "prova clareza, método ou resultado?")
    ============================================================ */
 
@@ -917,14 +909,14 @@ html.js-on .steps.mk-in .step:nth-child(4) .num { opacity:1; transform:none; tra
 }
 
 /* ============================================================
-   20. DESTAQUE "GRIFO DO RELATÓRIO" — no lugar do texto-degradê
+   15. DESTAQUE "GRIFO DO RELATÓRIO" — no lugar do texto-degradê
    A metáfora é humana e é a da marca: quem lê um relatório passa
    marca-texto no que importa. Cor chapada translúcida, cortes
    levemente inclinados como um traço de caneta, sem animação.
    Violeta nas folhas claras, ciano nos palcos escuros.
    ============================================================ */
-.grad-text, .hero h1 em, .band h2 em, .pipeline h2 em, .phone-copy h2 em,
-.nb-copy h2 em, .calc h2 em {
+.grad-text, .hero h1 em, .pipeline h2 em, .phone-copy h2 em,
+.nb-copy h2 em {
   --grifo: rgba(108, 76, 241, 0.18);
   background-image: linear-gradient(100deg,
     transparent 1.5%, var(--grifo) 4%,
@@ -944,7 +936,7 @@ html.js-on .steps.mk-in .step:nth-child(4) .num { opacity:1; transform:none; tra
   box-decoration-break: clone;
 }
 /* nos palcos escuros o grifo é ciano — a cor do dado */
-.hero h1 em, .band h2 em, .nb-copy h2 em, .calc h2 em,
+.hero h1 em, .nb-copy h2 em,
 .pipeline h2 em, .phone-copy h2 em,
 .on-dark .grad-text, .diag .grad-text {
   --grifo: rgba(34, 211, 238, 0.24);
@@ -1009,7 +1001,7 @@ html.rv-fallback .nb-glow { opacity: 1; }
 html.rv-fallback .nb-dica { display: none; }
 
 /* ============================================================
-   21. DIAGNÓSTICO NO HERÓI (home)
+   16. DIAGNÓSTICO NO HERÓI (home)
    O ato de conversão deixa de ser um botão que leva a um
    formulário. Três toques e a pessoa lê o próprio negócio.
    ============================================================ */

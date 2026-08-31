@@ -24,10 +24,8 @@
 
 .phone-scene {
   position: relative;
-  background:
-    radial-gradient(900px 500px at 78% 8%, rgba(108, 76, 241, 0.3), transparent 62%),
-    radial-gradient(700px 460px at 6% 92%, rgba(34, 211, 238, 0.14), transparent 60%),
-    var(--night);
+  /* PALCO LIMPO: noite chapada — aurora só no hero da home e no rodapé. */
+  background: var(--night);
   color: #fff;
 }
 
@@ -477,17 +475,15 @@
 
 .pipeline {
   position: relative;
-  background:
-    radial-gradient(700px 340px at 20% 0%, rgba(108, 76, 241, 0.26), transparent 62%),
-    radial-gradient(620px 340px at 92% 100%, rgba(34, 211, 238, 0.13), transparent 60%),
-    var(--night);
+  /* PALCO LIMPO: noite chapada. */
+  background: var(--night);
   color: #fff;
   border-radius: var(--radius-sheet);
   padding: clamp(38px, 5vw, 62px) clamp(22px, 4vw, 52px);
   overflow: hidden;
 }
 
-.pipeline h2 { color: #fff; max-width: 18ch; }
+.pipeline h2 { color: #fff; max-width: 24ch; }
 
 .pipeline h2 em { font-style: normal; }
 

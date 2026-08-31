@@ -613,7 +613,7 @@
           ao entrar na tela. html.js-on habilita as animações.
      ========================================================== */
   safe("markers", () => {
-    const els = document.querySelectorAll(".kicker, .timeline, .steps");
+    const els = document.querySelectorAll(".kicker, .steps");
     if (!els.length) return;
     document.documentElement.classList.add("js-on");
     if (REDUCED || !("IntersectionObserver" in window)) {

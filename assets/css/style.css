@@ -66,8 +66,10 @@ body {
 body.home, body.dark-shell { background: var(--night); }
 
 h1, h2, h3, h4 { font-family: var(--font-head); line-height: 1.14; letter-spacing: -0.015em; }
-h1 { font-size: clamp(2.05rem, 4.6vw, 3.15rem); font-weight: 700; }
-h2 { font-size: clamp(1.55rem, 3vw, 2.15rem); font-weight: 700; }
+/* PALCO LIMPO: a escala subiu um degrau — o brilho vem da tipografia
+   e do vazio, não de mais caixas. Um só destaque por título. */
+h1 { font-size: clamp(2.6rem, 7vw, 4.6rem); font-weight: 700; letter-spacing: -0.025em; }
+h2 { font-size: clamp(1.8rem, 4.5vw, 2.6rem); font-weight: 700; }
 h3 { font-size: 1.22rem; font-weight: 600; }
 p  { color: var(--muted); }
 a  { color: var(--violet); text-decoration: none; }
@@ -75,8 +77,8 @@ img, svg { max-width: 100%; display: block; }
 ul { list-style: none; }
 
 .container { width: min(1140px, 92%); margin-inline: auto; }
-.section { padding: 78px 0; }
-.section-tight { padding: 56px 0; }
+/* Cada seção respira como uma cena — o vazio faz parte do design. */
+.section { padding: clamp(88px, 13vh, 136px) 0; }
 
 .kicker {
   display: inline-block;
@@ -91,13 +93,12 @@ ul { list-style: none; }
 /* (a cor dos kickers em fundo escuro vive no motion.css — regra
    duplicada que perdia a cascata foi removida) */
 
-.section-head { max-width: 680px; margin-bottom: 38px; }
+.section-head { max-width: 680px; margin-bottom: 44px; }
 .section-head p { margin-top: 12px; font-size: 1.02rem; }
-.center { text-align: center; margin-inline: auto; }
 
-/* Seção que continua a anterior: respiro mínimo, decidido no CSS
-   (substitui os style="padding-top: 6px" espalhados pelo HTML). */
-.section-seq { padding-top: 6px; }
+/* Seção que continua a anterior dentro da mesma folha: menos que uma
+   cena inteira, mais que o empilhamento antigo de 6px. */
+.section-seq { padding-top: 34px; }
 .section-flush-t { padding-top: 0; }
 .section-flush-b { padding-bottom: 0; }
 
@@ -242,12 +243,11 @@ ul { list-style: none; }
 .hero-visual { position: relative; min-height: 360px; }
 /* Page hero (páginas internas) */
 .page-hero {
-  background:
-    radial-gradient(700px 300px at 90% -20%, rgba(108,76,241,0.35), transparent 60%),
-    radial-gradient(560px 300px at 0% 120%, rgba(34,211,238,0.12), transparent 60%),
-    var(--night);
+  /* PALCO LIMPO: aurora só no hero da home e no rodapé cine — aqui a
+     noite chapada vira o descanso que valoriza as duas que ficaram. */
+  background: var(--night);
   color: #fff;
-  padding: 68px 0 58px;
+  padding: 76px 0 62px;
 }
 body.dark-shell .page-hero { padding-bottom: 96px; }
 .page-hero h1 { color: #fff; }
@@ -284,14 +284,9 @@ body.home .trust { padding-bottom: 58px; }
 
 /* ---------- Faixa escura central ---------- */
 .band {
-  /* a ÚNICA seção com luz quente: âmbar = a temperatura da dor.
-     Todas as outras auroras do site são violeta/ciano — aqui o
-     calor avisa que o assunto é problema, antes de a solução voltar
-     fria. */
-  background:
-    radial-gradient(820px 400px at 12% 0%, rgba(108,76,241,0.24), transparent 60%),
-    radial-gradient(700px 420px at 95% 100%, rgba(245,158,11,0.09), transparent 60%),
-    var(--night);
+  /* PALCO LIMPO: a noite chapada; o calor da dor mora só no âmbar
+     dos textos dos cartões, não em luz de fundo. */
+  background: var(--night);
   color: #fff;
   padding: 108px 0 84px;
   margin-top: -34px;
@@ -300,11 +295,10 @@ body.home .trust { padding-bottom: 58px; }
 }
 .band + .sheet { margin-top: -34px; }
 .band h2 { color: #fff; }
-.band h2 em { font-style: normal; }
 .band .section-head p { color: rgba(255,255,255,0.66); }
-.band-gap { height: 64px; }
 
-/* Cards de dor (fundo escuro) */
+/* Cards de dor (fundo escuro) — texto-primeiro: o ícone-cubo repetido
+   saiu no Palco Limpo; a dor abre e a cura (verde) fecha o cartão. */
 .pain-card {
   background: linear-gradient(165deg, rgba(255,255,255,0.055), rgba(255,255,255,0.02));
   border: 1px solid rgba(255,255,255,0.09);
@@ -313,48 +307,10 @@ body.home .trust { padding-bottom: 58px; }
   transition: transform .2s var(--ease-zyva), border-color .2s ease;
 }
 .pain-card:hover { transform: translateY(-5px); border-color: rgba(108,76,241,0.55); }
-.pain-card .icon {
-  width: 46px; height: 46px;
-  border-radius: 12px;
-  background: rgba(108,76,241,0.16);
-  box-shadow: 0 0 26px rgba(108,76,241,0.28);
-  display: grid; place-items: center;
-  margin-bottom: 16px;
-}
-.pain-card .icon svg { width: 23px; height: 23px; stroke: #A78BFA; }
-.pain-card:nth-child(even) .icon { background: rgba(34,211,238,0.12); box-shadow: 0 0 26px rgba(34,211,238,0.22); }
-.pain-card:nth-child(even) .icon svg { stroke: var(--cyan); }
 .pain-card h3 { color: #fff; font-size: 1.08rem; margin-bottom: 8px; }
 .pain-card p { color: rgba(255,255,255,0.62); font-size: 0.93rem; }
-
-/* Linha do tempo do método (fundo escuro) */
-.timeline { position: relative; }
-.timeline::before {
-  content: "";
-  position: absolute;
-  left: 4%; right: 4%; top: 26px;
-  height: 2px;
-  background: rgba(108,76,241,0.6);
-  opacity: 0.45;
-}
-.tl-step { position: relative; padding-top: 6px; }
-.tl-step .num {
-  width: 52px; height: 52px;
-  border-radius: 50%;
-  display: grid; place-items: center;
-  font-family: var(--font-head);
-  font-weight: 700;
-  font-size: 1.15rem;
-  color: #fff;
-  background: linear-gradient(var(--night-2), var(--night-2)) padding-box, var(--violet) border-box;
-  border: 2px solid transparent;
-  margin-bottom: 18px;
-  position: relative;
-  z-index: 1;
-  box-shadow: 0 0 0 8px var(--night);
-}
-.tl-step h3 { color: #fff; font-size: 1.1rem; margin-bottom: 8px; }
-.tl-step p { color: rgba(255,255,255,0.62); font-size: 0.93rem; max-width: 240px; }
+/* (a linha do tempo do método saiu: os cartões de dor já contam o
+   método no "Com método:" — a timeline repetia a informação) */
 
 /* Compromissos (números) */
 .stats {
@@ -416,16 +372,8 @@ body.home .trust { padding-bottom: 58px; }
 }
 .card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
 .card:hover::after { opacity: 1; }
-.card .icon {
-  width: 46px; height: 46px;
-  border-radius: 12px;
-  background: rgba(108,76,241,0.1);
-  display: grid; place-items: center;
-  margin-bottom: 16px;
-}
-.card .icon svg { width: 24px; height: 24px; stroke: var(--violet); }
-.grid-4 .card:nth-child(even) .icon { background: rgba(34,211,238,0.13); }
-.grid-4 .card:nth-child(even) .icon svg { stroke: var(--cyan-ink); }
+/* (.card .icon saiu: nenhum card usa mais o cubo isométrico — os
+   serviços viraram índice editorial .svc-lista) */
 .card h3 { margin-bottom: 9px; line-height: 1.35; }
 .card p { font-size: 0.94rem; }
 .card a.more { display: inline-block; margin-top: 13px; font-weight: 600; font-size: 0.92rem; }
@@ -454,14 +402,62 @@ body.home .trust { padding-bottom: 58px; }
 /* (o comparativo improviso × método foi fundido nos pain-cards da
    banda "Se identifica?" — o CSS da seção extinta saiu junto) */
 
+/* ---------- Índice editorial de serviços (PALCO LIMPO) ----------
+   Número + nome grande + uma linha: a régua separa, o vazio organiza.
+   Substituiu a grade de 8 cards com cubo repetido. */
+.svc-lista { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.svc-lista li { border-bottom: 1px solid var(--line); }
+.svc-lista a {
+  display: grid;
+  grid-template-columns: 58px minmax(180px, 250px) 1fr auto;
+  align-items: baseline;
+  gap: 6px 22px;
+  padding: 22px 6px;
+  color: inherit;
+  text-decoration: none;
+  transition: background 0.2s ease, padding-left 0.25s var(--ease-zyva, ease);
+}
+.svc-lista i {
+  font-style: normal;
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 1.02rem;
+  color: var(--violet);
+  font-variant-numeric: tabular-nums;
+}
+.svc-lista b {
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: clamp(1.25rem, 2.2vw, 1.6rem);
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.svc-lista span { color: var(--muted); font-size: 0.97rem; }
+.svc-seta {
+  font-style: normal;
+  color: var(--violet);
+  font-weight: 600;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.2s ease, transform 0.25s ease;
+}
+.svc-lista a:hover, .svc-lista a:focus-visible { background: rgba(108, 76, 241, 0.05); padding-left: 14px; }
+.svc-lista a:hover .svc-seta, .svc-lista a:focus-visible .svc-seta { opacity: 1; transform: none; }
+.svc-lista a:focus-visible { outline: 3px solid rgba(34, 211, 238, 0.6); outline-offset: 2px; }
+@media (max-width: 900px) {
+  .svc-lista a { grid-template-columns: 44px 1fr auto; row-gap: 4px; }
+  .svc-lista span { grid-column: 2 / -1; }
+}
+/* Toque não tem hover: a seta fica sempre visível onde não há ponteiro fino. */
+@media (hover: none) {
+  .svc-seta { opacity: 1; transform: none; }
+}
+
 /* ---------- Painel do diagnóstico (escuro dentro da folha clara) ---------- */
 .diag {
-  /* painel-sobre-a-folha usa --night-2 e UMA aurora: material
-     distinto do palco full-bleed (--night, duas auroras) — o olho
-     lê três camadas: noite, objeto escuro, folha clara */
-  background:
-    radial-gradient(640px 300px at 88% -20%, rgba(108,76,241,0.38), transparent 62%),
-    var(--night-2);
+  /* painel-sobre-a-folha em --night-2 chapado: material distinto do
+     palco full-bleed sem precisar de aurora (PALCO LIMPO). */
+  background: var(--night-2);
   border-radius: 30px;
   color: #fff;
   padding: clamp(40px, 5vw, 62px);
@@ -558,7 +554,6 @@ body.home .trust { padding-bottom: 58px; }
 .case-cover svg { width: 100%; height: 100%; display: block; }
 
 /* ---------- Sobre ---------- */
-.values-grid .card h3 { display: flex; gap: 10px; align-items: center; }
 .about-name {
   background: var(--white);
   border-left: 4px solid var(--violet);
@@ -673,9 +668,7 @@ body.home .trust { padding-bottom: 58px; }
 
 /* ---------- CTA final ---------- */
 .cta-final {
-  background:
-    radial-gradient(700px 300px at 50% -40%, rgba(108,76,241,0.5), transparent 65%),
-    var(--night);
+  background: var(--night);
   color: #fff;
   text-align: center;
   padding: 96px 0 100px;
@@ -853,18 +846,19 @@ html.js-on .reveal.visible, .reveal.visible { opacity: 1; transform: none; }
   html { scroll-behavior: auto; }
 }
 
-/* ---------- Proporções de notebook ---------- */
+/* ---------- Proporções de notebook (telas baixas) ----------
+   Comprime menos que antes: o Palco Limpo pede que a escala nova
+   sobreviva também no laptop — só o exagero é aparado. */
 @media (min-width: 1000px) and (max-height: 880px) {
-  .section { padding: 60px 0; }
+  .section { padding: clamp(72px, 11vh, 104px) 0; }
   .hero { padding: 46px 0 42px; }
   .hero p.lead { font-size: 1.06rem; margin: 16px 0 26px; }
   .hero-points { margin-top: 22px; }
   .hero-visual { min-height: 315px; }
-  h1 { font-size: clamp(2rem, 3.9vw, 2.8rem); }
-  h2 { font-size: clamp(1.45rem, 2.6vw, 1.9rem); }
+  h1 { font-size: clamp(2.4rem, 4.8vw, 3.6rem); }
+  h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); }
   .section-head { margin-bottom: 30px; }
   .band { padding: 92px 0 72px; }
-  .band-gap { height: 48px; }
   .stats { margin-top: 52px; padding-top: 36px; }
   .cta-final { padding: 84px 0 88px; }
   body.home .cta-final { padding-top: 100px; }
@@ -883,14 +877,13 @@ html.js-on .reveal.visible, .reveal.visible { opacity: 1; transform: none; }
      promessa e dos botões — quem já decidiu não precisa responder
      nada, quem está pesquisando começa aqui. */
   .hero-visual { display: block; min-height: 0; margin-top: 30px; }
-  .timeline::before { display: none; }
-  .tl-step .num { box-shadow: none; }
   .stats { grid-template-columns: repeat(2, 1fr); gap: 28px 18px; }
   .diag-list { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 640px) {
-  .section { padding: 58px 0; }
+  /* Palco Limpo: o celular também respira — 58px colava as cenas. */
+  .section { padding: 76px 0; }
   .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
   .hero { padding: 64px 0 60px; }
   .band { padding: 84px 0 64px; }
@@ -1297,7 +1290,16 @@ html.js-on .reveal.visible, .reveal.visible { opacity: 1; transform: none; }
   font-size: 1.06rem;
   white-space: nowrap;
 }
-.calc-linha.calc-destaque b { color: var(--cyan); font-size: 1.35rem; }
+/* O clímax da calculadora vira momento de display: o retorno em
+   ciano GIGANTE — o número é o espetáculo (gesto do Palco Limpo). */
+.calc-linha.calc-destaque { flex-direction: column; align-items: flex-start; gap: 2px; padding-top: 16px; }
+.calc-linha.calc-destaque b {
+  color: var(--cyan);
+  font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  white-space: normal;
+}
 .calc-nota { font-size: 0.8rem; color: rgba(255,255,255,0.62); margin-top: 14px; line-height: 1.5; }
 .calc-cta { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
 .calc-cta .btn { justify-content: center; }
@@ -1310,32 +1312,22 @@ html.js-on .reveal.visible, .reveal.visible { opacity: 1; transform: none; }
 }
 
 /* ============================================================
-   FASE 3 — ÍCONES ISOMÉTRICOS
-   Cada frente é um bloco da máquina Zyva: mesmo bloco, mesma
-   câmera, mesma luz — e um símbolo próprio em ciano por cima.
-   Micro-inclinação no hover/toque (com equivalente de teclado).
+   ÍCONES ISOMÉTRICOS — hoje só nos títulos de /servicos/ (o cubo
+   repetido nos cards da home saiu no Palco Limpo: lá o glifo era
+   ilegível a 23px e virava textura).
    ============================================================ */
-.icon { perspective: 320px; }
-.icon .iso {
-  width: 34px;
-  height: 34px;
+.iso {
   transition: transform .3s var(--ease-zyva);
   will-change: transform;
 }
-.card:hover .iso,
-.pain-card:hover .iso,
-.card:focus-within .iso,
-.service-block h2:hover .iso {
-  transform: rotateX(10deg) rotateY(-12deg) scale(1.08);
-}
-.card:active .iso, .pain-card:active .iso { transform: rotateX(10deg) rotateY(-12deg) scale(1.02); }
-/* Nos títulos de /servicos/: anula o stroke violeta e o tamanho 30px
-   da regra antiga (.service-block h2 svg) — o bloco isométrico traz
-   as próprias cores por atributo. */
+.service-block h2:hover .iso { transform: rotateX(10deg) rotateY(-12deg) scale(1.08); }
+/* Anula o stroke violeta e o tamanho 30px da regra antiga
+   (.service-block h2 svg) — o bloco isométrico traz as próprias
+   cores por atributo. */
 .service-block h2 .iso { width: 36px; height: 36px; stroke: none; }
 @media (prefers-reduced-motion: reduce) {
-  .icon .iso { transition: none; }
-  .card:hover .iso, .pain-card:hover .iso { transform: none; }
+  .iso { transition: none; }
+  .service-block h2:hover .iso { transform: none; }
 }
 
 /* ============================================================
@@ -1615,7 +1607,10 @@ html.js-on .sem-js { display: none; }
    ganho — a regra saiu. Não reintroduzir sem resolver a âncora. */
 
 /* ================================================================
-   RODADA DE POLIMENTO (auditoria de design)
+   POLIMENTO DE CASCATA — regras que PRECISAM vir por último
+   (feedback de toque vence o hover magnético, estados do notebook
+   vencem a base, View Transitions e ajustes finos por mídia).
+   Não dissolver nas regras de cima: a ordem aqui é proposital.
    ================================================================ */
 
 /* Feedback de TOQUE: no celular não existe hover — apertar o botão
@@ -1742,13 +1737,8 @@ h1, h2, .section-head p { text-wrap: balance; }
    marca até aí */
 ::selection { background: rgba(108, 76, 241, 0.9); color: #fff; }
 
-/* O clímax da calculadora com tratamento de display: o número que
-   gera o lead maior e em ciano, linguagem do relatório do notebook */
-.calc-destaque b {
-  font-size: clamp(1.5rem, 2.4vw, 1.9rem);
-  line-height: 1.1;
-  color: var(--cyan);
-}
+/* (o clímax da calculadora agora é display GIGANTE — a regra vive
+   junto do componente .calc-linha.calc-destaque, lá em cima) */
 
 /* Tablet: em grades de 3, o último card órfão atravessa a linha em
    vez de sobrar ao lado de um buraco */
@@ -1917,5 +1907,5 @@ html, body { overflow-x: clip; }
   .calc { padding: 28px 18px; border-radius: 22px; }
   .calc-saida { padding: 18px 16px; }
   .calc-campo label { flex-wrap: wrap; gap: 4px 10px; }
-  .calc-destaque b { font-size: 1.45rem; }
+  .calc-destaque b { font-size: clamp(2rem, 9vw, 2.6rem); }
 }
