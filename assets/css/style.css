@@ -407,32 +407,38 @@ body.home .trust { padding-bottom: 58px; }
    Substituiu a grade de 8 cards com cubo repetido. */
 .svc-lista { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
 .svc-lista li { border-bottom: 1px solid var(--line); }
+/* REPAGINAÇÃO: índice em tipografia de DISPLAY — cada frente é uma
+   manchete, não uma linha de tabela. */
 .svc-lista a {
   display: grid;
-  grid-template-columns: 58px minmax(180px, 250px) 1fr auto;
-  align-items: baseline;
-  gap: 6px 22px;
-  padding: 22px 6px;
+  grid-template-columns: 84px 1fr auto;
+  align-items: center;
+  gap: 2px 28px;
+  padding: 28px 10px;
   color: inherit;
   text-decoration: none;
   transition: background 0.2s ease, padding-left 0.25s var(--ease-zyva, ease);
 }
 .svc-lista i {
+  grid-row: span 2;
   font-style: normal;
   font-family: var(--font-head);
   font-weight: 700;
-  font-size: 1.02rem;
+  font-size: clamp(1.25rem, 2vw, 1.7rem);
   color: var(--violet);
   font-variant-numeric: tabular-nums;
 }
 .svc-lista b {
+  grid-column: 2;
   font-family: var(--font-head);
-  font-weight: 600;
-  font-size: clamp(1.25rem, 2.2vw, 1.6rem);
-  letter-spacing: -0.01em;
+  font-weight: 700;
+  font-size: clamp(1.7rem, 3.4vw, 2.7rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
   color: var(--ink);
 }
-.svc-lista span { color: var(--muted); font-size: 0.97rem; }
+.svc-lista span { grid-column: 2; color: var(--muted); font-size: 1rem; }
+.svc-lista .svc-seta { grid-row: span 2; font-size: 1.5rem; }
 .svc-seta {
   font-style: normal;
   color: var(--violet);
@@ -443,9 +449,30 @@ body.home .trust { padding-bottom: 58px; }
 }
 .svc-lista a:hover, .svc-lista a:focus-visible { background: rgba(108, 76, 241, 0.05); padding-left: 14px; }
 .svc-lista a:hover .svc-seta, .svc-lista a:focus-visible .svc-seta { opacity: 1; transform: none; }
+/* microfísica do índice: o número acende e cresce, o nome desliza —
+   o item responde como objeto, não como linha de tabela */
+.svc-lista i, .svc-lista b { transition: transform 0.28s var(--ease-out-expo, ease), color 0.2s ease; }
+.svc-lista a:hover i, .svc-lista a:focus-visible i { transform: scale(1.22); color: var(--violet-deep, #5B3BE0); }
+.svc-lista a:hover b, .svc-lista a:focus-visible b { transform: translateX(5px); }
+.svc-lista li { position: relative; }
+.svc-lista li::before {
+  content: "";
+  position: absolute;
+  left: -2px; top: 18%; bottom: 18%;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--violet);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.3s var(--ease-out-expo, ease);
+}
+.svc-lista li:hover::before, .svc-lista li:focus-within::before { transform: scaleY(1); }
+@media (prefers-reduced-motion: reduce) {
+  .svc-lista i, .svc-lista b, .svc-lista li::before { transition: none; }
+}
 .svc-lista a:focus-visible { outline: 3px solid rgba(34, 211, 238, 0.6); outline-offset: 2px; }
 @media (max-width: 900px) {
-  .svc-lista a { grid-template-columns: 44px 1fr auto; row-gap: 4px; }
+  .svc-lista a { grid-template-columns: 52px 1fr auto; row-gap: 4px; padding: 22px 6px; }
   .svc-lista span { grid-column: 2 / -1; }
 }
 /* Toque não tem hover: a seta fica sempre visível onde não há ponteiro fino. */
@@ -1607,6 +1634,26 @@ html.js-on .sem-js { display: none; }
    ganho — a regra saiu. Não reintroduzir sem resolver a âncora. */
 
 /* ================================================================
+   NB3D — o notebook real em WebGL (progressive enhancement)
+   O canvas assume o palco quando o aparelho aguenta; o rig CSS
+   continua no DOM como fallback e como estado de carregamento.
+   ================================================================ */
+.nb3d-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 3;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.nb-scene.nb3d-on .nb3d-canvas { opacity: 1; }
+/* o rig CSS sai de cena SEM sair do DOM (volta na hora se o 3D cair) */
+.nb-scene.nb3d-on .nb-laptop,
+.nb-scene.nb3d-on .nb-shadow { visibility: hidden; }
+
+/* ================================================================
    POLIMENTO DE CASCATA — regras que PRECISAM vir por último
    (feedback de toque vence o hover magnético, estados do notebook
    vencem a base, View Transitions e ajustes finos por mídia).
@@ -1765,6 +1812,7 @@ h1, h2, .section-head p { text-wrap: balance; }
    teclado e leitor de tela. Sem case inventado: é meta rotulada.
    ================================================================ */
 .cmp { max-width: 860px; margin-inline: auto; }
+#cmp-titulo { font-size: clamp(2rem, 4.4vw, 3rem); }
 .cmp-tabs { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
 .cmp-tab {
   font-family: var(--font-head);
@@ -1909,3 +1957,117 @@ html, body { overflow-x: clip; }
   .calc-campo label { flex-wrap: wrap; gap: 4px 10px; }
   .calc-destaque b { font-size: clamp(2rem, 9vw, 2.6rem); }
 }
+/* ================================================================
+   REPAGINAÇÃO — A PILHA DE DORES (cartões-cena que empilham)
+   Cada dor toma o palco e a seguinte desliza por cima: o scroll
+   vira narrativa física. position: sticky puro — funciona em tudo.
+   ================================================================ */
+.pilha { display: block; }
+.pilha .pain-card {
+  position: sticky;
+  top: calc(96px + var(--i, 0) * 18px);
+  min-height: 42vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #12162a; /* sólido: um cartão COBRE o anterior */
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 26px;
+  padding: 44px 48px;
+  margin-bottom: 28px;
+  overflow: hidden;
+  box-shadow: 0 -18px 44px rgba(4, 6, 14, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+.pilha .pain-card:nth-child(1) { --i: 0; }
+.pilha .pain-card:nth-child(2) { --i: 1; }
+.pilha .pain-card:nth-child(3) { --i: 2; }
+.pilha .pain-card:nth-child(4) { --i: 3; }
+.pc-num {
+  position: absolute;
+  right: 26px;
+  top: 2px;
+  font-style: normal;
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: clamp(5rem, 10vw, 8rem);
+  line-height: 1.1;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(245, 158, 11, 0.2); /* âmbar: a cor da dor */
+  pointer-events: none;
+}
+.pilha .pain-card h3 { font-size: clamp(1.5rem, 3vw, 2.2rem); max-width: 72%; margin-bottom: 12px; }
+.pilha .pain-card > p { font-size: 1.05rem; max-width: 60ch; }
+.pilha .pain-cura { font-size: 1rem; max-width: 60ch; }
+
+/* cenas em ESCALA de cena: títulos de display e tela cheia */
+.band .section-head h2 { font-size: clamp(2.2rem, 5.5vw, 3.4rem); }
+.calc h2 { font-size: clamp(2rem, 4.2vw, 3rem); max-width: 15ch; }
+#calculadora { display: grid; align-items: center; min-height: 92svh; }
+
+@media (max-width: 640px) {
+  .pilha .pain-card { padding: 30px 22px; min-height: 40vh; top: calc(80px + var(--i, 0) * 12px); border-radius: 20px; }
+  .pc-num { font-size: 4.4rem; right: 16px; }
+  .pilha .pain-card h3 { max-width: 100%; }
+}
+
+/* ================================================================
+   REPAGINAÇÃO, ATO II — a segunda metade da home vira cena
+   ================================================================ */
+
+/* Hero com atmosfera viva: uma respiração de 26s no compositor.
+   Vida ambiente na primeira dobra, sem tocar no funil. */
+.hero { overflow: hidden; }
+.hero .container { position: relative; z-index: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: -22%;
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(680px 440px at 76% 28%, rgba(108, 76, 241, 0.13), transparent 62%);
+    animation: aurora-respira 26s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+  @keyframes aurora-respira {
+    from { transform: translate3d(-2.5%, -2%, 0) scale(1); }
+    to { transform: translate3d(2.5%, 3%, 0) scale(1.07); }
+  }
+}
+
+/* Diagnóstico em escala de cena */
+.diag h2 { font-size: clamp(2rem, 4vw, 2.8rem); max-width: 15ch; }
+
+/* A foto do Weba ganha o visor de câmera da página /weba/ —
+   a mesma assinatura atravessando o site */
+.qa-foto { position: relative; }
+.qa-foto img { display: block; width: 100%; height: auto; border-radius: 18px; }
+.qa-foto::before, .qa-foto::after {
+  content: "";
+  position: absolute;
+  width: 36px; height: 36px;
+  border: 2px solid rgba(34, 211, 238, 0.55);
+  pointer-events: none;
+}
+.qa-foto::before { top: -9px; left: -9px; border-right: 0; border-bottom: 0; border-radius: 10px 0 0 0; }
+.qa-foto::after { bottom: -9px; right: -9px; border-left: 0; border-top: 0; border-radius: 0 0 10px 0; }
+
+/* Blog vivo: mosaico assimétrico — a manchete manda, nada de três
+   cards iguais */
+.blog-vivo { display: grid; grid-template-columns: 1.35fr 1fr; gap: 22px; }
+.blog-vivo .post-card:first-child {
+  grid-row: span 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 36px;
+}
+.blog-vivo .post-card:first-child h3 { font-size: clamp(1.5rem, 2.4vw, 2.05rem); line-height: 1.2; }
+@media (max-width: 900px) {
+  .blog-vivo { grid-template-columns: 1fr; }
+  .blog-vivo .post-card:first-child { grid-row: auto; padding: 26px; }
+}
+
+/* O resumo da ópera fecha como manifesto */
+.opera h2 { font-size: clamp(2rem, 4.6vw, 3.1rem); }
+.opera p { font-size: 1.13rem; line-height: 1.75; max-width: 58ch; }

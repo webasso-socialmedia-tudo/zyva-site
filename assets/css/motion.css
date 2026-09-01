@@ -1142,3 +1142,134 @@ html.diag-na-tela .zyva-toasts {
   pointer-events: none;
   transition: opacity 0.3s ease, transform 0.35s var(--ease-out-expo);
 }
+
+/* ============================================================
+   17. CAMADA DE EXPERIÊNCIA (Palco Limpo, ato II)
+   Pesquisa: grain ESTÁTICO tileado + vinheta em paint único +
+   wipes por clip-path no compositor + palavra-fantasma como
+   tipografia cenográfica. Nada aqui roda por frame no main
+   thread; tudo é paint único ou scroll-driven no compositor.
+   ============================================================ */
+
+/* --- Grão de filme: textura minúscula, gerada UMA vez e tileada.
+       Sobre o tema escuro dá matéria; nas folhas claras o overlay
+       quase desaparece (comportamento desejado). --- */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0.065;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+@media (prefers-reduced-motion: reduce) { body::after { opacity: 0.035; } }
+
+/* --- Vinheta cinematográfica nos palcos que perderam a aurora:
+       escuridão nas bordas (paint único na pilha de background). --- */
+.band {
+  background:
+    radial-gradient(130% 100% at 50% 38%, transparent 52%, rgba(0, 0, 0, 0.4) 100%),
+    var(--night) !important;
+}
+.cta-final {
+  background:
+    radial-gradient(130% 110% at 50% 30%, transparent 55%, rgba(0, 0, 0, 0.38) 100%),
+    var(--night) !important;
+}
+
+/* --- Palavra-fantasma: tipografia como cenografia (o mesmo gesto
+       do ZYVA gigante do rodapé, racionado a DUAS seções). --- */
+.eco {
+  position: absolute;
+  z-index: 0;
+  right: -0.08em;
+  top: 8px;
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: clamp(6rem, 18vw, 13rem);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1.4px rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+  user-select: none;
+}
+.band { overflow: hidden; }
+.eco-claro { -webkit-text-stroke: 1.4px rgba(31, 36, 68, 0.11); right: auto; left: -0.06em; top: -18px; }
+.svc-lista { position: relative; z-index: 1; }
+.sheet .section .container { position: relative; }
+@media (max-width: 900px) { .eco { display: none; } }
+
+/* deriva lenta da palavra-fantasma amarrada ao scroll (compositor) */
+@supports (animation-timeline: view()) {
+  .eco {
+    animation: eco-deriva linear both;
+    animation-timeline: view();
+    animation-range: entry 0% exit 100%;
+  }
+  @keyframes eco-deriva {
+    from { transform: translateX(6%); }
+    to { transform: translateX(-4%); }
+  }
+}
+
+/* --- A virada de página: a folha clara entra num wipe de
+       clip-path (compositor), só onde há suporte a SDA. --- */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .sheet-pull {
+      animation: folha-vira linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 42%;
+    }
+    @keyframes folha-vira {
+      from { clip-path: inset(0 0 96% 0 round var(--radius-sheet)); }
+      to { clip-path: inset(0 0 0 0 round var(--radius-sheet)); }
+    }
+  }
+}
+
+/* --- Acabamento de vidro nos painéis escuros: aresta superior
+       com luz especular + borda que se dissolve para baixo.
+       Estático, custo zero por frame. --- */
+.pain-card,
+.calc-saida,
+.diag {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+.stat b { text-shadow: 0 0 26px rgba(34, 211, 238, 0.18); }
+
+/* --- Profundidade de saída do herói: ao rolar para o notebook, a
+       primeira dobra recua como plano de fundo de câmera (SDA no
+       compositor; sem suporte, nada acontece — e nada falta). --- */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .hero .hero-grid {
+      animation: hero-recua linear both;
+      animation-timeline: view();
+      animation-range: exit 0% exit 100%;
+    }
+    @keyframes hero-recua {
+      to { transform: translateY(-44px) scale(0.985); opacity: 0.55; }
+    }
+  }
+}
+
+/* --- Capítulos: cada página interna abre com a palavra-fantasma
+       do seu tema no hero — a MESMA assinatura cenográfica da home,
+       aplicada consistentemente ao site inteiro. --- */
+.page-hero { position: relative; overflow: hidden; }
+.page-hero .container { position: relative; z-index: 1; }
+.eco-hero {
+  right: -0.06em;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: clamp(4.6rem, 13vw, 9.5rem);
+  -webkit-text-stroke: 1.4px rgba(255, 255, 255, 0.09);
+}
+@supports (animation-timeline: view()) {
+  .eco-hero { animation-range: exit 0% exit 100%; }
+}

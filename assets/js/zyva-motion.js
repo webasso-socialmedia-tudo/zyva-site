@@ -1272,6 +1272,12 @@
     const MARCOS = [0, 0.52, 0.68, 0.84];
     const outCubic = (t) => 1 - Math.pow(1 - t, 3);
 
+    /* NB3D: quando o aparelho aguenta, o notebook vira OBJETO REAL
+       em WebGL (nb3d.js + three vendorizado), alimentado por ESTA
+       mesma medição. O rig CSS fica por baixo como fallback: se o
+       import falhar, nada muda para o visitante. */
+    let nb3d = null;
+
     const mede = () => {
       const vh = window.innerHeight || 1;
       const r = cena.getBoundingClientRect();
@@ -1282,13 +1288,15 @@
       const desce = outCubic(clamp((p - 0.36) / 0.56, 0, 1)); /* câmera desce por último  */
       const cam = -90 + desce * 72;
       const open = -90 + abre * 100;
+      const wake = clamp((cam + open + 70) / 50, 0, 1);
       laptop.style.setProperty("--nb-cam", cam.toFixed(2) + "deg");
       laptop.style.setProperty("--nb-open", open.toFixed(2) + "deg");
-      laptop.style.setProperty("--nb-wake", clamp((cam + open + 70) / 50, 0, 1).toFixed(3));
+      laptop.style.setProperty("--nb-wake", wake.toFixed(3));
       let ativo = 0;
       for (let i = MARCOS.length - 1; i >= 0; i--) { if (p >= MARCOS[i]) { ativo = i; break; } }
       passos.forEach((el, i) => el.classList.toggle("on", i === ativo));
       laptop.dataset.passo = String(ativo);
+      if (nb3d) nb3d.progresso({ cam, open, wake, passo: ativo });
     };
     let ticking = false;
     const onScroll = () => {
@@ -1299,6 +1307,82 @@
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
     mede();
+
+    /* carrega o 3D só quando: WebGL2 existe + a cena se aproxima.
+       (REDUCED já saiu lá em cima — quem pediu menos movimento fica
+       com o relatório estático do fallback.) */
+    const aguenta = (() => {
+      try {
+        const c = document.createElement("canvas");
+        return !!(window.WebGL2RenderingContext && c.getContext("webgl2"));
+      } catch (e) { return false; }
+    })();
+    const stage = cena.querySelector(".nb-stage");
+    if (aguenta && stage && "IntersectionObserver" in window) {
+      let carregou = false;
+      const carrega = () => {
+        if (carregou) return;
+        carregou = true;
+        import("/assets/js/nb3d.js?v=2d690bc5").then((mod) => {
+          nb3d = mod.montar(stage);
+          cena.classList.add("nb3d-on");
+          mede();
+          /* fora da tela, o loop do 3D dorme por completo */
+          const ioVis = new IntersectionObserver((es) => {
+            es.forEach((e) => nb3d && nb3d.visivel(e.isIntersecting));
+          }, { rootMargin: "160px" });
+          ioVis.observe(cena);
+        }).catch((e) => { window.__NB3D_ERRO = (e && e.stack || String(e)); cena.classList.remove("nb3d-on"); nb3d = null; });
+      };
+      const ioCarga = new IntersectionObserver((ents) => {
+        if (!ents.some((e) => e.isIntersecting)) return;
+        ioCarga.disconnect();
+        /* aba oculta: a GPU pode estar suspensa — montar WebGL agora
+           pode travar a página. Espera a aba ficar visível. */
+        if (document.hidden) {
+          document.addEventListener("visibilitychange", function espera() {
+            if (!document.hidden) {
+              document.removeEventListener("visibilitychange", espera);
+              carrega();
+            }
+          });
+          return;
+        }
+        carrega();
+      }, { rootMargin: "180% 0px" });
+      ioCarga.observe(cena);
+    }
+  });
+
+  /* ==========================================================
+     TILT DO QUIZ — o cartão do herói tem massa física: inclina
+     para o ponteiro com amortecimento (só pointer fine; celular
+     e reduced-motion ficam de fora). Primeira impressão viva.
+     ========================================================== */
+  safe("tilt-quiz", () => {
+    if (REDUCED || !matchMedia("(pointer: fine)").matches) return;
+    const card = document.querySelector(".dquiz");
+    if (!card) return;
+    let rx = 0, ry = 0, ax = 0, ay = 0, raf = 0;
+    const passo = () => {
+      raf = 0;
+      ax += (rx - ax) * 0.14;
+      ay += (ry - ay) * 0.14;
+      card.style.transform =
+        "perspective(950px) rotateX(" + ax.toFixed(2) + "deg) rotateY(" + ay.toFixed(2) + "deg)";
+      if (Math.abs(ax - rx) > 0.02 || Math.abs(ay - ry) > 0.02) raf = requestAnimationFrame(passo);
+    };
+    const anda = (e) => {
+      const r = card.getBoundingClientRect();
+      ry = ((e.clientX - r.left) / r.width - 0.5) * 6.5;
+      rx = -((e.clientY - r.top) / r.height - 0.5) * 5.5;
+      if (!raf) raf = requestAnimationFrame(passo);
+    };
+    card.addEventListener("pointermove", anda);
+    card.addEventListener("pointerleave", () => {
+      rx = 0; ry = 0;
+      if (!raf) raf = requestAnimationFrame(passo);
+    });
   });
 
   /* ==========================================================
